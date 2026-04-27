@@ -125,7 +125,7 @@ export default function AdminView() {
         <header className="sticky top-0 z-50 p-4 pt-12 md:p-6 md:pt-16 flex justify-between items-center bg-[#050505] border-b border-white/5">
             <button 
                 onClick={() => setIsOpen(true)}
-                className="w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass-panel rounded-xl border-white/10"
+                className="w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass-panel rounded-xl border-white/10 lg:hidden"
             >
                 <div className="w-6 h-0.5 bg-white rounded-full" />
                 <div className="w-6 h-0.5 bg-orange-500 rounded-full" />
@@ -143,15 +143,18 @@ export default function AdminView() {
                 </div>
             </div>
 
-            <div className="relative">
+            <div className="relative ml-auto">
                 <motion.button
                     onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs) markNotificationsRead(); }}
-                    className="w-12 h-12 md:w-14 md:h-14 glass-panel rounded-2xl flex items-center justify-center text-2xl relative border-orange-500/20"
-                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    className="w-12 h-12 glass-panel rounded-2xl flex items-center justify-center text-xl relative border-white/10"
+                    animate={unreadCount > 0 ? {
+                        rotate: [0, -10, 10, -10, 10, 0],
+                        transition: { repeat: Infinity, duration: 0.5, repeatDelay: 2 }
+                    } : {}}
                 >
                     🔔
                     {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center text-[9px] font-black border-2 border-[#050505]">
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center text-[9px] font-black border-2 border-[#050505] shadow-[0_0_10px_var(--orange-glow)]">
                             {unreadCount}
                         </span>
                     )}
@@ -159,25 +162,32 @@ export default function AdminView() {
 
                 <AnimatePresence>
                     {showNotifs && (
-                        <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                            className="absolute top-16 right-0 w-[280px] md:w-[450px] bg-[#0c0c0c] rounded-[2rem] p-6 z-[300] border border-orange-500/40 shadow-[0_40px_80px_rgba(0,0,0,1)]"
-                        >
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-6">Notificações</h4>
-                            <div className="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar">
-                                {adminNotifs.length === 0 ? (
-                                    <p className="text-center py-10 text-neutral-600 text-xs italic">Sem alertas.</p>
-                                ) : (
-                                    adminNotifs.map(n => (
-                                        <div key={n.id} className={`p-5 rounded-2xl border ${n.type === 'reward' ? 'bg-orange-600/20 border-orange-500/40' : 'bg-white/5 border-white/10'}`}>
-                                            <p className="text-sm font-bold text-white leading-relaxed">{n.message}</p>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </motion.div>
+                        <>
+                            <motion.div 
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                onClick={() => setShowNotifs(false)}
+                                className="fixed inset-0 z-[290] bg-black/20 backdrop-blur-[2px]"
+                            />
+                            <motion.div 
+                                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                className="absolute top-16 right-0 w-[280px] md:w-[450px] bg-[#0c0c0c] rounded-[2rem] p-6 z-[300] border border-orange-500/40 shadow-[0_40px_80px_rgba(0,0,0,1)]"
+                            >
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-6">Notificações</h4>
+                                <div className="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar">
+                                    {adminNotifs.length === 0 ? (
+                                        <p className="text-center py-10 text-neutral-600 text-xs italic">Sem alertas.</p>
+                                    ) : (
+                                        adminNotifs.map(n => (
+                                            <div key={n.id} className={`p-5 rounded-2xl border ${n.type === 'reward' ? 'bg-orange-600/20 border-orange-500/40' : 'bg-white/5 border-white/10'}`}>
+                                                <p className="text-sm font-bold text-white leading-relaxed">{n.message}</p>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </motion.div>
+                        </>
                     )}
                 </AnimatePresence>
             </div>
