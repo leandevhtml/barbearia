@@ -8,6 +8,7 @@ import BookingForm from './BookingForm';
 import LoyaltyCard from './LoyaltyCard';
 import AppointmentStatus from './AppointmentStatus';
 import QuickInfo from './QuickInfo';
+import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
 
 const TABS = [
   { id: 'book',   icon: '📅', label: 'Agendar' },
@@ -18,9 +19,17 @@ const TABS = [
 type TabId = typeof TABS[number]['id'];
 
 export default function ClientView() {
-  const { toggleAdminMode, currentUser, logout, notifications, markNotificationsRead, activeTab, setActiveTab, syncUser } = useBarbershopStore();
+  const { toggleAdminMode, currentUser, logout, notifications, markNotificationsRead, activeTab, setActiveTab, syncUser, settings } = useBarbershopStore();
   const [showNotifs, setShowNotifs] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
+
+  // Show announcement on initial mount if enabled
+  useEffect(() => {
+    if (settings?.announcementEnabled) {
+      setShowAnnouncement(true);
+    }
+  }, [settings?.announcementEnabled]);
 
   // Sync data periodically when view is active
   useEffect(() => {
@@ -121,6 +130,16 @@ export default function ClientView() {
                     <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-2xl text-neutral-500">✕</button>
                 </motion.aside>
             </>
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {showAnnouncement && settings && (
+          <AnnouncementPopup 
+            text={settings.announcementText}
+            image={settings.announcementImage}
+            onClose={() => setShowAnnouncement(false)}
+          />
         )}
       </AnimatePresence>
 
