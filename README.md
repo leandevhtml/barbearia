@@ -1,4 +1,4 @@
-# 💈 Barbearia - Gestão de Barbearia Premium
+# 💈 Elite Club - Gestão de Barbearia Premium
 
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)
@@ -6,7 +6,7 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4.0-38bdf8?logo=tailwind-css)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?logo=mongodb)
 
-O **Gigantes do Corte** é uma plataforma completa de gestão para barbearias modernas, focada em oferecer uma experiência premium tanto para o cliente quanto para o administrador. O sistema combina agendamento inteligente, fidelização de clientes e controle administrativo rigoroso em uma interface elegante e responsiva.
+O **Elite Club** é uma plataforma completa de gestão para barbearias modernas, focada em oferecer uma experiência premium tanto para o cliente quanto para o administrador. O sistema combina agendamento inteligente, fidelização de clientes e controle administrativo rigoroso em uma interface elegante e responsiva.
 
 ---
 
