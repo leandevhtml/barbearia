@@ -91,4 +91,4 @@ Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
-<p align="center">Desenvolvido com ❤️ por <a href="https://github.com/leandevhtml">Leandro Silva</a></p>
+<p align="center">Desenvolvido por <a href="https://github.com/leandevhtml">Leandro Silva</a></p>
