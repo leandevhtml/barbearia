@@ -1,4 +1,4 @@
-# 💈 Gigantes do Corte - Gestão de Barbearia Premium
+# 💈 Barbearia - Gestão de Barbearia Premium
 
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)
