@@ -53,10 +53,10 @@ export default function AppointmentStatus() {
 
   if (!list.length)
     return (
-      <div className="card-luxury p-16 md:p-24 text-center max-w-2xl mx-auto border-dashed opacity-40">
-        <div className="text-7xl md:text-9xl mb-10">📅</div>
-        <h3 className="text-4xl md:text-5xl text-bebas font-black text-white italic uppercase tracking-tight">SEM AGENDA</h3>
-        <p className="text-neutral-500 font-bold text-lg mt-4 max-w-sm mx-auto">
+      <div className="card-luxury p-10 md:p-16 text-center max-w-2xl mx-auto border-dashed opacity-40">
+        <div className="text-6xl md:text-9xl mb-6">📅</div>
+        <h3 className="text-3xl md:text-5xl text-bebas font-black text-white italic uppercase tracking-tight">SEM AGENDA</h3>
+        <p className="text-neutral-500 font-bold text-sm mt-4 max-w-sm mx-auto">
             Sua jornada de estilo começará assim que você realizar o primeiro agendamento.
         </p>
       </div>
@@ -86,39 +86,39 @@ export default function AppointmentStatus() {
                 </div>
             )}
 
-            <div className="p-8 md:p-12">
+            <div className="p-5 md:p-10">
                 {/* Status Section */}
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-2xl border border-white/15 bg-neutral-900" 
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-2xl border border-white/15 bg-neutral-900" 
                              style={{ color: cfg.color }}>
                             {cfg.icon}
                         </div>
                         <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.5em] mb-1 drop-shadow-sm" style={{ color: cfg.color }}>{cfg.label}</p>
-                            <p className="text-4xl md:text-5xl text-bebas font-black text-white italic leading-none drop-shadow-md">{timeFormatted}</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-0.5 drop-shadow-sm" style={{ color: cfg.color }}>{cfg.label}</p>
+                            <p className="text-3xl md:text-5xl text-bebas font-black text-white italic leading-none drop-shadow-md">{timeFormatted}</p>
                         </div>
                     </div>
-                    <div className="text-left md:text-right">
+                    <div className="text-left sm:text-right">
                         <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">PROTOCOLO VIP</p>
-                        <p className="text-2xl text-bebas font-black text-orange-500 italic tracking-tighter">#GDC-{(appt._id || appt.id || '').toString().toUpperCase().slice(0,8)}</p>
+                        <p className="text-xl text-bebas font-black text-orange-500 italic tracking-tighter">#{(appt._id || appt.id || '').toString().toUpperCase().slice(0,8)}</p>
                     </div>
                 </div>
 
                 {/* Service Details */}
-                <div className="space-y-4 mb-12">
-                    <h4 className="text-5xl md:text-8xl text-bebas font-black text-white italic uppercase leading-none tracking-tight drop-shadow-xl">
+                <div className="space-y-2 mb-6">
+                    <h4 className="text-3xl md:text-5xl text-bebas font-black text-white italic uppercase leading-none tracking-tight drop-shadow-xl break-words">
                         {appt.serviceName}
                     </h4>
-                    <p className="text-base md:text-xl font-bold text-neutral-400 max-w-xl leading-relaxed">
+                    <p className="text-sm font-bold text-neutral-400 leading-relaxed">
                         {cfg.desc}
                     </p>
                 </div>
 
-                {/* Footer Info (Enhanced Contrast) */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between pt-10 border-t border-white/10 gap-8">
-                    <div className="flex items-center gap-5">
-                        <div className="w-18 h-18 rounded-2xl bg-neutral-900 border border-white/15 flex items-center justify-center text-bebas font-black text-orange-500 text-3xl shadow-2xl overflow-hidden">
+                {/* Footer Info */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-5 border-t border-white/10 gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-white/15 flex items-center justify-center text-bebas font-black text-orange-500 text-xl shadow-2xl overflow-hidden flex-shrink-0">
                             {appt.barberId?.avatar && appt.barberId.avatar.startsWith('http') ? (
                               <img src={appt.barberId.avatar} alt={appt.barberId.name} className="w-full h-full object-cover" />
                             ) : (
@@ -126,22 +126,18 @@ export default function AppointmentStatus() {
                             )}
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-1">Especialista Responsável</p>
-                            <p className="text-3xl text-bebas font-black text-white italic uppercase leading-none tracking-tight">{appt.barberId?.name || 'Não atribuído'}</p>
+                            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-0.5">Especialista</p>
+                            <p className="text-xl text-bebas font-black text-white italic uppercase leading-none tracking-tight">{appt.barberId?.name || 'Não atribuído'}</p>
                         </div>
                     </div>
-                    <div className="text-left md:text-right">
-                        <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-1">Valor do Serviço</p>
-                        <p className="text-5xl text-bebas font-black text-orange-500 italic leading-none drop-shadow-lg">
+                    <div className="text-left sm:text-right">
+                        <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-0.5">Valor</p>
+                        <p className="text-3xl text-bebas font-black text-orange-500 italic leading-none drop-shadow-lg">
                           {appt.price === 0 ? 'GRÁTIS' : `R$ ${appt.price?.toFixed(2)}`}
                         </p>
                     </div>
                 </div>
             </div>
-
-            {/* Decorative Ticket Cuts */}
-            <div className="absolute top-1/2 -left-5 w-10 h-10 bg-[#020202] rounded-full border border-white/10" />
-            <div className="absolute top-1/2 -right-5 w-10 h-10 bg-[#020202] rounded-full border border-white/10" />
           </motion.div>
         );
       })}

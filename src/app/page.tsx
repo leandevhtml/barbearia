@@ -87,22 +87,15 @@ export default function HomePage() {
         <AuthView />
       ) : (
         <>
-          {/* ── Premium Header (Client Only) - Removed top glow by hiding global header for admin ── */}
-          {!isAdminMode && currentUser?.role !== 'barber' && (
-            <header className="sticky top-0 z-[100] px-6 py-6 md:py-8 pointer-events-none">
-                {/* Global header hidden elements or just padding */}
-            </header>
-          )}
-
           {/* ── Main Stage ── */}
-          <section className={`flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-10 ${isAdminMode ? 'py-0' : 'py-0 md:py-4'}`}>
+          <section className="flex-1 w-full max-w-screen-2xl mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={isAdminMode ? 'admin' : currentUser?.role === 'barber' ? 'barber' : 'client'}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.4 }}
                 className="flex-1 flex flex-col"
               >
                 {isAdminMode ? <AdminView /> : currentUser?.role === 'barber' ? <BarberDashboard /> : <ClientView />}

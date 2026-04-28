@@ -37,7 +37,7 @@ export default function LoyaltyCard() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-12 w-full max-w-xl mx-auto px-2 pb-20">
+    <div className="flex flex-col items-center gap-8 w-full max-w-xl mx-auto px-1 pb-20">
 
       {/* ── Premium Membership Card ── */}
       <motion.div
@@ -71,15 +71,15 @@ export default function LoyaltyCard() {
 
           {/* Middle Section: Adaptive Stamps Progress */}
           <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-[90%]">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-3 max-w-[95%]">
                 {Array.from({ length: maxStamps }, (_, i) => {
                 const filled = i < stamps;
                 return (
                     <motion.div
                         key={i}
-                        className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center border transition-all duration-1000 ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center border transition-all duration-1000 ${
                             filled 
-                            ? 'bg-orange-600 border-orange-400 shadow-[0_0_20px_rgba(255,110,0,0.5)]' 
+                            ? 'bg-orange-600 border-orange-400 shadow-[0_0_15px_rgba(255,110,0,0.4)]' 
                             : 'bg-white/5 border-white/10'
                         }`}
                         initial={filled ? { scale: 0.8, opacity: 0 } : { opacity: 1 }}
@@ -88,7 +88,7 @@ export default function LoyaltyCard() {
                         {filled && (
                             <motion.span 
                                 initial={{ rotate: -45, scale: 0 }} animate={{ rotate: 0, scale: 1 }}
-                                className="text-white text-xl md:text-2xl"
+                                className="text-white text-base sm:text-xl"
                             >
                                 ✂️
                             </motion.span>
@@ -97,9 +97,9 @@ export default function LoyaltyCard() {
                 );
                 })}
             </div>
-            <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em] mt-8 opacity-50">
-                {stamps} de {maxStamps} Concluídos
-            </p>
+              <p className="text-[9px] font-black text-orange-500 uppercase tracking-[0.3em] mt-4 opacity-50">
+                  {stamps} de {maxStamps} Concluídos
+              </p>
           </div>
 
           {/* Bottom Section: Clean Footer */}
@@ -114,31 +114,31 @@ export default function LoyaltyCard() {
       </motion.div>
 
       {/* ── Status Grid ── */}
-      <div className="grid grid-cols-2 gap-4 md:gap-8 w-full">
-        <div className="bg-[#0a0a0a] rounded-[2rem] p-8 md:p-12 flex flex-col items-center text-center border border-white/5 relative overflow-hidden group">
+      <div className="grid grid-cols-2 gap-4 w-full">
+        <div className="bg-[#0a0a0a] rounded-[1.5rem] p-5 md:p-10 flex flex-col items-center text-center border border-white/5 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <p className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-4">Total de Cortes</p>
-            <p className="text-6xl md:text-8xl text-bebas font-black text-white italic tracking-tighter leading-none drop-shadow-2xl">{totalCuts}</p>
+            <p className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-2">Total de Cortes</p>
+            <p className="text-5xl md:text-7xl text-bebas font-black text-white italic tracking-tighter leading-none drop-shadow-2xl">{totalCuts}</p>
         </div>
-        <div className="bg-[#0a0a0a] rounded-[2rem] p-8 md:p-12 flex flex-col items-center text-center border border-orange-500/10 relative overflow-hidden group">
+        <div className="bg-[#0a0a0a] rounded-[1.5rem] p-5 md:p-10 flex flex-col items-center text-center border border-orange-500/10 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-b from-orange-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <p className="text-[9px] font-black text-orange-500 uppercase tracking-[0.3em] mb-4">Faltam p/ Bônus</p>
-            <p className="text-6xl md:text-8xl text-bebas font-black text-orange-500 italic tracking-tighter leading-none drop-shadow-2xl">{Math.max(0, maxStamps - stamps)}</p>
+            <p className="text-[9px] font-black text-orange-500 uppercase tracking-[0.3em] mb-2">Faltam p/ Bônus</p>
+            <p className="text-5xl md:text-7xl text-bebas font-black text-orange-500 italic tracking-tighter leading-none drop-shadow-2xl">{Math.max(0, maxStamps - stamps)}</p>
         </div>
       </div>
 
       {freeCouponAvailable && (
         <motion.div 
-            className="w-full p-12 rounded-[3.5rem] text-center border-2 border-white/30 relative overflow-hidden shadow-[0_0_60px_rgba(234,88,12,0.3)]"
+            className="w-full p-6 sm:p-10 rounded-[2rem] text-center border-2 border-white/30 relative overflow-hidden shadow-[0_0_60px_rgba(234,88,12,0.3)]"
             style={{ background: 'linear-gradient(135deg, #ff6e00, #ea580c)' }}
             animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 3, repeat: Infinity }}
         >
-          <div className="absolute inset-0 opacity-10 pointer-events-none text-[12rem] font-bebas flex items-center justify-center">GOLDEN</div>
-          <p className="text-[12px] font-black text-white uppercase tracking-[0.6em] mb-4 drop-shadow-md">Benefício VIP Liberado</p>
-          <h3 className="text-5xl md:text-7xl text-bebas font-black text-white italic uppercase mb-8 leading-none tracking-tight drop-shadow-xl">CORTE GRÁTIS!</h3>
+          <div className="absolute inset-0 opacity-10 pointer-events-none text-[8rem] font-bebas flex items-center justify-center">GOLDEN</div>
+          <p className="text-[10px] font-black text-white uppercase tracking-[0.4em] mb-2 drop-shadow-md">Benefício VIP Liberado</p>
+          <h3 className="text-4xl sm:text-6xl text-bebas font-black text-white italic uppercase mb-5 leading-none tracking-tight drop-shadow-xl">CORTE GRÁTIS!</h3>
           <button 
             onClick={handleRedeem}
-            className="bg-white text-orange-600 font-black px-16 py-6 rounded-2xl text-sm uppercase tracking-[0.2em] shadow-2xl hover:scale-105 transition-transform border border-white"
+            className="bg-white text-orange-600 font-black px-8 sm:px-14 py-4 rounded-2xl text-sm uppercase tracking-[0.2em] shadow-2xl hover:scale-105 transition-transform border border-white"
           >
             RESGATAR AGORA
           </button>

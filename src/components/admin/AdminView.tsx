@@ -124,9 +124,9 @@ export default function AdminView() {
       </AnimatePresence>
 
       {/* ── Main Stage ── */}
-      <main className="flex-1 h-screen overflow-y-auto no-scrollbar relative">
+      <main className="flex-1 h-screen overflow-y-auto no-scrollbar relative pt-[72px] lg:pt-0">
         
-        <header className="sticky top-0 z-50 p-4 pt-12 md:p-6 md:pt-16 flex justify-between items-center bg-[#050505] border-b border-white/5">
+        <header className="sticky top-0 z-50 px-4 flex justify-between items-center bg-[#050505]/95 backdrop-blur-xl border-b border-white/5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', paddingBottom: '12px', minHeight: '72px' }}>
             <button 
                 onClick={() => setIsOpen(true)}
                 className="w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass-panel rounded-xl border-white/10 lg:hidden"

@@ -189,7 +189,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
           <motion.div 
             key="svc"
             initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
-            className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto pb-10 px-2 no-scrollbar"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
             {activeServices.map(s => {
               const price = getServicePrice(s.id);
@@ -199,17 +199,17 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                 <button 
                   key={s._id} 
                   onClick={() => { setSvc(s._id); setStep(2); }}
-                  className={`card-luxury flex-shrink-0 w-[280px] md:w-full p-8 flex flex-col items-center text-center group transition-all duration-500 ${isFree ? 'border-orange-500/50 bg-orange-500/5' : 'border-white/10'}`}
+                  className={`card-luxury w-full p-5 flex flex-col items-center text-center group transition-all duration-500 ${isFree ? 'border-orange-500/50 bg-orange-500/5' : 'border-white/10'}`}
                 >
-                  <div className="w-20 h-20 bg-neutral-950 rounded-[2rem] border border-white/5 flex items-center justify-center text-5xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+                  <div className="w-14 h-14 bg-neutral-950 rounded-2xl border border-white/5 flex items-center justify-center text-4xl mb-4 shadow-inner group-hover:scale-110 transition-transform">
                     {s.icon}
                   </div>
-                  <h3 className="text-2xl text-bebas font-black text-white italic uppercase mb-2 group-hover:text-orange-500 transition-colors tracking-tight">
+                  <h3 className="text-xl text-bebas font-black text-white italic uppercase mb-1 group-hover:text-orange-500 transition-colors tracking-tight">
                       {s.name}
-                      {isFree && <span className="block text-[10px] font-black text-orange-500 tracking-[0.2em] mt-1">GIFT REDEEMED</span>}
+                      {isFree && <span className="block text-[10px] font-black text-orange-500 tracking-[0.2em] mt-0.5">GIFT REDEEMED</span>}
                   </h3>
-                  <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-6">Duração: {s.duration}m</p>
-                  <div className={`text-4xl font-black tracking-tighter drop-shadow-lg ${isFree ? 'text-green-500' : 'text-orange-500'}`}>
+                  <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3">Duração: {s.duration}m</p>
+                  <div className={`text-3xl font-black tracking-tighter drop-shadow-lg ${isFree ? 'text-green-500' : 'text-orange-500'}`}>
                       {isFree ? 'GRÁTIS' : `R$${s.price}`}
                   </div>
                 </button>
@@ -223,24 +223,24 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
           <motion.div 
             key="brb"
             initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
-            className="space-y-10"
+            className="space-y-6"
           >
-            <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-4 px-2 no-scrollbar">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 px-1">
               {availableBarbers.map(b => (
                 <button 
                   key={b._id} 
                   onClick={() => { setBrb(b._id); setStep(3); }}
-                  className="card-luxury flex-shrink-0 w-[220px] md:w-full p-8 flex flex-col items-center text-center group border-white/10"
+                  className="card-luxury w-full p-5 flex flex-col items-center text-center group border-white/10 active:scale-95 transition-transform"
                 >
-                  <div className="w-24 h-24 rounded-[2.5rem] bg-gradient-to-br from-neutral-800 to-black border border-white/10 flex items-center justify-center text-white text-bebas font-black text-4xl shadow-2xl mb-6 relative overflow-hidden group-hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-neutral-800 to-black border border-white/10 flex items-center justify-center text-white text-bebas font-black text-3xl shadow-2xl mb-3 relative overflow-hidden group-hover:scale-105 transition-transform">
                     {b.avatar && b.avatar.startsWith('http') ? (
                       <img src={b.avatar} alt={b.name} className="w-full h-full object-cover" />
                     ) : (
                       b.avatar || b.name.substring(0, 2).toUpperCase()
                     )}
                   </div>
-                  <h3 className="text-xl text-bebas font-black text-white italic uppercase mb-1 tracking-tight">{b.name}</h3>
-                  <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">{b.specialty || 'Barbeiro'}</p>
+                  <h3 className="text-base text-bebas font-black text-white italic uppercase mb-0.5 tracking-tight">{b.name}</h3>
+                  <p className="text-[9px] font-bold text-orange-500 uppercase tracking-widest">{b.specialty || 'Barbeiro'}</p>
                 </button>
               ))}
             </div>

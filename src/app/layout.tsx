@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Outfit, Bebas_Neue, Inter } from 'next/font/google';
 import './globals.css';
 import Providers from '@/components/Providers';
@@ -22,6 +22,21 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Gigantes do Corte — Sistema Premium de Barbearia',
   description: 'Dashboard completo para gestão de barbearia com agendamento, fidelidade e controle financeiro.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Gigantes do Corte',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#020202',
+  interactiveWidget: 'resizes-content',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -33,4 +48,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
