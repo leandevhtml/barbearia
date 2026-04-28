@@ -2,16 +2,16 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectToDatabase from '@/lib/mongodb';
-import Settings from '@/models/Settings';
+import GlobalSetting from '@/models/Settings';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
     await connectToDatabase();
-    let settings = await Settings.findOne({});
+    let settings = await GlobalSetting.findOne({});
     if (!settings) {
-      settings = await Settings.create({});
+      settings = await GlobalSetting.create({});
     }
     return NextResponse.json(settings);
   } catch (error) {
@@ -29,9 +29,9 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     await connectToDatabase();
 
-    let settings = await Settings.findOne({});
+    let settings = await GlobalSetting.findOne({});
     if (!settings) {
-      settings = new Settings(body);
+      settings = new GlobalSetting(body);
     } else {
       Object.assign(settings, body);
     }

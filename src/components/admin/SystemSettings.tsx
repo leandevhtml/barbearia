@@ -69,6 +69,12 @@ export default function SystemSettings() {
                 Fidelidade
             </button>
             <button 
+                onClick={() => setActiveSubTab('recados')}
+                className={`px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'recados' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+            >
+                Recados / Pop-up
+            </button>
+            <button 
                 onClick={() => setActiveSubTab('servicos')}
                 className={`px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'servicos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
