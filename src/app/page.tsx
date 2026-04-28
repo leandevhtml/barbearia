@@ -12,10 +12,26 @@ import StampAnimationOverlay from '@/components/shared/StampAnimationOverlay';
 import FreeCouponModal from '@/components/shared/FreeCouponModal';
 
 import BarberLoading from '@/components/shared/BarberLoading';
+import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
+import { useState } from 'react';
 
 export default function HomePage() {
   const { data: session, status } = useSession();
-  const { currentUser, isAdminMode, setCurrentUser } = useBarbershopStore();
+  const { currentUser, isAdminMode, setCurrentUser, settings, syncUser } = useBarbershopStore();
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
+  const [hasShownThisSession, setHasShownThisSession] = useState(false);
+
+  // Sync settings and show announcement
+  useEffect(() => {
+    syncUser();
+  }, [syncUser]);
+
+  useEffect(() => {
+    if (settings?.announcementEnabled && !hasShownThisSession) {
+      setShowAnnouncement(true);
+      setHasShownThisSession(true);
+    }
+  }, [settings?.announcementEnabled, hasShownThisSession]);
 
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
@@ -83,13 +99,23 @@ export default function HomePage() {
         </>
       )}
 
-      {/* ── Overlays (Client Only) ── */}
       {!isAdminMode && currentUser?.role !== 'barber' && (
         <>
             <StampAnimationOverlay />
             <FreeCouponModal />
         </>
       )}
+
+      {/* ── Global Announcement Popup ── */}
+      <AnimatePresence>
+        {showAnnouncement && settings?.announcementEnabled && (
+          <AnnouncementPopup 
+            text={settings.announcementText}
+            image={settings.announcementImage}
+            onClose={() => setShowAnnouncement(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── Bottom Fade ── */}
       <div className="fixed bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-[10]" />
