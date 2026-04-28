@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBarbershopStore } from '@/store/barbershopStore';
 import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 import FinancialDashboard from './FinancialDashboard';
 import AppointmentControl from './AppointmentControl';
 import ServiceManager from './ServiceManager';
@@ -38,9 +39,12 @@ export default function AdminView() {
         <div>
             <div className="flex flex-col items-center mb-12">
                 <div className="relative w-32 h-24 mb-2">
-                    <img 
+                    <Image 
                         src="/logo.png" 
                         alt="Logo" 
+                        width={128}
+                        height={96}
+                        priority
                         className="w-full h-full object-contain"
                     />
                 </div>
@@ -135,10 +139,11 @@ export default function AdminView() {
             {/* Centered Logo */}
             <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex items-center justify-center">
                 <div className="relative w-32 h-16 md:w-40 md:h-20">
-                    <img 
+                    <Image 
                         src="/logo.png" 
                         alt="Logo" 
-                        className="w-full h-full object-contain"
+                        fill
+                        className="object-contain"
                     />
                 </div>
             </div>

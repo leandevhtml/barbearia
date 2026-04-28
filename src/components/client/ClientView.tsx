@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBarbershopStore } from '@/store/barbershopStore';
 import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 import BookingForm from './BookingForm';
 import LoyaltyCard from './LoyaltyCard';
 import AppointmentStatus from './AppointmentStatus';
@@ -22,9 +23,9 @@ export default function ClientView() {
   const [showNotifs, setShowNotifs] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Sync data periodically when view is active
+  // Sync data periodically when view is active (optimized for mobile)
   useEffect(() => {
-    const interval = setInterval(syncUser, 3000); // Sync every 3s
+    const interval = setInterval(syncUser, 8000); // Sync every 8s
     return () => clearInterval(interval);
   }, [syncUser]);
 
@@ -40,9 +41,12 @@ export default function ClientView() {
             {/* Identity & Logo */}
             <div className="flex flex-col items-center mb-12">
                 <div className="relative w-28 h-20 mb-4">
-                    <img 
+                    <Image 
                         src="/logo.png" 
                         alt="Logo" 
+                        width={112}
+                        height={80}
+                        priority
                         className="w-full h-full object-contain"
                     />
                 </div>
@@ -141,9 +145,11 @@ export default function ClientView() {
             {/* Centered Logo */}
             <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex items-center justify-center">
                 <div className="relative w-32 h-16">
-                    <img 
+                    <Image 
                         src="/logo.png" 
                         alt="Logo" 
+                        width={128}
+                        height={64}
                         className="w-full h-full object-contain"
                     />
                 </div>

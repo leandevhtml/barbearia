@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 interface AnnouncementPopupProps {
   text: string;
@@ -50,10 +51,11 @@ export default function AnnouncementPopup({ text, image, onClose }: Announcement
         {/* Image Container - Responsive height */}
         {image && (
           <div className="w-full h-48 sm:h-64 md:h-80 shrink-0 relative">
-            <img 
+            <Image 
               src={image} 
               alt="Anúncio" 
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-transparent to-transparent" />
           </div>

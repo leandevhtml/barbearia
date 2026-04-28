@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Bebas+Neue&family=Inter:wght@400;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -14,7 +13,7 @@
 body {
   background-color: var(--bg-deep);
   color: var(--text-main);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-outfit), sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -129,8 +128,8 @@ body {
 }
 
 /* ── Typography & Readability ── */
-.text-bebas { font-family: 'Bebas Neue', sans-serif; }
-.text-inter { font-family: 'Inter', sans-serif; }
+.text-bebas { font-family: var(--font-bebas), sans-serif; }
+.text-inter { font-family: var(--font-inter), sans-serif; }
 
 .gradient-title {
   background: linear-gradient(to bottom, #ffffff 40%, #ff6e00 100%);

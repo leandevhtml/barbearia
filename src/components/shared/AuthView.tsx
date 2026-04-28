@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import BarberLoading from './BarberLoading';
 
 export default function AuthView() {
@@ -88,14 +89,13 @@ export default function AuthView() {
         <div className="text-center mb-8 md:mb-10">
           <div className="flex justify-center mb-6">
               <div className="relative w-40 h-28">
-                <img 
+                <Image 
                     src="/logo.png" 
                     alt="Gigantes do Corte" 
+                    width={160}
+                    height={112}
+                    priority
                     className="w-full h-full object-contain brightness-110 drop-shadow-[0_0_20px_rgba(234,88,12,0.4)]"
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement!.innerHTML = '<h2 class="text-4xl md:text-6xl font-bebas font-black text-white italic tracking-tighter uppercase leading-none mb-1 md:mb-2">GIGANTES <span class="text-orange-500">DO CORTE</span></h2>';
-                    }}
                 />
               </div>
           </div>
