@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 const ALL_TIMES = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
 
 export default function BookingForm({ onBooked }: { onBooked: () => void }) {
-  const { services, currentUser, isBookingFreeCut, setBookingFreeCut, setGlobalLoading } = useBarbershopStore();
+  const { services, currentUser, isBookingFreeCut, setBookingFreeCut, setGlobalLoading, showToast } = useBarbershopStore();
   const user = currentUser;
 
   const [step, setStep] = useState(1);
@@ -46,15 +46,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
-            // Right now our DB Appointment date is a full Date, but we are doing time by hours.
-            // Let's assume today's appointments for simplicity in this demo MVP, 
-            // but ideally we'd filter by date.
             const barberAppointments = data.filter(a => a.barberId && a.barberId._id === brb && a.status !== 'cancelled');
-            // time is stored in date for now, or maybe we should store time string.
-            // Wait, Appointment model has `date: Date`. We need to extract hours if we only use one day, 
-            // but we didn't add a time field to the model! 
-            // For now, let's just map it if we can, but since our model only has date, let's extract time from date or add a `time` field.
-            // Let's assume time is stored in date, or we will add a time field.
             const blocked = barberAppointments.map(a => {
               const d = new Date(a.date);
               return `${d.getUTCHours().toString().padStart(2, '0')}:00`;
@@ -103,13 +95,14 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
 
       if (res.ok) {
         setDone(true);
+        showToast('Agendamento realizado com sucesso!', 'success');
         setTimeout(onBooked, 2200);
       } else {
-        alert('Erro ao agendar.');
+        showToast('Erro ao agendar. Tente outro horário.', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Erro de conexão.');
+      showToast('Erro de conexão ao servidor.', 'error');
     } finally {
       // Artificial delay for premium feel
       setTimeout(() => {
@@ -118,6 +111,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
       }, 1500);
     }
   }
+
 
   if (done)
     return (

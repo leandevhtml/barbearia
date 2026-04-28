@@ -67,6 +67,13 @@ export interface Notification {
   title?: string;
 }
 
+export interface Toast {
+  message: string;
+  type: 'success' | 'error' | 'info';
+  isVisible: boolean;
+}
+
+
 interface BarbershopState {
   services: Service[];
   barbers: Barber[];
@@ -90,6 +97,11 @@ interface BarbershopState {
   settings: any;
   isGlobalLoading: boolean;
   loadingMessage: string;
+  
+  toast: Toast;
+  showToast: (message: string, type?: Toast['type']) => void;
+  hideToast: () => void;
+
   
   // Actions
   login: (email: string, password: string) => Promise<boolean>;
@@ -168,6 +180,17 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
   settings: null as any,
   isGlobalLoading: false,
   loadingMessage: 'CARREGANDO...',
+
+  toast: { message: '', type: 'info', isVisible: false },
+  showToast: (message, type = 'info') => {
+    set({ toast: { message, type, isVisible: true } });
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      get().hideToast();
+    }, 4000);
+  },
+  hideToast: () => set(state => ({ toast: { ...state.toast, isVisible: false } })),
+
   
   syncUser: async () => {
     try {

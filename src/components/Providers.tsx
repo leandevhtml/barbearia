@@ -3,6 +3,7 @@
 import { SessionProvider } from 'next-auth/react';
 import { useBarbershopStore } from '@/store/barbershopStore';
 import BarberLoading from './shared/BarberLoading';
+import Toast from './shared/Toast';
 import { AnimatePresence } from 'framer-motion';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <AnimatePresence>
         {isGlobalLoading && <BarberLoading message={loadingMessage} />}
       </AnimatePresence>
+      <Toast />
       {children}
     </SessionProvider>
   );
 }
+

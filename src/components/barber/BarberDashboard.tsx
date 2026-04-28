@@ -45,13 +45,15 @@ export default function BarberDashboard() {
       });
       if (res.ok) {
         fetchAppointments();
+        if (status === 'completed') showToast('Serviço finalizado!', 'success');
+        if (status === 'in-progress') showToast('Serviço iniciado!', 'success');
       } else {
         const data = await res.json();
-        alert(`Erro: ${data.message || 'Falha ao atualizar'}`);
+        showToast(`Erro: ${data.message || 'Falha ao atualizar'}`, 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Erro de conexão.');
+      showToast('Erro de conexão.', 'error');
     }
   };
 

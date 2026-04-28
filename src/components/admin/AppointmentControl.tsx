@@ -36,9 +36,11 @@ export default function AppointmentControl() {
     }
   };
 
+  const { settings, showToast } = useBarbershopStore();
+
   const updateStatus = async (apptId: string, status: string, items?: any[], totalAmount?: number, paymentMethod?: string) => {
     if (!apptId || apptId === 'undefined') {
-      alert('Erro: ID do agendamento inválido.');
+      showToast('Erro: ID do agendamento inválido.', 'error');
       return;
     }
 
@@ -60,15 +62,23 @@ export default function AppointmentControl() {
       
       if (res.ok) {
         fetchAppointments();
+        if (status === 'completed') {
+          showToast('Atendimento finalizado com sucesso!', 'success');
+        } else if (status === 'in-progress') {
+          showToast('Atendimento iniciado!', 'success');
+        } else if (status === 'cancelled') {
+          showToast('Atendimento cancelado.', 'info');
+        }
       } else {
         console.error('Erro detalhado:', JSON.stringify(data));
-        alert(`Erro: ${data.message || 'Falha ao atualizar status'}`);
+        showToast(`Erro: ${data.message || 'Falha ao atualizar status'}`, 'error');
       }
     } catch (err: any) {
       console.error('Erro de conexão:', err);
-      alert('Erro de conexão ao tentar atualizar o agendamento.');
+      showToast('Erro de conexão ao tentar atualizar o agendamento.', 'error');
     }
   };
+
 
   const handleCheckoutConfirm = async (items: any[], totalAmount: number, paymentMethod: string) => {
     if (!checkoutAppt) return;
@@ -86,9 +96,8 @@ export default function AppointmentControl() {
     done:       sorted.filter(a => a.status === 'completed').length,
   };
 
-  const { settings } = useBarbershopStore();
-
   if (loading) {
+
     return <p className="text-neutral-500 animate-pulse text-center py-10 font-bebas tracking-widest">SINCRONIZANDO BANCO...</p>;
   }
 

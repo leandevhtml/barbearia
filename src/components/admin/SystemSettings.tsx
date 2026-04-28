@@ -29,7 +29,7 @@ export default function SystemSettings() {
       });
   }, []);
 
-  const { syncUser } = useBarbershopStore();
+  const { syncUser, showToast } = useBarbershopStore();
 
   const handleSave = async () => {
     setSaving(true);
@@ -46,8 +46,9 @@ export default function SystemSettings() {
         })
       });
       await syncUser();
-      alert('Configurações salvas com sucesso!');
+      showToast('Configurações salvas com sucesso!', 'success');
     } catch (err) {
+
       console.error(err);
     } finally {
       setSaving(false);
