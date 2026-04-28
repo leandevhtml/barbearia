@@ -129,10 +129,10 @@ export default function ClientView() {
       </AnimatePresence>
 
       {/* ── Main Content Area ── */}
-      <main className="flex-1 h-dvh overflow-y-auto no-scrollbar relative pt-[72px] lg:pt-0">
+      <main className="flex-1 h-dvh overflow-y-auto no-scrollbar relative lg:pt-0">
         
-        {/* Mobile Header */}
-        <header className="absolute lg:hidden top-0 left-0 right-0 z-[100] px-4 flex justify-between items-center bg-[#050505]/95 md:backdrop-blur-xl border-b border-white/5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', paddingBottom: '12px', minHeight: '72px' }}>
+        {/* Mobile Header (Natural flow - scrolls with page) */}
+        <header className="lg:hidden w-full z-[100] px-4 flex justify-between items-center bg-[#050505]/95 md:backdrop-blur-xl border-b border-white/5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px', minHeight: '80px' }}>
             <button 
                 onClick={() => setIsMenuOpen(true)}
                 className="w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass-panel rounded-xl border-white/10"
