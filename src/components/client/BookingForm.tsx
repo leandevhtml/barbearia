@@ -189,7 +189,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
           <motion.div 
             key="svc"
             initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+            className="flex overflow-x-auto gap-4 pb-6 px-1 snap-x snap-mandatory no-scrollbar"
           >
             {activeServices.map(s => {
               const price = getServicePrice(s.id);
@@ -199,7 +199,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                 <button 
                   key={s._id} 
                   onClick={() => { setSvc(s._id); setStep(2); }}
-                  className={`card-luxury w-full p-5 flex flex-col items-center text-center group transition-all duration-500 ${isFree ? 'border-orange-500/50 bg-orange-500/5' : 'border-white/10'}`}
+                  className={`card-luxury flex-none w-[260px] snap-center p-5 flex flex-col items-center text-center group transition-all duration-500 ${isFree ? 'border-orange-500/50 bg-orange-500/5' : 'border-white/10'}`}
                 >
                   <div className="w-14 h-14 bg-neutral-950 rounded-2xl border border-white/5 flex items-center justify-center text-4xl mb-4 shadow-inner group-hover:scale-110 transition-transform">
                     {s.icon}
@@ -225,12 +225,12 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
             initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
             className="space-y-6"
           >
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 px-1">
+            <div className="flex overflow-x-auto gap-4 pb-6 px-1 snap-x snap-mandatory no-scrollbar">
               {availableBarbers.map(b => (
                 <button 
                   key={b._id} 
                   onClick={() => { setBrb(b._id); setStep(3); }}
-                  className="card-luxury w-full p-5 flex flex-col items-center text-center group border-white/10 active:scale-95 transition-transform"
+                  className="card-luxury flex-none w-[180px] snap-center p-5 flex flex-col items-center text-center group border-white/10 active:scale-95 transition-transform"
                 >
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-neutral-800 to-black border border-white/10 flex items-center justify-center text-white text-bebas font-black text-3xl shadow-2xl mb-3 relative overflow-hidden group-hover:scale-105 transition-transform">
                     {b.avatar && b.avatar.startsWith('http') ? (
