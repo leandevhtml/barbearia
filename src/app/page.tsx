@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBarbershopStore } from '@/store/barbershopStore';
 import ClientView from '@/components/client/ClientView';
@@ -38,7 +38,16 @@ export default function HomePage() {
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
       fetch('/api/users/me')
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            if (res.status === 401 || res.status === 404) {
+              console.error('Session invalid or user not found, signing out...');
+              signOut({ redirect: false });
+            }
+            throw new Error(`Failed to fetch user: ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
           if (data._id) {
             const mappedUser = {
@@ -56,7 +65,9 @@ export default function HomePage() {
             setCurrentUser(mappedUser, data.role === 'admin');
           }
         })
-        .catch(err => console.error('Error fetching user', err));
+        .catch(err => {
+          console.error('Error fetching user', err);
+        });
     }
   }, [status, currentUser, setCurrentUser]);
 
