@@ -74,7 +74,7 @@ export default function BarberDashboard() {
   }
 
   return (
-    <div className="min-h-screen pb-20 w-full pt-10">
+    <div className="min-h-dvh pb-20 w-full pt-10">
       <div className="flex justify-between items-center mb-8 px-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-4xl text-bebas font-black text-white italic tracking-tight">Fala, {currentUser?.name?.split(' ')[0]}!</h1>

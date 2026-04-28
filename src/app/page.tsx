@@ -76,7 +76,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen relative flex flex-col overflow-x-hidden selection:bg-orange-500/30">
+    <main className="min-h-dvh relative flex flex-col overflow-x-hidden selection:bg-orange-500/30">
       {/* ── Visual Layers ── */}
       <div className="luxury-bg" />
       
@@ -95,7 +95,7 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
+                transition={{ duration: 0.2 }}
                 className="flex-1 flex flex-col"
               >
                 {isAdminMode ? <AdminView /> : currentUser?.role === 'barber' ? <BarberDashboard /> : <ClientView />}
@@ -122,8 +122,6 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* ── Bottom Fade ── */}
-      <div className="fixed bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-[10]" />
     </main>
   );
 }

@@ -90,7 +90,7 @@ export default function AdminView() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white -m-4 md:-m-10 relative overflow-hidden">
+    <div className="flex min-h-dvh bg-[#050505] text-white -m-4 md:-m-10 relative overflow-hidden">
       
       {/* ── Lateral Sidebar (Desktop) ── */}
       <aside className="hidden lg:block w-[300px] bg-[#050505] border-r border-white/5 sticky top-0 h-screen">
@@ -124,7 +124,7 @@ export default function AdminView() {
       </AnimatePresence>
 
       {/* ── Main Stage ── */}
-      <main className="flex-1 h-screen overflow-y-auto no-scrollbar relative pt-[72px] lg:pt-0">
+      <main className="flex-1 h-dvh overflow-y-auto no-scrollbar relative pt-[72px] lg:pt-0">
         
         <header className="sticky top-0 z-50 px-4 flex justify-between items-center bg-[#050505]/95 backdrop-blur-xl border-b border-white/5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', paddingBottom: '12px', minHeight: '72px' }}>
             <button 
