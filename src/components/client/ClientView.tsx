@@ -94,7 +94,6 @@ export default function ClientView() {
                 <p className="text-[8px] font-black text-neutral-800 uppercase tracking-[0.5em]">Gigantes do Corte © 2026</p>
             </div>
         </div>
-    </div>
   );
 
   return (
