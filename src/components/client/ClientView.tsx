@@ -36,11 +36,11 @@ export default function ClientView() {
   if (!currentUser) return null;
 
   const NavContent = () => (
-    <div className="h-full flex flex-col justify-between py-10 px-6">
-        <div>
-            {/* Identity & Logo */}
-            <div className="flex flex-col items-center mb-10 pt-4">
-                <div className="relative w-32 h-24 mb-4">
+    <div className="h-full flex flex-col justify-between py-6 px-5">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+            {/* Identity & Logo (Compact) */}
+            <div className="flex flex-col items-center mb-8 pt-2">
+                <div className="relative w-20 h-20 mb-3">
                     <Image 
                         src="/logo.png" 
                         alt="Logo" 
@@ -50,46 +50,45 @@ export default function ClientView() {
                     />
                 </div>
                 <div className="text-center">
-                    <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em] leading-none mb-2">Membro Elite</p>
-                    <h2 className="text-2xl text-bebas font-black text-white italic uppercase leading-none tracking-tight">{currentUser.name}</h2>
+                    <p className="text-[8px] font-black text-neutral-600 uppercase tracking-[0.4em] leading-none mb-1">Elite Club</p>
+                    <h2 className="text-lg text-bebas font-black text-white italic uppercase leading-none tracking-tight">{currentUser.name}</h2>
                 </div>
             </div>
 
-            <nav className="space-y-4">
+            <nav className="space-y-2">
                 {TABS.map(t => (
                     <button
                         key={t.id}
                         onClick={() => { setActiveTab(t.id); setIsMenuOpen(false); }}
-                        className={`w-full flex items-center gap-4 p-5 rounded-2xl transition-all duration-500 ${
-                            activeTab === t.id ? 'bg-orange-600 text-white shadow-[0_0_30px_var(--orange-glow)]' : 'text-neutral-500 hover:bg-white/5 hover:text-white'
+                        className={`w-full flex items-center gap-3 p-3.5 rounded-xl transition-all duration-300 ${
+                            activeTab === t.id ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'
                         }`}
                     >
-                        <span className="text-2xl">{t.icon}</span>
-                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">{t.label}</span>
+                        <span className="text-xl">{t.icon}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em]">{t.label}</span>
                     </button>
                 ))}
             </nav>
         </div>
 
-        <div className="space-y-6">
-            <div className="space-y-2">
-                {currentUser.email === 'admin@gigantes.com' && (
-                    <button 
-                        onClick={toggleAdminMode}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl text-orange-500 hover:bg-orange-500/10 transition-all"
-                    >
-                        <span className="text-xl">⚙️</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Painel Admin</span>
-                    </button>
-                )}
+        <div className="mt-4 pt-4 border-t border-white/5 space-y-1">
+            {currentUser.email === 'admin@gigantes.com' && (
                 <button 
-                    onClick={() => signOut()}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all"
+                    onClick={toggleAdminMode}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl text-orange-500 hover:bg-orange-500/10 transition-all"
                 >
-                    <span className="text-xl">✕</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest">Encerrar Sessão</span>
+                    <span className="text-lg">⚙️</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Painel Admin</span>
                 </button>
-            </div>
+            )}
+            <button 
+                onClick={() => signOut()}
+                className="w-full flex items-center gap-3 p-3 rounded-xl text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-all"
+            >
+                <span className="text-lg">✕</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Sair</span>
+            </button>
+        </div>
 
             <div className="pt-8 border-t border-white/5 text-center">
                 <p className="text-[8px] font-black text-neutral-800 uppercase tracking-[0.5em]">Gigantes do Corte © 2026</p>
