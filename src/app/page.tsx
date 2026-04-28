@@ -12,7 +12,6 @@ import StampAnimationOverlay from '@/components/shared/StampAnimationOverlay';
 import FreeCouponModal from '@/components/shared/FreeCouponModal';
 
 import BarberLoading from '@/components/shared/BarberLoading';
-import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
 import { useState } from 'react';
 
 export default function HomePage() {
@@ -21,19 +20,10 @@ export default function HomePage() {
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [lastShownUserId, setLastShownUserId] = useState<string | null>(null);
 
-  // Sync settings and show announcement
+  // Sync settings
   useEffect(() => {
     syncUser();
   }, [syncUser]);
-
-  // Trigger announcement once per user login
-  useEffect(() => {
-    const currentId = currentUser?._id || currentUser?.id;
-    if (settings?.announcementEnabled && currentId && currentId !== lastShownUserId) {
-      setShowAnnouncement(true);
-      setLastShownUserId(currentId);
-    }
-  }, [settings?.announcementEnabled, currentUser?.id, lastShownUserId]);
 
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
@@ -108,16 +98,6 @@ export default function HomePage() {
         </>
       )}
 
-      {/* ── Global Announcement Popup ── */}
-      <AnimatePresence>
-        {showAnnouncement && settings?.announcementEnabled && (
-          <AnnouncementPopup 
-            text={settings.announcementText}
-            image={settings.announcementImage}
-            onClose={() => setShowAnnouncement(false)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* ── Bottom Fade ── */}
       <div className="fixed bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-[10]" />
