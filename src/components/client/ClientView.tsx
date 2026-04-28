@@ -39,20 +39,19 @@ export default function ClientView() {
     <div className="h-full flex flex-col justify-between py-10 px-6">
         <div>
             {/* Identity & Logo */}
-            <div className="flex flex-col items-center mb-12">
-                <div className="relative w-28 h-20 mb-4">
+            <div className="flex flex-col items-center mb-10 pt-4">
+                <div className="relative w-32 h-24 mb-4">
                     <Image 
                         src="/logo.png" 
                         alt="Logo" 
-                        width={112}
-                        height={80}
+                        fill
                         priority
-                        className="w-full h-full object-contain"
+                        className="object-contain"
                     />
                 </div>
                 <div className="text-center">
-                    <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest leading-none mb-1">Membro Elite</p>
-                    <p className="text-xl text-bebas font-black text-white italic uppercase leading-none">{currentUser.name}</p>
+                    <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em] leading-none mb-2">Membro Elite</p>
+                    <h2 className="text-2xl text-bebas font-black text-white italic uppercase leading-none tracking-tight">{currentUser.name}</h2>
                 </div>
             </div>
 
@@ -119,10 +118,17 @@ export default function ClientView() {
                 <motion.aside 
                     initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#050505] z-[501] lg:hidden border-r border-white/10"
+                    className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#050505]/98 backdrop-blur-3xl z-[501] lg:hidden border-r border-white/10 shadow-[20px_0_80px_rgba(0,0,0,0.9)]"
                 >
+                    <div className="absolute top-[calc(env(safe-area-inset-top,0px)+16px)] right-6">
+                        <button 
+                            onClick={() => setIsMenuOpen(false)} 
+                            className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-xl text-white border-white/10"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <NavContent />
-                    <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-2xl text-neutral-500">✕</button>
                 </motion.aside>
             </>
         )}
@@ -142,15 +148,14 @@ export default function ClientView() {
                 <div className="w-6 h-0.5 bg-white rounded-full" />
             </button>
 
-            {/* Centered Logo */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex items-center justify-center">
+            {/* Centered Logo (Vertically Aligned) */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center" style={{ marginTop: 'calc(env(safe-area-inset-top, 0px) / 2)' }}>
                 <div className="relative w-32 h-16">
                     <Image 
                         src="/logo.png" 
                         alt="Logo" 
-                        width={128}
-                        height={64}
-                        className="w-full h-full object-contain"
+                        fill
+                        className="object-contain"
                     />
                 </div>
             </div>
