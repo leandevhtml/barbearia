@@ -233,7 +233,3 @@ export default function SystemSettings() {
     </div>
   );
 }
-      </AnimatePresence>
-    </div>
-  );
-}
