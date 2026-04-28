@@ -26,30 +26,30 @@ export default function AnnouncementPopup({ text, image, onClose }: Announcement
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md"
+      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-md"
     >
       <motion.div 
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
-        className="relative w-full max-w-lg bg-[#0c0c0c] border border-orange-500/30 rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(234,88,12,0.15)]"
+        className="relative w-full max-w-[95vw] md:max-w-lg bg-[#0c0c0c] border border-orange-500/30 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(234,88,12,0.15)] max-h-[90vh] flex flex-col"
       >
         {/* Close Button & Timer */}
-        <div className="absolute top-6 right-6 flex items-center gap-4 z-10">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-600/20 border border-orange-500/40 text-orange-500 text-[10px] font-black font-mono">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 flex items-center gap-3 md:gap-4 z-10">
+          <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-600/20 border border-orange-500/40 text-orange-500 text-[9px] md:text-[10px] font-black font-mono">
             {countdown}s
           </div>
           <button 
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+            className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors text-sm"
           >
             ✕
           </button>
         </div>
 
-        {/* Image */}
+        {/* Image Container - Responsive height */}
         {image && (
-          <div className="w-full h-64 md:h-80 relative">
+          <div className="w-full h-48 sm:h-64 md:h-80 shrink-0 relative">
             <img 
               src={image} 
               alt="Anúncio" 
@@ -59,23 +59,23 @@ export default function AnnouncementPopup({ text, image, onClose }: Announcement
           </div>
         )}
 
-        {/* Content */}
-        <div className="p-10 pt-6 text-center space-y-6">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-orange-600/10 border border-orange-500/20">
-            <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em]">Recado do Barbeiro</p>
+        {/* Content - Scrollable if too long */}
+        <div className="p-6 md:p-10 pt-4 md:pt-6 text-center space-y-4 md:space-y-6 overflow-y-auto no-scrollbar">
+          <div className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-orange-600/10 border border-orange-500/20">
+            <p className="text-[8px] md:text-[10px] font-black text-orange-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Recado do Barbeiro</p>
           </div>
           
-          <p className="text-xl md:text-2xl font-bold text-white leading-relaxed italic">
+          <p className="text-lg md:text-2xl font-bold text-white leading-relaxed italic px-2">
             "{text}"
           </p>
 
-          <div className="pt-4">
+          <div className="pt-2 md:pt-4">
             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div 
                     initial={{ width: '100%' }}
                     animate={{ width: '0%' }}
                     transition={{ duration: 5, ease: 'linear' }}
-                    className="h-full bg-orange-600"
+                    className="h-full bg-orange-600 shadow-[0_0_10px_#ea580c]"
                 />
             </div>
           </div>
