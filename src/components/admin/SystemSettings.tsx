@@ -17,7 +17,7 @@ export default function SystemSettings() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch('/api/admin/settings')
+    fetch('/api/admin/settings', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setFidelityEnabled(data.fidelityEnabled);

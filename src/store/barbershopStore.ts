@@ -173,8 +173,8 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
     try {
       // Sync user and global settings in parallel
       const [userRes, settingsRes] = await Promise.all([
-        fetch('/api/users/me'),
-        fetch('/api/admin/settings')
+        fetch('/api/users/me', { cache: 'no-store' }),
+        fetch('/api/admin/settings', { cache: 'no-store' })
       ]);
 
       if (userRes.ok) {
