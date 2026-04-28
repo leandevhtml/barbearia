@@ -90,10 +90,10 @@ export default function AdminView() {
   );
 
   return (
-    <div className="flex min-h-dvh bg-[#050505] text-white -m-4 md:-m-10 relative overflow-hidden">
+    <div className="flex min-h-dvh bg-[#050505] text-white relative overflow-hidden">
       
       {/* ── Lateral Sidebar (Desktop) ── */}
-      <aside className="hidden lg:block w-[300px] bg-[#050505] border-r border-white/5 sticky top-0 h-screen">
+      <aside className="hidden lg:block w-[300px] bg-[#050505] border-r border-white/5 sticky top-0 h-dvh">
           <NavContent />
       </aside>
 

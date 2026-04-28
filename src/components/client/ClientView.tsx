@@ -100,10 +100,10 @@ export default function ClientView() {
   );
 
   return (
-    <div className="flex min-h-dvh bg-[#050505] -m-4 md:-m-10 relative">
+    <div className="flex min-h-dvh bg-[#050505] relative">
       
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:block w-[320px] bg-[#050505] border-r border-white/5 sticky top-0 h-screen">
+      <aside className="hidden lg:block w-[320px] bg-[#050505] border-r border-white/5 sticky top-0 h-dvh">
           <NavContent />
       </aside>
 
