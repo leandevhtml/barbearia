@@ -19,19 +19,21 @@ export default function HomePage() {
   const { data: session, status } = useSession();
   const { currentUser, isAdminMode, setCurrentUser, settings, syncUser } = useBarbershopStore();
   const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [hasShownThisSession, setHasShownThisSession] = useState(false);
+  const [lastShownUserId, setLastShownUserId] = useState<string | null>(null);
 
   // Sync settings and show announcement
   useEffect(() => {
     syncUser();
   }, [syncUser]);
 
+  // Trigger announcement once per user login
   useEffect(() => {
-    if (settings?.announcementEnabled && !hasShownThisSession) {
+    const currentId = currentUser?._id || currentUser?.id;
+    if (settings?.announcementEnabled && currentId && currentId !== lastShownUserId) {
       setShowAnnouncement(true);
-      setHasShownThisSession(true);
+      setLastShownUserId(currentId);
     }
-  }, [settings?.announcementEnabled, hasShownThisSession]);
+  }, [settings?.announcementEnabled, currentUser?.id, lastShownUserId]);
 
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
