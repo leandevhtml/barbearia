@@ -371,9 +371,6 @@ export default function ProductManager() {
               <motion.div 
                 key={p._id} 
                 layout
-              <motion.div 
-                key={p._id} 
-                layout
                 className="luxury-card flex flex-col sm:flex-row border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden h-full sm:h-auto sm:min-h-[180px] gap-0 sm:gap-6"
               >
                 {/* Image Section */}
@@ -438,7 +435,6 @@ export default function ProductManager() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
               </motion.div>
             ))}
             
