@@ -371,66 +371,68 @@ export default function ProductManager() {
               <motion.div 
                 key={p._id} 
                 layout
-                className="luxury-card p-6 flex items-center gap-5 border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden"
+                className="luxury-card flex flex-col border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden h-full"
               >
-                <div className="absolute -right-4 -bottom-4 opacity-5 text-neutral-500 group-hover:text-orange-500 transition-colors">
-                  <Package size={80} />
-                </div>
-
-                <div className="w-24 h-24 bg-neutral-900/80 rounded-2xl overflow-hidden flex items-center justify-center relative shadow-2xl flex-shrink-0 border border-white/5">
+                {/* Header: Image & Actions */}
+                <div className="relative w-full h-48 bg-neutral-900/80 overflow-hidden flex items-center justify-center border-b border-white/5">
                   {p.image ? (
-                    <img src={p.image} className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500" />
+                    <img src={p.image} className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500" />
                   ) : (
-                    <span className="text-3xl grayscale group-hover:grayscale-0 transition-all text-neutral-800">📦</span>
-                  )}
-                </div>
-
-                {/* Action Buttons - Absolute Top Right */}
-                <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-                  <button 
-                    onClick={() => handleEditClick(p)}
-                    className="w-8 h-8 rounded-full bg-black/60 text-neutral-400 hover:text-orange-500 hover:bg-black/80 transition-all flex items-center justify-center border border-white/5"
-                    title="Editar"
-                  >
-                    <Edit3 size={14} />
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteClick(p._id)}
-                    className="w-8 h-8 rounded-full bg-black/60 text-neutral-400 hover:text-red-500 hover:bg-black/80 transition-all flex items-center justify-center border border-white/5"
-                    title="Excluir"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-
-                <div className="flex-1 min-w-0 z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <div className="pr-20"> {/* Extra padding for the buttons */}
-                      <h4 className="font-black text-lg text-white leading-tight break-words uppercase tracking-tighter">
-                        {p.name}
-                      </h4>
+                    <div className="flex flex-col items-center gap-2 opacity-20">
+                        <Package size={48} />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Sem Foto</span>
                     </div>
-                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest mt-1 italic">{p.category}</p>
+                  )}
+
+                  {/* Floating Action Buttons */}
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button 
+                      onClick={() => handleEditClick(p)}
+                      className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-orange-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      title="Editar"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteClick(p._id)}
+                      className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-red-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      title="Excluir"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
+
+                  <div className="absolute bottom-3 left-3">
+                    <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-lg text-[9px] font-black text-orange-500 uppercase tracking-widest italic shadow-xl">
+                        {p.category}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content Body */}
+                <div className="p-6 flex flex-col flex-1 gap-6">
+                  <h4 className="font-black text-xl text-white leading-tight break-words uppercase tracking-tighter min-h-[3rem]">
+                    {p.name}
+                  </h4>
                   
-                  <div className="flex flex-wrap items-end justify-between gap-3 mt-4">
-                    <div className="shrink-0">
-                      <p className="text-[9px] text-neutral-500 uppercase font-black">Preço</p>
-                      <span className="text-lg font-black text-white tracking-tighter leading-none block">R$ {p.price.toFixed(2)}</span>
+                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-center sm:text-left">
+                      <p className="text-[9px] text-neutral-500 uppercase font-black mb-1">Preço Sugerido</p>
+                      <span className="text-2xl font-black text-white tracking-tighter">R$ {p.price.toFixed(2)}</span>
                     </div>
                     
-                    <div className="flex items-center gap-1 bg-neutral-950 p-1 rounded-xl border border-white/5 shrink-0 ml-auto">
+                    <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-2xl border border-white/5 shadow-inner">
                       <button 
                         onClick={() => updateStock(p._id, -1)}
-                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors text-sm"
+                        className="w-10 h-10 rounded-xl bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors shadow-lg"
                       >-</button>
-                      <div className="px-2 flex flex-col items-center min-w-[32px]">
-                        <span className={`text-xs font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[7px] font-black text-neutral-600 uppercase">UN</span>
+                      <div className="px-4 flex flex-col items-center min-w-[50px]">
+                        <span className={`text-lg font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
+                        <span className="text-[8px] font-black text-neutral-600 uppercase mt-1">Stock</span>
                       </div>
                       <button 
                         onClick={() => updateStock(p._id, 1)}
-                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors text-sm"
+                        className="w-10 h-10 rounded-xl bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors shadow-lg"
                       >+</button>
                     </div>
                   </div>
