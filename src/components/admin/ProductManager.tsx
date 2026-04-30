@@ -371,73 +371,74 @@ export default function ProductManager() {
               <motion.div 
                 key={p._id} 
                 layout
-                className="luxury-card flex flex-col border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden h-full"
+              <motion.div 
+                key={p._id} 
+                layout
+                className="luxury-card flex flex-col sm:flex-row border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden h-full sm:h-auto sm:min-h-[180px] gap-0 sm:gap-6"
               >
-                {/* Header: Image & Actions */}
-                <div className="relative w-full h-48 bg-neutral-900/80 overflow-hidden flex items-center justify-center border-b border-white/5">
+                {/* Image Section */}
+                <div className="relative w-full sm:w-40 h-48 sm:h-auto bg-neutral-900/80 overflow-hidden flex items-center justify-center border-b sm:border-b-0 sm:border-r border-white/5 flex-shrink-0">
                   {p.image ? (
                     <img src={p.image} className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500" />
                   ) : (
                     <div className="flex flex-col items-center gap-2 opacity-20">
-                        <Package size={48} />
+                        <Package size={40} />
                         <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Sem Foto</span>
                     </div>
                   )}
 
                   {/* Floating Action Buttons */}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
                     <button 
                       onClick={() => handleEditClick(p)}
                       className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-orange-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
-                      title="Editar"
                     >
                       <Edit3 size={16} />
                     </button>
                     <button 
                       onClick={() => handleDeleteClick(p._id)}
                       className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-red-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
-                      title="Excluir"
                     >
                       <Trash2 size={16} />
                     </button>
                   </div>
-
+                  
                   <div className="absolute bottom-3 left-3">
-                    <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-lg text-[9px] font-black text-orange-500 uppercase tracking-widest italic shadow-xl">
+                    <span className="px-2 py-0.5 bg-black/60 backdrop-blur-md border border-white/10 rounded text-[8px] font-black text-orange-500 uppercase tracking-widest italic">
                         {p.category}
                     </span>
                   </div>
                 </div>
 
                 {/* Content Body */}
-                <div className="p-6 flex flex-col flex-1 gap-6">
-                  <h4 className="font-black text-xl text-white leading-tight break-words uppercase tracking-tighter min-h-[3rem] text-center sm:text-left">
-                    {p.name}
-                  </h4>
+                <div className="p-6 flex flex-col flex-1 justify-between gap-6 sm:gap-4">
+                  <div className="text-center sm:text-left">
+                    <h4 className="font-black text-xl text-white leading-tight break-words uppercase tracking-tighter">
+                      {p.name}
+                    </h4>
+                  </div>
                   
-                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4 w-full">
                     <div className="text-center sm:text-left flex flex-col gap-1">
                       <div className="flex flex-col -space-y-0.5">
-                        <span className="text-[10px] text-neutral-500 uppercase font-black tracking-[0.2em]">Preço</span>
-                        <span className="text-[10px] text-neutral-500 uppercase font-black tracking-[0.2em]">Sugerido</span>
+                        <span className="text-[10px] text-neutral-500 uppercase font-black tracking-widest">Preço Sugerido</span>
                       </div>
-                      <div className="flex items-baseline gap-2 mt-2 justify-center sm:justify-start">
-                        <span className="text-base font-black text-orange-500">R$</span>
+                      <div className="flex items-baseline gap-2 mt-1 justify-center sm:justify-start">
+                        <span className="text-sm font-black text-orange-500 italic">R$</span>
                         <span className="text-4xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 bg-neutral-950/50 px-6 py-3 rounded-2xl border border-white/5 shadow-inner">
+                    <div className="flex items-center gap-4 bg-neutral-950/50 px-5 py-2.5 rounded-2xl border border-white/5 shadow-inner sm:ml-auto">
                       <div className="flex flex-col items-center sm:items-end">
                         <span className={`text-xl font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[9px] font-black text-neutral-600 uppercase mt-1 tracking-widest">Disponível</span>
+                        <span className="text-[8px] font-black text-neutral-600 uppercase mt-0.5 tracking-widest">Em Estoque</span>
                       </div>
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-                        <Package size={18} className="text-neutral-500" />
-                      </div>
+                      <Package size={16} className="text-neutral-700" />
                     </div>
                   </div>
                 </div>
+              </motion.div>
               </motion.div>
             ))}
             
