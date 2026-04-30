@@ -416,9 +416,15 @@ export default function ProductManager() {
                   </h4>
                   
                   <div className="mt-auto pt-6 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
-                    <div className="text-center sm:text-left flex flex-col">
-                      <span className="text-[10px] text-neutral-500 uppercase font-black tracking-widest mb-1">Preço Sugerido</span>
-                      <span className="text-3xl font-black text-white tracking-tighter leading-none">R$ {p.price.toFixed(2)}</span>
+                    <div className="text-center sm:text-left flex flex-col gap-1">
+                      <div className="flex flex-col -space-y-1">
+                        <span className="text-[9px] text-neutral-500 uppercase font-black tracking-widest">Preço</span>
+                        <span className="text-[9px] text-neutral-500 uppercase font-black tracking-widest">Sugerido</span>
+                      </div>
+                      <div className="flex items-baseline gap-1 mt-1 justify-center sm:justify-start">
+                        <span className="text-sm font-black text-orange-500">R$</span>
+                        <span className="text-3xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-2xl border border-white/5 shadow-inner">
