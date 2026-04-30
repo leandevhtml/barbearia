@@ -385,28 +385,32 @@ export default function ProductManager() {
                   )}
                 </div>
 
+                {/* Action Buttons - Absolute Top Right */}
+                <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+                  <button 
+                    onClick={() => handleEditClick(p)}
+                    className="w-8 h-8 rounded-full bg-black/60 text-neutral-400 hover:text-orange-500 hover:bg-black/80 transition-all flex items-center justify-center border border-white/5"
+                    title="Editar"
+                  >
+                    <Edit3 size={14} />
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteClick(p._id)}
+                    className="w-8 h-8 rounded-full bg-black/60 text-neutral-400 hover:text-red-500 hover:bg-black/80 transition-all flex items-center justify-center border border-white/5"
+                    title="Excluir"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+
                 <div className="flex-1 min-w-0 z-10 flex flex-col h-full justify-between">
                   <div>
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="font-black text-lg text-white leading-tight break-words uppercase tracking-tighter flex-1">{p.name}</h4>
-                      <div className="flex items-center gap-1 shrink-0 bg-black/40 p-1 rounded-lg border border-white/5">
-                        <button 
-                          onClick={() => handleEditClick(p)}
-                          className="text-neutral-500 hover:text-orange-500 transition-colors p-1"
-                          title="Editar"
-                        >
-                          <Edit3 size={14} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteClick(p._id)}
-                          className="text-neutral-600 hover:text-red-500 transition-colors p-1"
-                          title="Excluir"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                    <div className="pr-20"> {/* Extra padding for the buttons */}
+                      <h4 className="font-black text-lg text-white leading-tight break-words uppercase tracking-tighter">
+                        {p.name}
+                      </h4>
                     </div>
-                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest mt-0.5 italic">{p.category}</p>
+                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest mt-1 italic">{p.category}</p>
                   </div>
                   
                   <div className="flex flex-wrap items-end justify-between gap-3 mt-4">
