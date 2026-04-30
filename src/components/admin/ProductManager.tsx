@@ -388,7 +388,7 @@ export default function ProductManager() {
                 <div className="flex-1 min-w-0 z-10 flex flex-col h-full justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <h4 className="font-black text-lg text-white leading-tight truncate uppercase tracking-tighter flex-1">{p.name}</h4>
+                      <h4 className="font-black text-lg text-white leading-tight break-words uppercase tracking-tighter flex-1">{p.name}</h4>
                       <div className="flex items-center gap-1 shrink-0 bg-black/40 p-1 rounded-lg border border-white/5">
                         <button 
                           onClick={() => handleEditClick(p)}
