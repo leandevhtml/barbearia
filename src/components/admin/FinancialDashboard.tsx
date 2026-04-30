@@ -16,7 +16,7 @@ function TTip({ active, payload, label }: any) {
     <div className="glass-bright rounded-2xl p-4 text-xs border-orange-500/20 shadow-2xl">
       <p className="mb-2 font-black text-neutral-500 uppercase tracking-widest">{label}</p>
       {payload.map((p: any) => (
-        <p key={p.name} className="font-black text-xl text-orange-500">
+        <p key={p.name} className="font-black text-xl text-white drop-shadow-md">
           {p.name === 'revenue' ? `R$ ${Number(p.value).toFixed(2)}` : `${p.value} cortes`}
         </p>
       ))}
@@ -27,9 +27,11 @@ function TTip({ active, payload, label }: any) {
 export default function FinancialDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('7d'); // 1d, 7d, 30d, 1y
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    setLoading(true);
+    fetch(`/api/admin/stats?range=${timeRange}`)
       .then(res => res.json())
       .then(json => {
         setData(json);
@@ -39,22 +41,28 @@ export default function FinancialDashboard() {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [timeRange]);
 
-  const { todayRev = 0, todayCuts = 0, weeklyData = [], pieData = [] } = data || {};
+  const { totalRev = 0, totalCuts = 0, chartData = [], pieData = [] } = data || {};
   
-  const weekRev = weeklyData.reduce((s: number, d: any) => s + d.revenue, 0);
-  const weekCuts = weeklyData.reduce((s: number, d: any) => s + d.cuts, 0);
-  const avg = todayCuts > 0 ? todayRev / todayCuts : 0;
+  const avg = totalCuts > 0 ? totalRev / totalCuts : 0;
+  const bestDay = chartData.reduce((prev: any, curr: any) => (curr.revenue > prev.revenue ? curr : prev), { revenue: 0, day: '-' });
+
+  const getRangeText = () => {
+    if (timeRange === '1d') return 'HOJE';
+    if (timeRange === '7d') return '7 DIAS';
+    if (timeRange === '30d') return '30 DIAS';
+    return '1 ANO';
+  };
 
   const kpis = [
-    { label:'Receita Diária', value:`R$ ${todayRev.toFixed(2)}`, icon:'💰', color:'#10b981', trend:'HOJE' },
-    { label:'Atendimentos',   value:todayCuts,                    icon:'✂️', color:'var(--orange)', trend:`HOJE` },
+    { label:`Receita (${getRangeText()})`, value:`R$ ${totalRev.toFixed(2)}`, icon:'💰', color:'#10b981', trend:getRangeText() },
+    { label:'Atendimentos',   value:totalCuts,                    icon:'✂️', color:'var(--orange)', trend:getRangeText() },
     { label:'Ticket Médio',   value:`R$ ${avg.toFixed(2)}`,       icon:'🧾', color:'#f59e0b', trend:'MÉDIA' },
-    { label:'Total Semanal',  value:`R$ ${weekRev.toLocaleString('pt-BR')}`, icon:'📈', color:'#06b6d4', trend:'7 DIAS' },
+    { label:'Pico de Receita',value:`R$ ${bestDay.revenue.toFixed(2)}`, icon:'📈', color:'#06b6d4', trend:bestDay.day || '-' },
   ];
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
@@ -65,6 +73,35 @@ export default function FinancialDashboard() {
 
   return (
     <div className="space-y-8">
+      
+      {/* ── Filter Header ── */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-3xl font-bebas italic tracking-widest text-white">Relatório <span className="text-orange-500">Financeiro</span></h2>
+          <p className="text-sm font-bold text-neutral-400 uppercase">Acompanhe seus resultados e faturamento</p>
+        </div>
+        
+        <div className="flex p-1 bg-neutral-900 border border-white/5 rounded-xl">
+          {[
+            { id: '1d', label: '1 Dia' },
+            { id: '7d', label: '1 Semana' },
+            { id: '30d', label: '1 Mês' },
+            { id: '1y', label: '1 Ano' }
+          ].map(r => (
+            <button
+              key={r.id}
+              onClick={() => setTimeRange(r.id)}
+              className={`px-4 py-2 rounded-lg text-xs font-black uppercase transition-all ${
+                timeRange === r.id 
+                  ? 'bg-orange-600 text-white shadow-lg' 
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* ── KPI Grid ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -78,12 +115,12 @@ export default function FinancialDashboard() {
               style={{ background: k.color }} />
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl">{k.icon}</div>
-              <span className="text-[10px] font-black px-3 py-1 rounded-full bg-white/5 border border-white/5 text-white/50 uppercase tracking-widest">
+              <span className="text-xs font-black px-3 py-1 rounded-full bg-white/5 border border-white/5 text-white/70 uppercase tracking-widest">
                 {k.trend}
               </span>
             </div>
             <p className="text-3xl font-black text-white tracking-tighter">{k.value}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-neutral-500">{k.label}</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] mt-1 text-neutral-400">{k.label}</p>
           </motion.div>
         ))}
       </div>
@@ -94,19 +131,20 @@ export default function FinancialDashboard() {
         {/* Revenue Area Chart */}
         <motion.div className="glass rounded-[2rem] p-8 border border-white/5"
           initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}>
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-start mb-8 relative">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 mb-1">Performance Financeira</p>
-              <h4 className="text-2xl font-black text-white tracking-tighter">Receita nos Últimos 7 Dias</h4>
+              <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-400 mb-1">Performance Financeira</p>
+              <h4 className="text-2xl font-black text-white tracking-tighter">Receita no Período</h4>
             </div>
             <div className="text-right">
-                <p className="text-2xl font-black text-orange-500 tracking-tighter">R$ {weekRev.toLocaleString('pt-BR')}</p>
-                <p className="text-[10px] font-bold text-neutral-500">Volume total acumulado</p>
+                <p className="text-2xl font-black text-white tracking-tighter drop-shadow-md">R$ {totalRev.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-xs font-bold text-neutral-400">Volume total acumulado</p>
             </div>
+            {loading && <div className="absolute top-0 right-0 w-full h-full bg-neutral-950/50 flex items-center justify-center z-10 backdrop-blur-[2px] rounded-[2rem]"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>}
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={weeklyData} margin={{ top:10, right:10, bottom:0, left:-20 }}>
+                <AreaChart data={chartData} margin={{ top:10, right:10, bottom:0, left:-20 }}>
                 <defs>
                     <linearGradient id="orangeGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%"  stopColor="#ff6e00" stopOpacity={0.3} />
@@ -114,9 +152,9 @@ export default function FinancialDashboard() {
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fill:'#444', fontSize:11, fontWeight:800 }} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{ fill:'#444', fontSize:11, fontWeight:800 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<TTip />} />
+                <XAxis dataKey="day" tick={{ fill:'#888', fontSize:12, fontWeight:700 }} axisLine={false} tickLine={false} dy={10} />
+                <YAxis tick={{ fill:'#888', fontSize:12, fontWeight:700 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<TTip />} cursor={{ stroke: 'rgba(255,110,0,0.2)', strokeWidth: 2, strokeDasharray: '5 5' }} />
                 <Area type="monotone" dataKey="revenue" stroke="#ff6e00" strokeWidth={4}
                     fill="url(#orangeGrad)" dot={{ fill:'#ff6e00', strokeWidth:0, r:4 }}
                     activeDot={{ r:8, fill:'#fff', stroke:'#ff6e00', strokeWidth:4 }} />
@@ -128,28 +166,24 @@ export default function FinancialDashboard() {
         {/* Volume Bar Chart */}
         <motion.div className="glass rounded-[2rem] p-8 border border-white/5"
           initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}>
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-start mb-8 relative">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 mb-1">Volume de Clientes</p>
-              <h4 className="text-2xl font-black text-white tracking-tighter">Atendimentos por Dia</h4>
+              <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-400 mb-1">Volume de Clientes</p>
+              <h4 className="text-2xl font-black text-white tracking-tighter">Atendimentos no Período</h4>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-orange-600/10 flex items-center justify-center text-orange-500 text-xl font-black">
-                {weekCuts}
+            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white text-xl font-black shadow-lg">
+                {totalCuts}
             </div>
+            {loading && <div className="absolute top-0 right-0 w-full h-full bg-neutral-950/50 flex items-center justify-center z-10 backdrop-blur-[2px] rounded-[2rem]"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>}
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData} margin={{ top:10, right:10, bottom:0, left:-20 }}>
+                <BarChart data={chartData} margin={{ top:10, right:10, bottom:0, left:-20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fill:'#444', fontSize:11, fontWeight:800 }} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{ fill:'#444', fontSize:11, fontWeight:800 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<TTip />} />
-                <Bar dataKey="cuts" radius={[8,8,0,0]} barSize={40}>
-                    {weeklyData.map((_: any, i: number) => (
-                    <Cell key={i} fill={i === weeklyData.length - 1 ? 'var(--orange)' : 'rgba(255,255,255,0.05)'} 
-                          className="hover:fill-orange-400 transition-colors duration-300" />
-                    ))}
-                </Bar>
+                <XAxis dataKey="day" tick={{ fill:'#888', fontSize:12, fontWeight:700 }} axisLine={false} tickLine={false} dy={10} />
+                <YAxis tick={{ fill:'#888', fontSize:12, fontWeight:700 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<TTip />} cursor={{ fill: 'rgba(255,110,0,0.1)' }} />
+                <Bar dataKey="cuts" radius={[8,8,0,0]} maxBarSize={50} fill="#ff6e00" />
                 </BarChart>
             </ResponsiveContainer>
           </div>
@@ -160,9 +194,10 @@ export default function FinancialDashboard() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         
         {/* Service Mix Pie */}
-        <motion.div className="glass rounded-[2rem] p-8 border border-white/5"
+        <motion.div className="glass rounded-[2rem] p-8 border border-white/5 relative"
           initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.5 }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 mb-6">Mix de Serviços</p>
+          {loading && <div className="absolute inset-0 bg-neutral-950/50 flex items-center justify-center z-10 backdrop-blur-[2px] rounded-[2rem]"><div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>}
+          <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-400 mb-6">Mix de Serviços</p>
           <div className="h-[200px] w-full flex justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -188,16 +223,74 @@ export default function FinancialDashboard() {
           </div>
         </motion.div>
 
-        {/* Long term trend info card */}
-        <motion.div className="glass rounded-[2rem] p-8 border border-white/5 xl:col-span-2 flex flex-col justify-center items-center text-center space-y-4"
+        {/* Revenue Breakdown Card */}
+        <motion.div className="glass rounded-[2rem] p-8 border border-white/5 xl:col-span-2 space-y-8"
           initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.6 }}>
-          <div className="w-20 h-20 bg-orange-600/10 rounded-full flex items-center justify-center text-4xl mb-2">💎</div>
-          <h4 className="text-2xl font-bebas italic text-white tracking-widest uppercase">Clube Gigantes do Corte</h4>
-          <p className="text-xs font-bold text-neutral-500 max-w-sm">
-            Os dados acima refletem apenas atendimentos finalizados. O sistema de fidelidade e estoque é atualizado em tempo real no momento do checkout.
-          </p>
-          <div className="bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
-             <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Status do Servidor: Operacional</p>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-400 mb-6">Detalhamento de Receita</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* Services vs Consumption */}
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">Serviços vs Consumo</span>
+                        <span className="text-xs font-bold text-neutral-500">{((data?.splits?.serviceRevenue / totalRev) * 100 || 0).toFixed(0)}% / {((data?.splits?.consumptionRevenue / totalRev) * 100 || 0).toFixed(0)}%</span>
+                    </div>
+                    <div className="h-4 bg-white/5 rounded-full overflow-hidden flex border border-white/5">
+                        <div className="h-full bg-orange-600 shadow-[0_0_15px_rgba(234,88,12,0.5)]" style={{ width: `${(data?.splits?.serviceRevenue / totalRev) * 100 || 0}%` }} />
+                        <div className="h-full bg-white/10" style={{ width: `${(data?.splits?.consumptionRevenue / totalRev) * 100 || 0}%` }} />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-600"></span>
+                            <span className="text-neutral-400">Mão de Obra:</span>
+                            <span className="text-white">R$ {data?.splits?.serviceRevenue?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-white/20"></span>
+                            <span className="text-neutral-400">Produtos:</span>
+                            <span className="text-white">R$ {data?.splits?.consumptionRevenue?.toFixed(2) || '0.00'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* App vs Counter */}
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">Origem do Pagamento</span>
+                        <span className="text-xs font-bold text-neutral-500">{((data?.splits?.appRevenue / totalRev) * 100 || 0).toFixed(0)}% APP</span>
+                    </div>
+                    <div className="h-4 bg-white/5 rounded-full overflow-hidden flex border border-white/5">
+                        <div className="h-full bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]" style={{ width: `${(data?.splits?.appRevenue / totalRev) * 100 || 0}%` }} />
+                        <div className="h-full bg-white/10" style={{ width: `${(data?.splits?.counterRevenue / totalRev) * 100 || 0}%` }} />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span className="text-neutral-400">Pré-pago (App):</span>
+                            <span className="text-white">R$ {data?.splits?.appRevenue?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-white/20"></span>
+                            <span className="text-neutral-400">No Balcão:</span>
+                            <span className="text-white">R$ {data?.splits?.counterRevenue?.toFixed(2) || '0.00'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-600/10 rounded-2xl flex items-center justify-center text-2xl">📊</div>
+                  <div>
+                      <p className="text-xs font-black text-white uppercase tracking-widest">Análise de Tendência</p>
+                      <p className="text-[10px] font-bold text-neutral-500 uppercase">Dados baseados em {getRangeText()}</p>
+                  </div>
+              </div>
+              <p className="text-xs text-neutral-500 font-bold max-w-sm text-center md:text-right italic">
+                Lembre-se: O lucro real depende do abatimento das comissões dos barbeiros e custo dos produtos.
+              </p>
           </div>
         </motion.div>
       </div>

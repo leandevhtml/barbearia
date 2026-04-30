@@ -16,6 +16,7 @@ interface Service {
 export default function ServiceManager() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newPrice, setNewPrice] = useState('');
   const [newDuration, setNewDuration] = useState('');
@@ -37,11 +38,14 @@ export default function ServiceManager() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/services', {
-        method: 'POST',
+      const url = editingId ? `/api/services/${editingId}` : '/api/services';
+      const method = editingId ? 'PATCH' : 'POST';
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           name: newName, 
@@ -51,12 +55,29 @@ export default function ServiceManager() {
         })
       });
       if (res.ok) {
-        setNewName(''); setNewPrice(''); setNewDuration('');
+        resetForm();
         fetchServices();
       }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleEdit = (service: Service) => {
+    setEditingId(service._id);
+    setNewName(service.name);
+    setNewPrice(service.price.toString());
+    setNewDuration(service.duration.toString());
+    setNewIcon(service.icon);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setNewName('');
+    setNewPrice('');
+    setNewDuration('');
+    setNewIcon('✂️');
   };
 
   const toggleService = async (service: Service) => {
@@ -100,11 +121,16 @@ export default function ServiceManager() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Create Form */}
         <motion.div 
-            className="luxury-card p-6 border border-orange-500/20"
+            className="luxury-card p-6 border border-orange-500/20 sticky top-24 self-start"
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
         >
-            <h3 className="text-xl font-bebas italic tracking-widest text-orange-500 mb-6">Novo Serviço</h3>
-            <form onSubmit={handleCreate} className="space-y-4">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bebas italic tracking-widest text-orange-500">{editingId ? 'Editar Serviço' : 'Novo Serviço'}</h3>
+                {editingId && (
+                    <button onClick={resetForm} className="text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-colors">Cancelar</button>
+                )}
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <input 
                     type="text" placeholder="Nome do Serviço" required
                     value={newName} onChange={e => setNewName(e.target.value)}
@@ -133,7 +159,9 @@ export default function ServiceManager() {
                     <option value="🎨">🎨 Pigmento</option>
                     <option value="✨">✨ Brilho</option>
                 </select>
-                <button type="submit" className="btn-prime w-full py-4 text-xs font-black uppercase tracking-widest">Criar Serviço</button>
+                <button type="submit" className="btn-prime w-full py-4 text-xs font-black uppercase tracking-widest">
+                    {editingId ? 'Salvar Alterações' : 'Criar Serviço'}
+                </button>
             </form>
         </motion.div>
 
@@ -194,20 +222,30 @@ export default function ServiceManager() {
                 </div>
               </div>
 
-              <button
-                onClick={() => toggleService(service)}
-                className={`relative w-14 h-7 rounded-full transition-all duration-500 flex-shrink-0 flex items-center px-1 ${
-                  service.active
-                    ? 'bg-orange-600 shadow-[0_0_15px_rgba(255,110,0,0.4)]'
-                    : 'bg-white/5 border border-white/10'
-                }`}
-              >
-                <motion.div
-                  className="w-5 h-5 rounded-full bg-white shadow-xl"
-                  animate={{ x: service.active ? 24 : 0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                />
-              </button>
+              <div className="flex flex-col md:flex-row items-center gap-4">
+                <button
+                  onClick={() => handleEdit(service)}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-orange-500 hover:border-orange-500/30 transition-all text-sm"
+                  title="Editar Serviço"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => toggleService(service)}
+                  className={`relative w-14 h-7 rounded-full transition-all duration-500 flex-shrink-0 flex items-center px-1 ${
+                    service.active
+                      ? 'bg-orange-600 shadow-[0_0_15px_rgba(255,110,0,0.4)]'
+                      : 'bg-white/5 border border-white/10'
+                  }`}
+                  title={service.active ? 'Desativar Serviço' : 'Ativar Serviço'}
+                >
+                  <motion.div
+                    className="w-5 h-5 rounded-full bg-white shadow-xl"
+                    animate={{ x: service.active ? 24 : 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  />
+                </button>
+              </div>
             </div>
           </motion.div>
         ))}

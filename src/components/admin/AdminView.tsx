@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBarbershopStore } from '@/store/barbershopStore';
 import { signOut } from 'next-auth/react';
@@ -25,8 +25,14 @@ type AdminTab = typeof ADMIN_TABS[number]['id'];
 export default function AdminView() {
   const [tab, setTab] = useState<AdminTab>('appointments');
   const [isOpen, setIsOpen] = useState(false);
-  const { toggleAdminMode, notifications, markNotificationsRead, logout, currentUser } = useBarbershopStore();
+  const { toggleAdminMode, notifications, markNotificationsRead, logout, currentUser, syncUser } = useBarbershopStore();
   const [showNotifs, setShowNotifs] = useState(false);
+
+  // Auto-sync notifications and settings
+  useEffect(() => {
+    const interval = setInterval(syncUser, 8000);
+    return () => clearInterval(interval);
+  }, [syncUser]);
 
   // Absolute Security Guard - Role-based protection
   if (currentUser?.role !== 'admin') return null;
@@ -90,10 +96,10 @@ export default function AdminView() {
   );
 
   return (
-    <div className="flex min-h-dvh bg-[#050505] text-white relative overflow-hidden">
+    <div className="flex h-screen bg-[#020202] text-white relative overflow-hidden">
       
       {/* ── Lateral Sidebar (Desktop) ── */}
-      <aside className="hidden lg:block w-[300px] bg-[#050505] border-r border-white/5 sticky top-0 h-dvh">
+      <aside className="hidden lg:block w-[300px] bg-[#050505] border-r border-white/5 sticky top-0 h-[100dvh]">
           <NavContent />
       </aside>
 
@@ -124,9 +130,8 @@ export default function AdminView() {
       </AnimatePresence>
 
       {/* ── Main Stage ── */}
-      <main className="flex-1 h-dvh overflow-y-auto no-scrollbar relative lg:pt-0">
-        
-        <header className="lg:hidden w-full z-50 px-4 flex justify-between items-center bg-[#050505]/95 md:backdrop-blur-xl border-b border-white/5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px', minHeight: '80px' }}>
+      <main className="flex-1 overflow-y-auto no-scrollbar relative lg:pt-0 grid-bg">
+        <header className={`relative lg:hidden w-full px-4 flex justify-between items-center bg-black/60 backdrop-blur-xl border-b border-white/5 ${showNotifs ? 'z-[1000]' : 'z-50'}`} style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: '16px', minHeight: '80px' }}>
             <button 
                 onClick={() => setIsOpen(true)}
                 className="w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass-panel rounded-xl border-white/10 lg:hidden"
@@ -136,8 +141,8 @@ export default function AdminView() {
                 <div className="w-6 h-0.5 bg-white rounded-full" />
             </button>
 
-            {/* Centered Logo */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex items-center justify-center">
+            {/* Centered Logo (Vertically Aligned) */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center" style={{ marginTop: 'calc(env(safe-area-inset-top, 0px) / 2)' }}>
                 <div className="relative w-32 h-16 md:w-40 md:h-20">
                     <Image 
                         src="/logo.png" 
@@ -164,42 +169,11 @@ export default function AdminView() {
                         </span>
                     )}
                 </motion.button>
-
-                <AnimatePresence>
-                    {showNotifs && (
-                        <>
-                            <motion.div 
-                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                onClick={() => setShowNotifs(false)}
-                                className="fixed inset-0 z-[290] bg-black/20 backdrop-blur-[2px]"
-                            />
-                            <motion.div 
-                                initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                                className="absolute top-16 right-0 w-[280px] md:w-[450px] bg-[#0c0c0c] rounded-[2rem] p-6 z-[300] border border-orange-500/40 shadow-[0_40px_80px_rgba(0,0,0,1)]"
-                            >
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-6">Notificações</h4>
-                                <div className="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar">
-                                    {adminNotifs.length === 0 ? (
-                                        <p className="text-center py-10 text-neutral-600 text-xs italic">Sem alertas.</p>
-                                    ) : (
-                                        adminNotifs.map(n => (
-                                            <div key={n.id} className={`p-5 rounded-2xl border ${n.type === 'reward' ? 'bg-orange-600/20 border-orange-500/40' : 'bg-white/5 border-white/10'}`}>
-                                                <p className="text-sm font-bold text-white leading-relaxed">{n.message}</p>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
             </div>
         </header>
 
         {/* Content Section */}
-        <div className="p-6 pb-24">
+        <div className="p-6 lg:px-12 pb-8 max-w-5xl mx-auto w-full">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={tab}
@@ -221,6 +195,54 @@ export default function AdminView() {
             </AnimatePresence>
         </div>
       </main>
+
+      {/* ── Global Admin Notifications Overlay (Root level) ── */}
+      <AnimatePresence>
+        {showNotifs && (
+            <>
+                <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => setShowNotifs(false)}
+                    className="fixed inset-0 z-[2000] bg-black/80 backdrop-blur-xl"
+                />
+                
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[450px] bg-[#0c0c0c] rounded-[2.5rem] p-8 z-[2001] border border-orange-500/30 shadow-[0_50px_100px_rgba(0,0,0,1)] flex flex-col"
+                    style={{ maxHeight: '80dvh' }}
+                >
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-orange-500 mb-1">Alertas do Sistema</h4>
+                            <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Painel Administrativo</p>
+                        </div>
+                        <button onClick={() => setShowNotifs(false)} className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-xl text-white border-white/10">✕</button>
+                    </div>
+
+                    <div className="space-y-4 overflow-y-auto no-scrollbar pr-1">
+                        {adminNotifs.length === 0 ? (
+                            <div className="text-center py-20">
+                                <span className="text-5xl block mb-4 opacity-20">🔔</span>
+                                <p className="text-neutral-600 text-xs font-bold uppercase tracking-widest italic">Sem novos alertas.</p>
+                            </div>
+                        ) : (
+                            adminNotifs.map(n => (
+                                <div key={n.id} className={`p-5 rounded-3xl border space-y-2 ${n.type === 'reward' ? 'bg-orange-600/10 border-orange-500/30' : 'bg-white/5 border-white/10'}`}>
+                                    <p className="text-xs font-bold text-white leading-relaxed">{n.message}</p>
+                                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/5">
+                                        <p className="text-[8px] font-black text-neutral-600 uppercase tracking-widest">Admin Notification</p>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${n.type === 'reward' ? 'bg-orange-500' : 'bg-neutral-700'}`} />
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </motion.div>
+            </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

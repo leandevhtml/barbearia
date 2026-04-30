@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, email, phone, password, specialty, commissionRate } = await req.json();
+    const { name, email, phone, password, specialty, commissionRate, avatar } = await req.json();
 
     if (!name || !email || !phone || !password) {
       return NextResponse.json({ message: 'Campos obrigatórios faltando' }, { status: 400 });
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       role: 'barber',
       specialty,
       commissionRate: commissionRate || 50,
-      avatar: name.substring(0, 2).toUpperCase(),
+      avatar: avatar || name.substring(0, 2).toUpperCase(),
     });
 
     await newBarber.save();

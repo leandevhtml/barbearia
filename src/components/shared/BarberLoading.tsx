@@ -1,139 +1,87 @@
 'use client';
 
-// Pure CSS loading screen — zero Framer Motion, zero JS animation overhead
-// Uses CSS @keyframes which run on the compositor thread (GPU) on iOS
-export default function BarberLoading({ message = 'PREPARANDO SUA CADEIRA...' }: { message?: string }) {
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+
+/**
+ * BarberLoading - High Performance Loading Screen
+ * 
+ * Uses GPU-accelerated CSS animations defined in globals.css.
+ * Optimized for mobile to prevent 'freezing' and main-thread blocking.
+ * Integrated with Framer Motion for smooth exit transitions.
+ */
+export default function BarberLoading({ 
+  message = 'PREPARANDO SUA CADEIRA...',
+  inline = false 
+}: { 
+  message?: string,
+  inline?: boolean
+}) {
   return (
-    <div className="barber-loading-overlay">
+    <motion.div 
+      className={inline ? "flex flex-col items-center justify-center py-20 w-full h-full min-h-[400px]" : "barber-loading-overlay"}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="barber-loading-inner">
-        {/* CSS-only spinner ring */}
-        <div className="barber-spinner">
-          <div className="barber-spinner-track" />
-          <div className="barber-spinner-head" />
-          {/* Barber pole center bar */}
-          <div className="barber-pole-bar" />
+        {/* SVG Premium Spinner - Branded with Logo */}
+        <div className="relative w-28 h-28 flex items-center justify-center">
+          <motion.svg 
+            className="w-full h-full" 
+            viewBox="0 0 100 100"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+          >
+            <defs>
+              <linearGradient id="spinner-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff6e00" />
+                <stop offset="100%" stopColor="#ea580c" />
+              </linearGradient>
+            </defs>
+            {/* Background static ring */}
+            <circle 
+              cx="50" cy="50" r="46" 
+              stroke="rgba(255,110,0,0.05)" 
+              strokeWidth="2" 
+              fill="none" 
+            />
+            {/* Active rotating ring */}
+            <circle 
+              cx="50" cy="50" r="46" 
+              stroke="url(#spinner-grad)" 
+              strokeWidth="4" 
+              strokeLinecap="round" 
+              fill="none" 
+              strokeDasharray="140 300"
+            />
+          </motion.svg>
+          
+          {/* Logo in the center with breathing effect */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div 
+              className="relative w-16 h-16 flex items-center justify-center"
+              animate={{ 
+                scale: [1, 1.05, 1],
+                filter: ['brightness(1)', 'brightness(1.2)', 'brightness(1)']
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Image 
+                src="/logo.png" 
+                alt="Logo" 
+                width={64} 
+                height={64} 
+                className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,110,0,0.3)]"
+              />
+            </motion.div>
+          </div>
         </div>
-        {/* Text */}
+
+        {/* Status Text */}
         <p className="barber-loading-text">{message}</p>
-        {/* Dots */}
-        <div className="barber-dots">
-          <span className="barber-dot" style={{ animationDelay: '0s' }} />
-          <span className="barber-dot" style={{ animationDelay: '0.2s' }} />
-          <span className="barber-dot" style={{ animationDelay: '0.4s' }} />
-        </div>
       </div>
-
-      <style>{`
-        .barber-loading-overlay {
-          position: fixed;
-          inset: 0;
-          z-index: 9999;
-          background: #050505;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1.5rem;
-          /* GPU layer hint — prevents compositing conflicts */
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-          will-change: opacity;
-          animation: fadeIn 0.2s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-
-        .barber-loading-inner {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
-        }
-
-        .barber-spinner {
-          position: relative;
-          width: 72px;
-          height: 72px;
-          margin-bottom: 28px;
-        }
-
-        .barber-spinner-track {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          border: 2px solid rgba(255, 110, 0, 0.15);
-        }
-
-        .barber-spinner-head {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          border: 2px solid transparent;
-          border-top-color: #ff6e00;
-          /* CSS animation runs on compositor thread — zero JS */
-          animation: spin 0.9s linear infinite;
-          will-change: transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
-        .barber-pole-bar {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%) translateZ(0);
-          width: 3px;
-          height: 28px;
-          border-radius: 999px;
-          background: linear-gradient(to bottom, #ef4444, #ffffff, #3b82f6);
-          animation: pulse-bar 1.6s ease-in-out infinite;
-          will-change: opacity;
-        }
-
-        @keyframes pulse-bar {
-          0%, 100% { opacity: 0.5; }
-          50%       { opacity: 1; }
-        }
-
-        .barber-loading-text {
-          font-size: 9px;
-          font-weight: 900;
-          color: rgba(255,255,255,0.35);
-          text-transform: uppercase;
-          letter-spacing: 0.5em;
-          margin-bottom: 14px;
-          font-family: var(--font-outfit, sans-serif);
-        }
-
-        .barber-dots {
-          display: flex;
-          gap: 5px;
-          align-items: center;
-        }
-
-        .barber-dot {
-          display: block;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #ff6e00;
-          animation: dot-pulse 1s ease-in-out infinite;
-          will-change: opacity, transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-        }
-
-        @keyframes dot-pulse {
-          0%, 100% { opacity: 0.25; transform: scale(0.8) translateZ(0); }
-          50%       { opacity: 1;    transform: scale(1.2) translateZ(0); }
-        }
-      `}</style>
-    </div>
+    </motion.div>
   );
 }

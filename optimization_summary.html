@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimização de Tokens</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Bebas+Neue&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-image: 
+                radial-gradient(circle at top right, rgba(234, 88, 12, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at bottom left, rgba(234, 88, 12, 0.1) 0%, transparent 50%);
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 32px;
+            padding: 60px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #ea580c;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #a3a3a3;
+            margin-bottom: 50px;
+            font-weight: 400;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 40px 20px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(234, 88, 12, 0.3);
+            box-shadow: 0 10px 30px rgba(234, 88, 12, 0.1);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .metric-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ea580c;
+            font-weight: 700;
+        }
+
+        .files-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: left;
+        }
+
+        .files-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #737373;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .file-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border-left: 3px solid #ea580c;
+        }
+
+        .file-name {
+            font-family: monospace;
+            color: #e5e5e5;
+            font-size: 0.95rem;
+        }
+
+        .file-lines {
+            font-weight: 700;
+            color: #ef4444;
+            font-size: 0.9rem;
+        }
+        
+        .file-target {
+            font-weight: 700;
+            color: #22c55e;
+            font-size: 0.9rem;
+        }
+        
+        .arrow {
+            color: #737373;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Token Economy Plan</h1>
+        <p class="subtitle">Auditoria de estrutura para máxima eficiência do Agente IA</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">📉</div>
+                <div class="metric-value">-60%</div>
+                <div class="metric-label">Uso de Tokens</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⚡</div>
+                <div class="metric-value">2.5x</div>
+                <div class="metric-label">Mais Rápido</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">💰</div>
+                <div class="metric-value">-60%</div>
+                <div class="metric-label">Custos por Sessão</div>
+            </div>
+        </div>
+
+        <div class="files-section">
+            <div class="files-title">Gargalos Identificados (> 300 linhas)</div>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">ProductManager.tsx</span>
+                    <div><span class="file-lines">469 lin.</span> <span class="arrow">→</span> <span class="file-target">~100 lin. (Dividido)</span></div>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">BarberManager.tsx</span>
+                    <div><span class="file-lines">407 lin.</span> <span class="arrow">→</span> <span class="file-target">~80 lin. (Dividido)</span></div>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">barbershopStore.ts</span>
+                    <div><span class="file-lines">401 lin.</span> <span class="arrow">→</span> <span class="file-target">~50 lin. (Slices)</span></div>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">SystemSettings.tsx</span>
+                    <div><span class="file-lines">384 lin.</span> <span class="arrow">→</span> <span class="file-target">~100 lin. (Dividido)</span></div>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">BookingForm.tsx</span>
+                    <div><span class="file-lines">348 lin.</span> <span class="arrow">→</span> <span class="file-target">~80 lin. (Dividido)</span></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

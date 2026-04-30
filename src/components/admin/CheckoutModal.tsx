@@ -21,6 +21,9 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'cash'>('pix');
+  const [isServicePaid, setIsServicePaid] = useState(
+    appointment.paymentStatus === 'paid_app' || appointment.paymentStatus === 'free_reward'
+  );
 
   useEffect(() => {
     fetch('/api/products')
@@ -59,7 +62,7 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
   };
 
   const subtotalProducts = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const total = appointment.price + subtotalProducts;
+  const totalToPay = (isServicePaid ? 0 : appointment.price) + subtotalProducts;
 
   return (
     <motion.div 
@@ -108,11 +111,21 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
             
             <div className="flex-1 space-y-4 overflow-y-auto pr-2">
               <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-bold text-white uppercase tracking-tight">{appointment.serviceName}</p>
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                    {appointment.serviceName}
+                    {isServicePaid && (
+                        <span className="text-[7px] bg-green-500/20 text-green-500 px-1.5 py-0.5 rounded-full uppercase font-black">PAGO</span>
+                    )}
+                  </p>
                   <p className="text-[10px] text-neutral-500">Serviço Agendado</p>
                 </div>
-                <p className="text-xs font-black text-white">R$ {appointment.price.toFixed(2)}</p>
+                <button 
+                    onClick={() => setIsServicePaid(!isServicePaid)}
+                    className={`text-xs font-black transition-all ${isServicePaid ? 'text-neutral-500 line-through' : 'text-orange-500 hover:text-orange-400 underline decoration-dotted'}`}
+                >
+                    R$ {appointment.price.toFixed(2)}
+                </button>
               </div>
 
               {selectedItems.map(item => (
@@ -135,7 +148,7 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
 
             <div className="mt-6 pt-6 border-t border-white/10 space-y-5">
               <div>
-                <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-3">Forma de Pagamento</p>
+                <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-3">Forma de Pagamento (Restante)</p>
                 <div className="grid grid-cols-3 gap-2">
                     {[
                         { id: 'pix', label: 'PIX', icon: '📱' },
@@ -158,10 +171,12 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
 
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Total a Pagar</span>
-                <span className="text-3xl text-bebas font-black text-orange-500 italic">R$ {total.toFixed(2)}</span>
+                <span className="text-3xl text-bebas font-black text-orange-500 italic">
+                    R$ {totalToPay.toFixed(2)}
+                </span>
               </div>
               <button 
-                onClick={() => onConfirm(selectedItems, total, paymentMethod)}
+                onClick={() => onConfirm(selectedItems, totalToPay, paymentMethod)}
                 className="btn-prime w-full py-4 text-xs font-black tracking-widest"
               >
                 FINALIZAR E PAGAR

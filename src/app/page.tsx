@@ -11,7 +11,6 @@ import AuthView from '@/components/shared/AuthView';
 import StampAnimationOverlay from '@/components/shared/StampAnimationOverlay';
 import FreeCouponModal from '@/components/shared/FreeCouponModal';
 
-import BarberLoading from '@/components/shared/BarberLoading';
 import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
 import { useState } from 'react';
 
@@ -19,21 +18,44 @@ export default function HomePage() {
   const { data: session, status } = useSession();
   const { currentUser, isAdminMode, setCurrentUser, settings, syncUser } = useBarbershopStore();
   const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [lastShownUserId, setLastShownUserId] = useState<string | null>(null);
+  const [hasDismissedAnnouncement, setHasDismissedAnnouncement] = useState(false);
+  const [autoAnnouncement, setAutoAnnouncement] = useState<{text: string, image: string} | null>(null);
 
   // Sync settings
   useEffect(() => {
     syncUser();
   }, [syncUser]);
 
-  // Trigger announcement once per user login
+  // Trigger announcement once per user login (Manual or Auto-warning)
   useEffect(() => {
     const currentId = currentUser?._id || currentUser?.id;
-    if (settings?.announcementEnabled && currentId && currentId !== lastShownUserId) {
+    if (!currentId || !settings) return;
+
+    // 1. Check Global Manual Announcement
+    if (settings.announcementEnabled && !hasDismissedAnnouncement) {
+      setAutoAnnouncement(null); // Clear auto if manual is active
       setShowAnnouncement(true);
-      setLastShownUserId(currentId);
+      return;
     }
-  }, [settings?.announcementEnabled, currentUser?.id, lastShownUserId]);
+
+    // 2. Auto-Warning for Tomorrow's Closure (Shown 1 day before)
+    if (!hasDismissedAnnouncement) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
+      
+      const specialTomorrow = settings.specialDays?.find((s: any) => s.date === tomorrowStr && s.isClosed);
+      
+      if (specialTomorrow) {
+        const dateFmt = new Date(specialTomorrow.date + 'T12:00:00Z').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+        setAutoAnnouncement({
+          text: `⚠️ AVISO: Amanhã (${dateFmt}) a barbearia não funcionará devido ao feriado/folga. Antecipe seu agendamento!`,
+          image: '/announcements/feriado.png'
+        });
+        setShowAnnouncement(true);
+      }
+    }
+  }, [settings, currentUser?.id, hasDismissedAnnouncement]);
 
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
@@ -71,9 +93,7 @@ export default function HomePage() {
     }
   }, [status, currentUser, setCurrentUser]);
 
-  if (status === 'loading' || (status === 'authenticated' && !currentUser)) {
-    return <BarberLoading message="CARREGANDO CLUBE GIGANTES..." />;
-  }
+  // Combined loading check is now handled by Providers for a smoother transition
 
   return (
     <main className="min-h-dvh relative flex flex-col overflow-x-hidden selection:bg-orange-500/30">
@@ -113,11 +133,14 @@ export default function HomePage() {
       )}
       {/* ── Global Announcement Popup ── */}
       <AnimatePresence>
-        {showAnnouncement && settings?.announcementEnabled && (
+        {showAnnouncement && (settings?.announcementEnabled || autoAnnouncement) && !hasDismissedAnnouncement && (
           <AnnouncementPopup 
-            text={settings.announcementText}
-            image={settings.announcementImage}
-            onClose={() => setShowAnnouncement(false)}
+            text={settings?.announcementEnabled ? settings.announcementText : autoAnnouncement?.text || ''}
+            image={settings?.announcementEnabled ? settings.announcementImage : autoAnnouncement?.image || ''}
+            onClose={() => {
+              setShowAnnouncement(false);
+              setHasDismissedAnnouncement(true);
+            }}
           />
         )}
       </AnimatePresence>

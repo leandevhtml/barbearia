@@ -46,7 +46,7 @@ export default function AppointmentStatus() {
   if (!currentUser) return null;
 
   if (loading) {
-    return <BarberLoading message="CARREGANDO SEUS AGENDAMENTOS..." />;
+    return <BarberLoading inline message="CARREGANDO SEUS AGENDAMENTOS..." />;
   }
 
   const list = appointments;
@@ -119,10 +119,10 @@ export default function AppointmentStatus() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-5 border-t border-white/10 gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-white/15 flex items-center justify-center text-bebas font-black text-orange-500 text-xl shadow-2xl overflow-hidden flex-shrink-0">
-                            {appt.barberId?.avatar && appt.barberId.avatar.startsWith('http') ? (
+                            {appt.barberId?.avatar && (appt.barberId.avatar.startsWith('http') || appt.barberId.avatar.startsWith('data:image')) ? (
                               <img src={appt.barberId.avatar} alt={appt.barberId.name} className="w-full h-full object-cover" />
                             ) : (
-                              appt.barberId?.avatar || appt.barberId?.name?.substring(0,2).toUpperCase() || 'BB'
+                              appt.barberId?.name?.substring(0,2).toUpperCase() || 'BB'
                             )}
                         </div>
                         <div>

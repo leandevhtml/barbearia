@@ -118,14 +118,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         }
 
         // D. Create Transaction Record
-        await Transaction.create({
-          appointmentId: updatedAppointment._id,
-          type: 'service',
-          amount: totalAmount || updatedAppointment.price,
-          description: `Atendimento: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
-          category: 'Venda de Serviço',
-          paymentMethod: paymentMethod || 'pix'
-        });
+        const existingTx = await Transaction.findOne({ appointmentId: updatedAppointment._id });
+        
+        if (!existingTx) {
+          // No pre-payment: Record the full amount (Service + Items)
+          await Transaction.create({
+            appointmentId: updatedAppointment._id,
+            type: 'service',
+            amount: totalAmount || updatedAppointment.price,
+            description: `Atendimento: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
+            category: 'Venda de Serviço',
+            paymentMethod: paymentMethod || 'pix'
+          });
+        } else if (totalAmount && totalAmount > 0) {
+          // Pre-paid service exists: Record only the additional items/consumption
+          await Transaction.create({
+            appointmentId: updatedAppointment._id,
+            type: 'product',
+            amount: totalAmount,
+            description: `Consumo Extra: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
+            category: 'Venda de Produtos',
+            paymentMethod: paymentMethod || 'pix'
+          });
+        }
       }
 
     return NextResponse.json(updatedAppointment);

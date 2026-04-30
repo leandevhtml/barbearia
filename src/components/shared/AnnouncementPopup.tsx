@@ -11,7 +11,7 @@ interface AnnouncementPopupProps {
 }
 
 export default function AnnouncementPopup({ text, image, onClose }: AnnouncementPopupProps) {
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -76,7 +76,7 @@ export default function AnnouncementPopup({ text, image, onClose }: Announcement
                 <motion.div 
                     initial={{ width: '100%' }}
                     animate={{ width: '0%' }}
-                    transition={{ duration: 5, ease: 'linear' }}
+                    transition={{ duration: 10, ease: 'linear' }}
                     className="h-full bg-orange-600 shadow-[0_0_10px_#ea580c]"
                 />
             </div>
