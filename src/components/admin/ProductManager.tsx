@@ -385,46 +385,48 @@ export default function ProductManager() {
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0 z-10">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-black text-lg text-white leading-tight truncate uppercase tracking-tighter">{p.name}</h4>
-                    <div className="flex items-center gap-1 ml-2">
-                      <button 
-                        onClick={() => handleEditClick(p)}
-                        className="text-neutral-600 hover:text-orange-500 transition-colors p-1"
-                        title="Editar"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteClick(p._id)}
-                        className="text-neutral-600 hover:text-red-500 transition-colors p-1"
-                        title="Excluir"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                <div className="flex-1 min-w-0 z-10 flex flex-col h-full justify-between">
+                  <div>
+                    <div className="flex justify-between items-start gap-2">
+                      <h4 className="font-black text-lg text-white leading-tight truncate uppercase tracking-tighter flex-1">{p.name}</h4>
+                      <div className="flex items-center gap-1 shrink-0 bg-black/40 p-1 rounded-lg border border-white/5">
+                        <button 
+                          onClick={() => handleEditClick(p)}
+                          className="text-neutral-500 hover:text-orange-500 transition-colors p-1"
+                          title="Editar"
+                        >
+                          <Edit3 size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteClick(p._id)}
+                          className="text-neutral-600 hover:text-red-500 transition-colors p-1"
+                          title="Excluir"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
+                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest mt-0.5 italic">{p.category}</p>
                   </div>
-                  <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest mt-1 italic">{p.category}</p>
                   
-                  <div className="flex justify-between items-end mt-4">
-                    <div>
+                  <div className="flex flex-wrap items-end justify-between gap-3 mt-4">
+                    <div className="shrink-0">
                       <p className="text-[9px] text-neutral-500 uppercase font-black">Preço</p>
-                      <span className="text-xl font-black text-white tracking-tighter">R$ {p.price.toFixed(2)}</span>
+                      <span className="text-lg font-black text-white tracking-tighter leading-none block">R$ {p.price.toFixed(2)}</span>
                     </div>
                     
-                    <div className="flex items-center gap-1.5 bg-neutral-950 p-1 rounded-xl border border-white/5">
+                    <div className="flex items-center gap-1 bg-neutral-950 p-1 rounded-xl border border-white/5 shrink-0 ml-auto">
                       <button 
                         onClick={() => updateStock(p._id, -1)}
-                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors"
+                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors text-sm"
                       >-</button>
-                      <div className="px-3 flex flex-col items-center">
-                        <span className={`text-sm font-black ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[8px] font-black text-neutral-600 uppercase">UN</span>
+                      <div className="px-2 flex flex-col items-center min-w-[32px]">
+                        <span className={`text-xs font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
+                        <span className="text-[7px] font-black text-neutral-600 uppercase">UN</span>
                       </div>
                       <button 
                         onClick={() => updateStock(p._id, 1)}
-                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors"
+                        className="w-8 h-8 rounded-lg bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors text-sm"
                       >+</button>
                     </div>
                   </div>
