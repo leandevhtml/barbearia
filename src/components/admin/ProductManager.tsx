@@ -427,19 +427,12 @@ export default function ProductManager() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-2xl border border-white/5 shadow-inner">
-                      <button 
-                        onClick={() => updateStock(p._id, -1)}
-                        className="w-10 h-10 rounded-xl bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors shadow-lg"
-                      >-</button>
-                      <div className="px-4 flex flex-col items-center min-w-[50px]">
+                    <div className="flex items-center gap-3 bg-neutral-950/50 px-4 py-2 rounded-2xl border border-white/5 shadow-inner shrink-0 ml-auto">
+                      <div className="flex flex-col items-end">
                         <span className={`text-lg font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[8px] font-black text-neutral-600 uppercase mt-1">Stock</span>
+                        <span className="text-[8px] font-black text-neutral-600 uppercase mt-1">Disponível</span>
                       </div>
-                      <button 
-                        onClick={() => updateStock(p._id, 1)}
-                        className="w-10 h-10 rounded-xl bg-neutral-900 text-white font-black hover:bg-orange-600 transition-colors shadow-lg"
-                      >+</button>
+                      <Package size={16} className="text-neutral-700" />
                     </div>
                   </div>
                 </div>
