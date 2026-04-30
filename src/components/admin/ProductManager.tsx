@@ -411,14 +411,14 @@ export default function ProductManager() {
 
                 {/* Content Body */}
                 <div className="p-6 flex flex-col flex-1 gap-6">
-                  <h4 className="font-black text-xl text-white leading-tight break-words uppercase tracking-tighter min-h-[3rem]">
+                  <h4 className="font-black text-xl text-white leading-tight break-words uppercase tracking-tighter min-h-[3rem] text-center sm:text-left">
                     {p.name}
                   </h4>
                   
-                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-center sm:text-left">
-                      <p className="text-[9px] text-neutral-500 uppercase font-black mb-1">Preço Sugerido</p>
-                      <span className="text-2xl font-black text-white tracking-tighter">R$ {p.price.toFixed(2)}</span>
+                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div className="text-center sm:text-left flex flex-col">
+                      <span className="text-[10px] text-neutral-500 uppercase font-black tracking-widest mb-1">Preço Sugerido</span>
+                      <span className="text-3xl font-black text-white tracking-tighter leading-none">R$ {p.price.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-2xl border border-white/5 shadow-inner">
