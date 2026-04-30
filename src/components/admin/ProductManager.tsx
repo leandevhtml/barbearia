@@ -415,24 +415,26 @@ export default function ProductManager() {
                     {p.name}
                   </h4>
                   
-                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
+                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
                     <div className="text-center sm:text-left flex flex-col gap-1">
-                      <div className="flex flex-col -space-y-1">
-                        <span className="text-[9px] text-neutral-500 uppercase font-black tracking-widest">Preço</span>
-                        <span className="text-[9px] text-neutral-500 uppercase font-black tracking-widest">Sugerido</span>
+                      <div className="flex flex-col -space-y-0.5">
+                        <span className="text-[10px] text-neutral-500 uppercase font-black tracking-[0.2em]">Preço</span>
+                        <span className="text-[10px] text-neutral-500 uppercase font-black tracking-[0.2em]">Sugerido</span>
                       </div>
-                      <div className="flex items-baseline gap-1 mt-1 justify-center sm:justify-start">
-                        <span className="text-sm font-black text-orange-500">R$</span>
-                        <span className="text-3xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
+                      <div className="flex items-baseline gap-2 mt-2 justify-center sm:justify-start">
+                        <span className="text-base font-black text-orange-500">R$</span>
+                        <span className="text-4xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 bg-neutral-950/50 px-4 py-2 rounded-2xl border border-white/5 shadow-inner shrink-0 ml-auto">
-                      <div className="flex flex-col items-end">
-                        <span className={`text-lg font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[8px] font-black text-neutral-600 uppercase mt-1">Disponível</span>
+                    <div className="flex items-center gap-4 bg-neutral-950/50 px-6 py-3 rounded-2xl border border-white/5 shadow-inner">
+                      <div className="flex flex-col items-center sm:items-end">
+                        <span className={`text-xl font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
+                        <span className="text-[9px] font-black text-neutral-600 uppercase mt-1 tracking-widest">Disponível</span>
                       </div>
-                      <Package size={16} className="text-neutral-700" />
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                        <Package size={18} className="text-neutral-500" />
+                      </div>
                     </div>
                   </div>
                 </div>
