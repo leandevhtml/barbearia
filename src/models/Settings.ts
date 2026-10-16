@@ -64,7 +64,7 @@ const SettingsSchema: Schema = new Schema(
     ],
     mpAccessToken: { type: String, default: '' },
     mpPublicKey: { type: String, default: '' },
-    whatsappAutoSendEnabled: { type: Boolean, default: false },
+    whatsappAutoSendEnabled: { type: Boolean, default: true },
     evolutionApiUrl: { type: String, default: '' },
     evolutionApiKey: { type: String, default: '' },
     evolutionInstanceName: { type: String, default: 'gigantes-do-corte' },

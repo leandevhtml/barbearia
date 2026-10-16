@@ -12,8 +12,11 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
       return { success: false, reason: 'Telefone ausente' };
     }
 
-    const settings = await Settings.findOne({ barbershopId });
-    if (!settings || !settings.whatsappAutoSendEnabled) {
+    let settings = await Settings.findOne({ barbershopId });
+    if (!settings) {
+      settings = await Settings.findOne();
+    }
+    if (settings && settings.whatsappAutoSendEnabled === false) {
       return { success: false, reason: 'Disparo automático de WhatsApp desativado nas configurações' };
     }
 

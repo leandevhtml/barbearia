@@ -228,6 +228,8 @@ export async function POST(req: Request) {
           barbershopId,
           phone: clientUser.phone,
           message: whatsappText
+        }).then(result => {
+          console.log('[WhatsApp Hook Result]:', result);
         }).catch(err => console.error('[WhatsApp Hook Error]:', err));
       }
     } catch (waError) {
