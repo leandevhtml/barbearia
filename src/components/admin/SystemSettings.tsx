@@ -126,10 +126,10 @@ export default function SystemSettings() {
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-4">
-        <h2 className="hidden md:block text-white font-bold text-xl tracking-tight">Configurações</h2>
+      <div className="flex flex-col gap-4 mb-4">
+        <h2 className="text-white font-bold text-xl tracking-tight">Painel de Configurações</h2>
         
-        <div className="flex flex-nowrap bg-neutral-900/80 p-1.5 rounded-2xl border border-white/5 shadow-inner overflow-x-auto no-scrollbar w-full gap-1">
+        <div className="flex flex-wrap items-center bg-neutral-900/80 p-2 rounded-2xl border border-white/5 shadow-inner gap-2 w-full">
             <button 
                 onClick={() => setActiveSubTab('geral')}
                 className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'geral' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
