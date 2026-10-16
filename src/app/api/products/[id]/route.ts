@@ -7,13 +7,19 @@ import Product from '@/models/Product';
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'admin') {
+    const role = (session?.user as any)?.role;
+    if (!session || (role !== 'admin' && role !== 'superadmin')) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const body = await req.json();
     await connectToDatabase();
+
+    // Remover _id e id do corpo de atualização para evitar erro de campo imutável no MongoDB
+    const updateData = { ...body };
+    delete updateData._id;
+    delete updateData.id;
 
     const mongoose = (await import('mongoose')).default;
     const isValidId = mongoose.Types.ObjectId.isValid(id);
@@ -31,14 +37,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       const bId = mongoose.Types.ObjectId.isValid(barbershopId) ? new mongoose.Types.ObjectId(barbershopId) : barbershopId;
       updatedProduct = await Product.findOneAndUpdate(
         { _id: filterId, barbershopId: bId },
-        { $set: body }, 
+        { $set: updateData }, 
         { new: true }
       );
     }
 
     // Fallback por _id direto se barbershopId não bateu ou é nulo
     if (!updatedProduct) {
-      updatedProduct = await Product.findByIdAndUpdate(filterId, { $set: body }, { new: true });
+      updatedProduct = await Product.findByIdAndUpdate(filterId, { $set: updateData }, { new: true });
     }
     
     if (!updatedProduct) {
@@ -55,7 +61,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'admin') {
+    const role = (session?.user as any)?.role;
+    if (!session || (role !== 'admin' && role !== 'superadmin')) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
