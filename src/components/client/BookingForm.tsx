@@ -427,11 +427,19 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
       )}
 
       {/* ── Progress Journey ── */}
-      <div className="flex items-center justify-center gap-4 md:gap-6">
         {[1, 2, 3, 4].map((n) => (
           <div key={n} className="flex items-center gap-4 md:gap-6">
-            <motion.div 
-                className={`w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-xs md:text-sm border transition-colors duration-500`}
+            <motion.button 
+                type="button"
+                onClick={() => {
+                  if (step > n) {
+                    setStep(n);
+                  }
+                }}
+                disabled={step < n}
+                className={`w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-xs md:text-sm border transition-colors duration-500 ${
+                  step > n ? 'cursor-pointer hover:border-orange-400 hover:scale-105 active:scale-95' : step === n ? 'cursor-default' : 'cursor-not-allowed opacity-50'
+                }`}
                 animate={{
                     backgroundColor: step >= n ? 'var(--orange-prime)' : 'rgba(255,255,255,0.05)',
                     borderColor: step >= n ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.05)',
@@ -440,9 +448,10 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                     boxShadow: step === n ? '0 0 30px rgba(234,88,12,0.3)' : '0 0 0px rgba(0,0,0,0)'
                 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                title={step > n ? `Voltar para a etapa 0${n}` : undefined}
             >
                 {step > n ? '✓' : `0${n}`}
-            </motion.div>
+            </motion.button>
             {n < 4 && (
                 <div className="w-8 md:w-16 h-1 bg-neutral-900 rounded-full overflow-hidden relative">
                     <motion.div 
@@ -620,7 +629,31 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
             className="flex flex-col items-center gap-12"
           >
             <div className="w-full text-center">
-                <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em] mb-6">Horários Disponíveis</p>
+                <div className="flex items-center justify-between max-w-2xl mx-auto mb-6 px-2">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      if (pixStep) { setPixStep(false); setPixData(null); return; }
+                      setStep(3);
+                    }} 
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-orange-600/20 text-neutral-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 group"
+                  >
+                    <span className="group-hover:-translate-x-1 transition-transform">←</span> Voltar
+                  </button>
+
+                  <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.3em]">
+                    Horários Disponíveis
+                  </p>
+
+                  <button 
+                    type="button"
+                    onClick={() => setStep(1)} 
+                    className="text-[9px] font-black text-neutral-600 hover:text-white uppercase tracking-wider transition-colors"
+                    title="Recomeçar do Serviço"
+                  >
+                    Reiniciar
+                  </button>
+                </div>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-3 w-full max-w-2xl mx-auto">
                 {availableTimes.map(t => {
                     return (
