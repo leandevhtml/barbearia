@@ -351,19 +351,21 @@ export default function ProductManager() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bebas italic tracking-widest text-white">Prateleira Digital <span className="text-orange-500 ml-2">({filteredProducts.length})</span></h3>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar w-full max-w-[200px] md:max-w-none pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 className="text-2xl font-bebas italic tracking-widest text-white shrink-0">
+              Prateleira Digital <span className="text-orange-500 ml-2">({filteredProducts.length})</span>
+            </h3>
+            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-thin scrollbar-thumb-white/10 w-full sm:w-auto flex-wrap">
               {['Tudo', 'Estoque Baixo', 'Bebidas', 'Cosméticos', 'Acessórios'].map(cat => (
                 <button 
                   key={cat} 
                   onClick={() => setActiveFilter(cat)}
-                  className={`shrink-0 px-4 py-2 rounded-lg border text-[9px] font-black uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`shrink-0 px-3.5 py-2 rounded-xl border text-[9px] font-black uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     activeFilter === cat 
                       ? cat === 'Estoque Baixo' 
                         ? 'bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                         : 'bg-orange-600 text-white border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)]' 
-                      : 'bg-neutral-900 text-neutral-500 border-white/5 hover:text-white hover:border-white/10'
+                      : 'bg-neutral-900/80 text-neutral-400 border-white/5 hover:text-white hover:border-white/15'
                   }`}
                 >
                   {cat === 'Estoque Baixo' && <AlertCircle size={12} className={activeFilter === cat ? 'text-white' : 'text-red-500'} />}
@@ -465,11 +467,30 @@ export default function ProductManager() {
               </motion.div>
             ))}
             
-            {products.length === 0 && (
-              <div className="col-span-full py-20 text-center glass-panel rounded-[2.5rem] border-dashed border-white/10 opacity-30">
-                <div className="text-5xl mb-4">📦</div>
-                <h4 className="text-xl font-bebas italic tracking-widest">Estoque Vazio</h4>
-                <p className="text-xs font-bold text-neutral-500 uppercase mt-2">Nenhum item disponível para o Clube</p>
+            {filteredProducts.length === 0 && (
+              <div className="col-span-full py-16 px-6 text-center luxury-card border-dashed border-white/10 flex flex-col items-center justify-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-3xl shadow-inner">
+                  📦
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xl font-bebas italic tracking-widest text-white">
+                    {products.length === 0 ? 'Nenhum Item Cadastrado' : 'Nenhum Item Nesta Categoria'}
+                  </h4>
+                  <p className="text-xs font-medium text-neutral-400 max-w-sm mx-auto leading-relaxed">
+                    {products.length === 0 
+                      ? 'Preencha o formulário ao lado para cadastrar suas bebidas, cosméticos ou produtos no catálogo.' 
+                      : `Não encontramos itens com o filtro "${activeFilter}". Tente selecionar outra categoria.`}
+                  </p>
+                </div>
+                {activeFilter !== 'Tudo' && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveFilter('Tudo')}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-orange-400 border border-orange-500/20 text-[10px] font-black uppercase tracking-wider transition-all"
+                  >
+                    Ver Todos os Produtos
+                  </button>
+                )}
               </div>
             )}
           </div>

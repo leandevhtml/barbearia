@@ -187,7 +187,7 @@ export default function AdminView() {
         </header>
 
         {/* Content Section */}
-        <div className="p-6 lg:px-12 pb-8 max-w-5xl mx-auto w-full">
+        <div className="p-4 sm:p-6 lg:px-10 xl:px-12 pb-12 max-w-7xl mx-auto w-full">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={tab}
