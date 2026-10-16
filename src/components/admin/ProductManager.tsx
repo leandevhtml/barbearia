@@ -141,15 +141,24 @@ export default function ProductManager() {
     if (!product) return;
     const newStock = Math.max(0, product.stock + delta);
     
+    // Atualização otimista imediata na interface
+    setProducts(prev => prev.map(p => p._id === id ? { ...p, stock: newStock } : p));
+    
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stock: newStock }),
       });
-      if (res.ok) fetchProducts();
+      if (!res.ok) {
+        // Reverte se der erro
+        fetchProducts();
+        setError('Não foi possível alterar a quantidade');
+      }
     } catch (err) {
       console.error(err);
+      fetchProducts();
+      setError('Erro de conexão ao alterar estoque');
     }
   };
 

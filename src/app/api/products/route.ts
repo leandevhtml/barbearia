@@ -47,14 +47,22 @@ export async function POST(req: Request) {
     const body = await req.json();
     await connectToDatabase();
 
+    let barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      const Barbershop = (await import('@/models/Barbershop')).default;
+      const defaultShop = await Barbershop.findOne({});
+      if (defaultShop) barbershopId = defaultShop._id;
+    }
+
     const newProduct = new Product({
       ...body,
-      barbershopId: (session.user as any).barbershopId,
+      barbershopId,
     });
     await newProduct.save();
 
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {
+    console.error('Error creating product:', error);
     return NextResponse.json({ message: 'Error creating product' }, { status: 500 });
   }
 }

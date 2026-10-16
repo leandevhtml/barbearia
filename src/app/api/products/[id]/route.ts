@@ -15,11 +15,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     await connectToDatabase();
 
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: id, barbershopId: (session.user as any).barbershopId },
-      body, 
-      { new: true }
-    );
+    let barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      const Barbershop = (await import('@/models/Barbershop')).default;
+      const defaultShop = await Barbershop.findOne({});
+      if (defaultShop) barbershopId = defaultShop._id;
+    }
+
+    let updatedProduct = null;
+    if (barbershopId) {
+      updatedProduct = await Product.findOneAndUpdate(
+        { _id: id, barbershopId },
+        body, 
+        { new: true }
+      );
+    }
+
+    // Fallback por _id direto se não encontrou com barbershopId
+    if (!updatedProduct) {
+      updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
+    }
     
     if (!updatedProduct) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
@@ -27,6 +42,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     return NextResponse.json(updatedProduct);
   } catch (error) {
+    console.error('Error updating product:', error);
     return NextResponse.json({ message: 'Error updating product' }, { status: 500 });
   }
 }
@@ -41,10 +57,24 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { id } = await params;
     await connectToDatabase();
 
-    const deletedProduct = await Product.findOneAndDelete({ 
-      _id: id, 
-      barbershopId: (session.user as any).barbershopId 
-    });
+    let barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      const Barbershop = (await import('@/models/Barbershop')).default;
+      const defaultShop = await Barbershop.findOne({});
+      if (defaultShop) barbershopId = defaultShop._id;
+    }
+
+    let deletedProduct = null;
+    if (barbershopId) {
+      deletedProduct = await Product.findOneAndDelete({ 
+        _id: id, 
+        barbershopId 
+      });
+    }
+
+    if (!deletedProduct) {
+      deletedProduct = await Product.findByIdAndDelete(id);
+    }
     
     if (!deletedProduct) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
@@ -52,6 +82,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     return NextResponse.json({ message: 'Product deleted' });
   } catch (error) {
+    console.error('Error deleting product:', error);
     return NextResponse.json({ message: 'Error deleting product' }, { status: 500 });
   }
 }
+
