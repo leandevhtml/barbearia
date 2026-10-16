@@ -224,8 +224,70 @@ const server = http.createServer(async (req, res) => {
   res.end('Not Found');
 });
 
+// Fila de Mensagens Automáticas da Nuvem (Neon DB Poller)
+// Garante que qualquer mensagem disparada pela Vercel seja enviada em tempo real
+async function pollOutboxQueue() {
+  if (!sock || connectionStatus !== 'open') return;
+  try {
+    const pool = new Pool({
+      connectionString: NEON_DB_URL,
+      max: 2,
+      connectionTimeoutMillis: 5000,
+    });
+
+    // Cria a tabela se não existir
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS whatsapp_outbox (
+        id SERIAL PRIMARY KEY,
+        phone TEXT NOT NULL,
+        message TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        sent_at TIMESTAMPTZ
+      );
+    `);
+
+    const res = await pool.query(`
+      SELECT id, phone, message FROM whatsapp_outbox 
+      WHERE status = 'pending' 
+      ORDER BY id ASC LIMIT 5
+    `);
+
+    for (const row of res.rows) {
+      let cleanNumber = row.phone.replace(/\D/g, '');
+      if (!cleanNumber.startsWith('55') && cleanNumber.length >= 10) {
+        cleanNumber = `55${cleanNumber}`;
+      }
+      const jid = `${cleanNumber}@s.whatsapp.net`;
+
+      try {
+        await sock.sendMessage(jid, { text: row.message });
+        console.log(`[WhatsApp Outbox Worker] ✅ Mensagem da nuvem enviada com sucesso para ${cleanNumber}!`);
+        await pool.query(
+          `UPDATE whatsapp_outbox SET status = 'sent', sent_at = NOW() WHERE id = $1`,
+          [row.id]
+        );
+      } catch (sendErr) {
+        console.error(`[WhatsApp Outbox Worker] Erro ao enviar para ${cleanNumber}:`, sendErr.message);
+        await pool.query(
+          `UPDATE whatsapp_outbox SET status = 'failed' WHERE id = $1`,
+          [row.id]
+        );
+      }
+    }
+
+    await pool.end();
+  } catch (err) {
+    // Ignora erros temporários de conexão
+  }
+}
+
+// Inicia polling a cada 3 segundos
+setInterval(pollOutboxQueue, 3000);
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[WhatsApp Bot Gateway] Rodando na porta ${PORT}`);
   startWhatsAppBot();
   startTunnel();
 });
+

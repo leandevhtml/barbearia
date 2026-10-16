@@ -427,6 +427,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
       )}
 
       {/* ── Progress Journey ── */}
+      <div className="flex justify-center items-center gap-4 md:gap-6 my-6">
         {[1, 2, 3, 4].map((n) => (
           <div key={n} className="flex items-center gap-4 md:gap-6">
             <motion.button 

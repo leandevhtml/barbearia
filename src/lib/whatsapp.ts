@@ -110,6 +110,38 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
       return { success: true };
     }
 
+    // 3. Fallback: Gravar na fila autônoma do banco (Neon)
+    // Desta forma, mesmo se a requisição HTTP direta falhar ou sofrer timeout,
+    // o robô em background pega a mensagem da fila e envia em poucos segundos!
+    try {
+      const { Pool } = await import('pg');
+      const NEON_DB_URL =
+        process.env.POSTGRES_URL ||
+        process.env.DATABASE_URL ||
+        'postgresql://neondb_owner:npg_1etfTpdj9MIs@ep-solitary-grass-aw63o3pp-pooler.c-12.us-east-1.aws.neon.tech/neondb?sslmode=require';
+      
+      const pool = new Pool({ connectionString: NEON_DB_URL, max: 2, connectionTimeoutMillis: 4000 });
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS whatsapp_outbox (
+          id SERIAL PRIMARY KEY,
+          phone TEXT NOT NULL,
+          message TEXT NOT NULL,
+          status TEXT DEFAULT 'pending',
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          sent_at TIMESTAMPTZ
+        );
+      `);
+      await pool.query(
+        `INSERT INTO whatsapp_outbox (phone, message, status) VALUES ($1, $2, 'pending')`,
+        [phone, message]
+      );
+      await pool.end();
+      console.log(`[WhatsApp Outbox] Mensagem enfileirada no banco com sucesso para ${phone}`);
+      return { success: true };
+    } catch (queueErr) {
+      console.warn('[WhatsApp Outbox] Falha ao enfileirar mensagem:', queueErr);
+    }
+
     return { success: false, reason: 'Nenhum robô de WhatsApp ativo ou online no momento' };
   } catch (error: any) {
     console.error('[WhatsApp Service Error]:', error);
