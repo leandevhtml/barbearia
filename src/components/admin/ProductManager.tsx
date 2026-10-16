@@ -112,10 +112,11 @@ export default function ProductManager() {
         fetchProducts();
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError('Erro ao salvar produto');
+        const data = await res.json().catch(() => null);
+        setError(data?.message || 'Erro ao salvar produto');
       }
     } catch (err) {
-      setError('Erro de conexão');
+      setError('Erro de conexão ao salvar produto');
     }
   };
 
@@ -151,9 +152,11 @@ export default function ProductManager() {
         body: JSON.stringify({ stock: newStock }),
       });
       if (!res.ok) {
-        // Reverte se der erro
+        const data = await res.json().catch(() => null);
         fetchProducts();
-        setError('Não foi possível alterar a quantidade');
+        setError(data?.message ? `Erro: ${data.message}` : 'Não foi possível alterar a quantidade');
+      } else {
+        setError('');
       }
     } catch (err) {
       console.error(err);
@@ -409,18 +412,22 @@ export default function ProductManager() {
                   )}
 
                   {/* Floating Action Buttons */}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
+                  <div className="absolute top-2 right-2 flex gap-1.5 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 z-30">
                     <button 
+                      type="button"
                       onClick={() => handleEditClick(p)}
-                      className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-orange-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/80 text-white hover:bg-orange-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      title="Editar Produto"
                     >
-                      <Edit3 size={16} />
+                      <Edit3 size={14} />
                     </button>
                     <button 
+                      type="button"
                       onClick={() => handleDeleteClick(p._id)}
-                      className="w-10 h-10 rounded-xl bg-black/80 text-white hover:bg-red-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/80 text-white hover:bg-red-600 transition-all flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md"
+                      title="Excluir Produto"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                   

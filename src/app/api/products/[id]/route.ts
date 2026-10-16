@@ -15,6 +15,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     await connectToDatabase();
 
+    const mongoose = (await import('mongoose')).default;
+    const isValidId = mongoose.Types.ObjectId.isValid(id);
+    const filterId = isValidId ? new mongoose.Types.ObjectId(id) : id;
+
     let barbershopId = (session.user as any).barbershopId;
     if (!barbershopId) {
       const Barbershop = (await import('@/models/Barbershop')).default;
@@ -24,26 +28,27 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     let updatedProduct = null;
     if (barbershopId) {
+      const bId = mongoose.Types.ObjectId.isValid(barbershopId) ? new mongoose.Types.ObjectId(barbershopId) : barbershopId;
       updatedProduct = await Product.findOneAndUpdate(
-        { _id: id, barbershopId },
-        body, 
+        { _id: filterId, barbershopId: bId },
+        { $set: body }, 
         { new: true }
       );
     }
 
-    // Fallback por _id direto se não encontrou com barbershopId
+    // Fallback por _id direto se barbershopId não bateu ou é nulo
     if (!updatedProduct) {
-      updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
+      updatedProduct = await Product.findByIdAndUpdate(filterId, { $set: body }, { new: true });
     }
     
     if (!updatedProduct) {
-      return NextResponse.json({ message: 'Product not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found', id }, { status: 404 });
     }
 
     return NextResponse.json(updatedProduct);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating product:', error);
-    return NextResponse.json({ message: 'Error updating product' }, { status: 500 });
+    return NextResponse.json({ message: error?.message || 'Error updating product' }, { status: 500 });
   }
 }
 
