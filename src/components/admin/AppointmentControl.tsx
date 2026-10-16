@@ -322,6 +322,13 @@ export default function AppointmentControl() {
                         </div>
                       )}
                     </div>
+
+                    {appt.clientNotes && (
+                      <div className="mt-2 text-[10px] text-orange-400/90 bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-2">
+                        <span>✂️ Obs:</span>
+                        <span className="italic font-medium text-white">{appt.clientNotes}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

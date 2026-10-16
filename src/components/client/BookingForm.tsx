@@ -16,6 +16,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
   const [brb,  setBrb]  = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [time, setTime] = useState('');
+  const [clientNotes, setClientNotes] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'app' | 'counter'>('counter');
@@ -276,6 +277,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
           date: dateStr,
           barberId: brb,
           paymentStatus: pStatus,
+          clientNotes: clientNotes.trim(),
           totalAmount: getServicePrice(svc)
         })
       });
@@ -621,6 +623,20 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                               </div>
                           </div>
                       )}
+
+                      <div className="pt-4 border-t border-white/10">
+                        <label className="block text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-2">
+                          Observação ou Preferência de Corte (Opcional)
+                        </label>
+                        <input
+                          type="text"
+                          value={clientNotes}
+                          onChange={(e) => setClientNotes(e.target.value)}
+                          placeholder="Ex: disfarçado na zero, barba desenhada, navalha..."
+                          maxLength={120}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-orange-500 transition-all font-medium"
+                        />
+                      </div>
                     </>
                   ) : (
                     <div className="text-center space-y-6 py-4">

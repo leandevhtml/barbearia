@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     // 🛡️ SECURITY: Sanitizar inputs contra NoSQL Injection
     const rawBody = await req.json();
     const body = sanitizeBody(rawBody);
-    const { serviceId, date, barberId, paymentStatus, totalAmount } = body;
+    const { serviceId, date, barberId, paymentStatus, totalAmount, clientNotes } = body;
 
     if (!serviceId || !date) {
       return NextResponse.json({ message: 'Campos obrigatórios faltando' }, { status: 400 });
@@ -143,6 +143,8 @@ export async function POST(req: Request) {
       date: appointmentDate,
       status: 'pending',
       paymentStatus: finalPaymentStatus,
+      clientNotes: clientNotes || '',
+      barberNotes: '',
       totalAmount: finalPaymentStatus === 'free_reward' ? 0 : (totalAmount ?? finalPrice)
     });
 

@@ -11,6 +11,8 @@ export interface IAppointment extends Document {
   status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
   paymentStatus?: 'pending' | 'paid_app' | 'free_reward';
   items: Array<{ productId?: mongoose.Types.ObjectId | string; name: string; price: number; quantity: number }>;
+  clientNotes?: string;
+  barberNotes?: string;
   totalAmount?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -27,6 +29,8 @@ const AppointmentSchema: Schema = new Schema(
     date: { type: Date, required: true },
     status: { type: String, enum: ['pending', 'in-progress', 'completed', 'cancelled'], default: 'pending' },
     paymentStatus: { type: String, enum: ['pending', 'paid_app', 'free_reward'], default: 'pending' },
+    clientNotes: { type: String, default: '' },
+    barberNotes: { type: String, default: '' },
     items: [
       {
         productId: { type: Schema.Types.ObjectId, ref: 'Product' },

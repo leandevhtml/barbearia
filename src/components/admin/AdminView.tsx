@@ -10,11 +10,13 @@ import AppointmentControl from './AppointmentControl';
 import ServiceManager from './ServiceManager';
 import BarberManager from './BarberManager';
 import ProductManager from './ProductManager';
+import ClientCRM from './ClientCRM';
 import SystemSettings from './SystemSettings';
 
 const ADMIN_TABS = [
   { id: 'appointments', icon: '✂️', label: 'Agenda Geral' },
-  { id: 'barbers',      icon: '👥', label: 'Equipe' },
+  { id: 'clients',      icon: '👥', label: 'Clientes CRM' },
+  { id: 'barbers',      icon: '💈', label: 'Equipe' },
   { id: 'products',     icon: '📦', label: 'Inventário' },
   { id: 'financial',    icon: '📊', label: 'Financeiro' },
   { id: 'settings',     icon: '⚙️', label: 'Configurações' },
@@ -188,6 +190,7 @@ export default function AdminView() {
                     </div>
                     {tab === 'financial'    && <FinancialDashboard />}
                     {tab === 'appointments' && <AppointmentControl />}
+                    {tab === 'clients'      && <ClientCRM />}
                     {tab === 'barbers'      && <BarberManager />}
                     {tab === 'products'     && <ProductManager />}
                     {tab === 'settings'     && <SystemSettings />}

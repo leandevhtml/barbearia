@@ -27,7 +27,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     // 🛡️ SECURITY: Sanitizar inputs
     const rawBody = await req.json();
     const body = sanitizeBody(rawBody);
-    const { status, items, totalAmount, paymentMethod } = body;
+    const { status, items, totalAmount, paymentMethod, barberNotes, clientNotes } = body;
     const { id } = await params;
 
     if (!id || id === 'undefined' || !isValidObjectId(id)) {
@@ -72,6 +72,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (status) updateData.status = status;
     if (items) updateData.items = items;
     if (totalAmount !== undefined) updateData.totalAmount = totalAmount;
+    if (barberNotes !== undefined) updateData.barberNotes = barberNotes;
+    if (clientNotes !== undefined) updateData.clientNotes = clientNotes;
 
     // 2. Perform the appointment update
     if (status === 'completed' && currentAppointment.status === 'completed') {

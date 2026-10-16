@@ -168,6 +168,18 @@ export default function BarberDashboard() {
                       ) : null}
                       {' '}• R$ {(appt.totalAmount || appt.price || 0).toFixed(2)}
                     </p>
+
+                    {/* Ficha Técnica / Observação do Cliente */}
+                    {appt.clientNotes && (
+                      <div className="mt-3 p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 max-w-lg">
+                        <p className="text-[8px] font-black uppercase tracking-widest text-orange-400 mb-0.5">
+                          ✂️ Preferência do Cliente
+                        </p>
+                        <p className="text-[11px] text-white/90 italic font-medium leading-tight">
+                          "{appt.clientNotes}"
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-3xl text-bebas font-black text-orange-500 italic leading-none">{timeFormatted}</p>

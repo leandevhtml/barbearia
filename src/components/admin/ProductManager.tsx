@@ -174,9 +174,13 @@ export default function ProductManager() {
     }
   };
 
-  const filteredProducts = products.filter(p => activeFilter === 'Tudo' || p.category === activeFilter);
+  const filteredProducts = products.filter(p => {
+    if (activeFilter === 'Tudo') return true;
+    if (activeFilter === 'Estoque Baixo') return p.stock <= 5;
+    return p.category === activeFilter;
+  });
 
-  if (loading) return <BarberLoading message="CARREGANDO ESTOQUE..." />;
+  const lowStockCount = products.filter(p => p.stock <= 5).length;
 
   return (
     <div className="space-y-8">
@@ -350,17 +354,25 @@ export default function ProductManager() {
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-bebas italic tracking-widest text-white">Prateleira Digital <span className="text-orange-500 ml-2">({filteredProducts.length})</span></h3>
             <div className="flex gap-2 overflow-x-auto no-scrollbar w-full max-w-[200px] md:max-w-none pb-2">
-              {['Tudo', 'Bebidas', 'Cosméticos', 'Acessórios'].map(cat => (
+              {['Tudo', 'Estoque Baixo', 'Bebidas', 'Cosméticos', 'Acessórios'].map(cat => (
                 <button 
                   key={cat} 
                   onClick={() => setActiveFilter(cat)}
-                  className={`shrink-0 px-4 py-2 rounded-lg border text-[9px] font-black uppercase transition-all whitespace-nowrap ${
+                  className={`shrink-0 px-4 py-2 rounded-lg border text-[9px] font-black uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     activeFilter === cat 
-                      ? 'bg-orange-600 text-white border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)]' 
+                      ? cat === 'Estoque Baixo' 
+                        ? 'bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                        : 'bg-orange-600 text-white border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)]' 
                       : 'bg-neutral-900 text-neutral-500 border-white/5 hover:text-white hover:border-white/10'
                   }`}
                 >
-                  {cat}
+                  {cat === 'Estoque Baixo' && <AlertCircle size={12} className={activeFilter === cat ? 'text-white' : 'text-red-500'} />}
+                  <span>{cat}</span>
+                  {cat === 'Estoque Baixo' && lowStockCount > 0 && (
+                    <span className="px-1.5 py-0.2 bg-red-500/20 text-red-400 rounded-full text-[8px] font-black border border-red-500/30">
+                      {lowStockCount}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -424,12 +436,29 @@ export default function ProductManager() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 bg-neutral-950/50 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
-                      <div className="flex flex-col items-end">
-                        <span className={`text-base font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[6px] font-black text-neutral-600 uppercase mt-0.5 tracking-widest">Estoque</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 bg-neutral-900 border border-white/5 rounded-xl p-1">
+                        <button
+                          type="button"
+                          onClick={() => updateStock(p._id, -1)}
+                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 font-black text-xs flex items-center justify-center transition-all border border-white/5"
+                          title="Diminuir 1 unidade"
+                        >
+                          -
+                        </button>
+                        <div className="px-2 flex flex-col items-center min-w-[32px]">
+                          <span className={`text-sm font-black leading-none ${p.stock <= 5 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
+                          <span className="text-[6px] font-black text-neutral-600 uppercase tracking-widest mt-0.5">Qtd</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => updateStock(p._id, 1)}
+                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-green-500/20 text-neutral-400 hover:text-green-400 font-black text-xs flex items-center justify-center transition-all border border-white/5"
+                          title="Adicionar 1 unidade"
+                        >
+                          +
+                        </button>
                       </div>
-                      <Package size={12} className="text-neutral-700" />
                     </div>
                   </div>
                 </div>
