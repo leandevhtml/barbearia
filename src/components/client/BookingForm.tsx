@@ -288,7 +288,6 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
         if (pStatus === 'free_reward') setBookingFreeCut(false);
         setDone(true);
         showToast('Agendamento realizado com sucesso!', 'success');
-        setTimeout(onBooked, 2200);
       } else {
         showToast(data.message || 'Erro ao agendar. Tente outro horário.', 'error');
       }
@@ -305,24 +304,89 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
   }
 
 
-  if (done)
+  if (done) {
+    const selectedServiceName = activeServices.find(s => s._id === svc)?.name || 'Corte';
+    const selectedBarberName = availableBarbers.find(b => b._id === brb)?.name || 'Profissional';
+    const formattedDateStr = format(selectedDate, 'dd/MM/yyyy');
+    const userPhoneClean = (user?.phone || '').replace(/\D/g, '');
+    const supportPhoneClean = (settings?.supportPhone || '5511999999999').replace(/\D/g, '');
+
+    const confirmationMessage = `✂️ *AGENDAMENTO CONFIRMADO - BARBEARIA GIGANTES DO CORTE* ✂️\n\n` +
+      `👤 *Cliente:* ${user?.name || 'Cliente'}\n` +
+      `💈 *Serviço:* ${selectedServiceName}\n` +
+      `✂️ *Especialista:* ${selectedBarberName}\n` +
+      `📅 *Data:* ${formattedDateStr}\n` +
+      `⏰ *Horário:* ${time}h\n` +
+      (clientNotes ? `📝 *Observação:* ${clientNotes}\n` : '') +
+      `\nTe aguardamos na barbearia! Chegue com 5 minutinhos de antecedência. Qualquer dúvida ou imprevisto, estamos à disposição.`;
+
+    // WhatsApp para o próprio cliente salvar/receber no celular
+    const clientWaUrl = userPhoneClean 
+      ? `https://wa.me/55${userPhoneClean}?text=${encodeURIComponent(confirmationMessage)}`
+      : `https://wa.me/${supportPhoneClean}?text=${encodeURIComponent(confirmationMessage)}`;
+
     return (
       <motion.div 
-        className="card-luxury p-12 text-center max-w-md mx-auto border-orange-500/20"
+        className="card-luxury p-8 md:p-12 text-center max-w-lg mx-auto border-orange-500/30 shadow-[0_0_50px_rgba(234,88,12,0.15)]"
         initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
       >
         <motion.div 
-            className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-8 border-4 border-white/20 shadow-[0_0_50px_var(--orange-prime)]"
-            animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}
+            className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white/20 shadow-[0_0_50px_var(--orange-prime)]"
+            animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
         >
             <span className="text-4xl text-white">✓</span>
         </motion.div>
-        <h2 className="text-4xl text-bebas font-black text-white italic uppercase mb-4 tracking-tight">RESERVADO!</h2>
-        <p className="text-neutral-400 font-bold text-sm leading-relaxed">
-            Seu lugar no clube está garantido para às <span className="text-orange-500 font-black">{time}</span>.
+
+        <h2 className="text-4xl text-bebas font-black text-white italic uppercase mb-2 tracking-tight">RESERVA CONFIRMADA!</h2>
+        
+        <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest mb-6">
+          Seu lugar no clube está garantido
         </p>
+
+        {/* Resumo do Agendamento */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 text-left space-y-2.5">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-neutral-500 uppercase font-black text-[9px] tracking-wider">Serviço:</span>
+            <span className="font-bold text-white">{selectedServiceName}</span>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-neutral-500 uppercase font-black text-[9px] tracking-wider">Barbeiro:</span>
+            <span className="font-bold text-orange-400">{selectedBarberName}</span>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-neutral-500 uppercase font-black text-[9px] tracking-wider">Data & Horário:</span>
+            <span className="font-bold text-white">{formattedDateStr} às <span className="text-orange-500">{time}</span></span>
+          </div>
+          {clientNotes && (
+            <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+              <span className="text-neutral-500 uppercase font-black text-[9px] tracking-wider">Observação:</span>
+              <span className="font-medium italic text-neutral-300">{clientNotes}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Botão de Enviar Confirmação no WhatsApp */}
+        <div className="space-y-3">
+          <a
+            href={clientWaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-4 rounded-xl bg-green-500 hover:bg-green-600 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_0_25px_rgba(34,197,94,0.3)] hover:scale-[1.02]"
+          >
+            <span className="text-lg">💬</span>
+            <span>Receber Confirmação no WhatsApp</span>
+          </a>
+
+          <button
+            onClick={onBooked}
+            className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all border border-white/5"
+          >
+            Acompanhar Meus Agendamentos →
+          </button>
+        </div>
       </motion.div>
     );
+  }
 
   return (
     <div className="space-y-12 w-full px-2">
