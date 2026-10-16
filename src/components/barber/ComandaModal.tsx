@@ -191,7 +191,7 @@ export default function ComandaModal({ appointment, onClose, onSaved, onFinalize
                 {saving ? '...' : 'SALVAR'}
                 </button>
                 <button 
-                onClick={() => onFinalize(items, totalAmount)}
+                onClick={() => onFinalize(items, totalToPay)}
                 disabled={saving}
                 className={`btn-prime py-4 px-8 text-xs font-black uppercase tracking-widest ${totalToPay === 0 ? 'bg-green-600 hover:bg-green-500 border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : ''}`}
                 >

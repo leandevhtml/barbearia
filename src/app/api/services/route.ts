@@ -27,7 +27,8 @@ export async function GET(req: Request) {
       if (defaultShop) filterShopId = defaultShop._id.toString();
     }
 
-    const query: any = { active: true };
+    const includeAll = searchParams.get('includeAll') === 'true';
+    const query: any = includeAll ? {} : { active: true };
     if (filterShopId) query.barbershopId = filterShopId;
 
     const services = await Service.find(query).sort({ name: 1 });

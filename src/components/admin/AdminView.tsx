@@ -37,7 +37,7 @@ export default function AdminView() {
   // Absolute Security Guard - Role-based protection
   if (currentUser?.role !== 'admin') return null;
 
-  const adminNotifs = notifications.filter(n => !n.userId);
+  const adminNotifs = notifications;
   const unreadCount = adminNotifs.filter(n => !n.read).length;
 
   const NavContent = () => (

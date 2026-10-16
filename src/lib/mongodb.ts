@@ -70,8 +70,10 @@ async function ensureDefaultData() {
       await existingAdmin.save();
     }
 
-    const serviceCount = await Service.countDocuments({ barbershopId: defaultShop._id });
-    if (serviceCount === 0) {
+    const Product = (await import('@/models/Product')).default;
+
+    const allServices = await Service.find({ barbershopId: defaultShop._id });
+    if (allServices.length === 0) {
       await Service.insertMany([
         { barbershopId: defaultShop._id, name: 'Corte Social', price: 45, duration: 30, icon: '✂️', active: true },
         { barbershopId: defaultShop._id, name: 'Barba Terapia', price: 60, duration: 45, icon: '🪒', active: true },
@@ -79,6 +81,27 @@ async function ensureDefaultData() {
         { barbershopId: defaultShop._id, name: 'Degradê Navalhado', price: 55, duration: 40, icon: '💈', active: true },
         { barbershopId: defaultShop._id, name: 'Pigmentação', price: 35, duration: 25, icon: '🎨', active: true },
         { barbershopId: defaultShop._id, name: 'Sobrancelha', price: 20, duration: 15, icon: '✨', active: true },
+      ]);
+    } else if (allServices.length > 6) {
+      // Remove duplicate services created by earlier cold starts
+      const seenNames = new Set<string>();
+      for (const svc of allServices) {
+        const key = (svc.name || '').trim().toLowerCase();
+        if (seenNames.has(key)) {
+          await Service.deleteOne({ _id: svc._id });
+        } else {
+          seenNames.add(key);
+        }
+      }
+    }
+
+    const productCount = await Product.countDocuments({ barbershopId: defaultShop._id });
+    if (productCount === 0) {
+      await Product.insertMany([
+        { barbershopId: defaultShop._id, name: 'Pomada Efeito Matte', price: 35, stock: 25, category: 'Cosméticos', active: true },
+        { barbershopId: defaultShop._id, name: 'Óleo para Barba Premium', price: 40, stock: 20, category: 'Cosméticos', active: true },
+        { barbershopId: defaultShop._id, name: 'Cerveja Artesanal Gelada', price: 15, stock: 48, category: 'Bebidas', active: true },
+        { barbershopId: defaultShop._id, name: 'Refrigerante Lata', price: 8, stock: 36, category: 'Bebidas', active: true },
       ]);
     }
 
@@ -106,6 +129,7 @@ async function ensureDefaultData() {
 async function connectToDatabase() {
   if (cached.conn && mongoose.connection.readyState === 1) {
     await loadCollectionsFromNeon(true);
+    await ensureDefaultData();
     return cached.conn;
   }
 

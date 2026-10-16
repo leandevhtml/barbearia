@@ -18,7 +18,7 @@ interface CheckoutModalProps {
 
 export default function CheckoutModal({ appointment, onClose, onConfirm }: CheckoutModalProps) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>(appointment.items || []);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'cash'>('pix');
   const [isSubmitting, setIsSubmitting] = useState(false);

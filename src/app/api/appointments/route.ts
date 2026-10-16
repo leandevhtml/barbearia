@@ -100,8 +100,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Serviço não encontrado ou inativo.' }, { status: 404 });
     }
 
-    const realPrice = dbService.price;
     const realServiceName = dbService.name;
+    const clientUserId = (session.user as any).id;
+
+    let finalPrice = dbService.price;
+    let finalPaymentStatus = paymentStatus || 'pending';
+
+    if (paymentStatus === 'free_reward') {
+      const clientUser = await User.findById(clientUserId);
+      if (clientUser && clientUser.freeCouponAvailable && realServiceName.toLowerCase().includes('corte social')) {
+        finalPrice = 0;
+        finalPaymentStatus = 'free_reward';
+        await User.findByIdAndUpdate(clientUserId, { $set: { freeCouponAvailable: false } });
+      } else {
+        finalPaymentStatus = 'pending';
+      }
+    }
 
     // SENIOR FIX: Evitar Race Condition (Reserva Dupla)
     const appointmentDate = new Date(date);
@@ -121,15 +135,15 @@ export async function POST(req: Request) {
 
     const newAppointment = new Appointment({
       barbershopId,
-      userId: (session.user as any).id,
+      userId: clientUserId,
       barberId: barberId || null,
       serviceId,
       serviceName: realServiceName,
-      price: realPrice,
+      price: finalPrice,
       date: appointmentDate,
       status: 'pending',
-      paymentStatus: paymentStatus || 'pending',
-      totalAmount: totalAmount || realPrice
+      paymentStatus: finalPaymentStatus,
+      totalAmount: finalPaymentStatus === 'free_reward' ? 0 : (totalAmount ?? finalPrice)
     });
 
     await newAppointment.save();
@@ -137,31 +151,33 @@ export async function POST(req: Request) {
     // 🛡️ AUDIT: Registrar a criação do agendamento
     auditLog({
       action: 'APPOINTMENT_CREATED',
-      userId: (session.user as any).id,
+      userId: clientUserId,
       userRole: (session.user as any).role,
       ip: getClientIP(req),
       details: {
         appointmentId: newAppointment._id,
         serviceId,
         serviceName: realServiceName,
-        price: realPrice,
+        price: finalPrice,
         barberId,
-        paymentStatus: paymentStatus || 'pending',
+        paymentStatus: finalPaymentStatus,
       },
       timestamp: new Date(),
     });
 
     // Side effect: If paid via App (PIX), create transaction record and notify admin immediately
-    if (paymentStatus === 'paid_app') {
+    if (finalPaymentStatus === 'paid_app') {
       try {
         await Transaction.create({
           barbershopId,
+          userId: clientUserId,
           appointmentId: newAppointment._id,
           type: 'service',
-          amount: totalAmount || realPrice,
+          amount: totalAmount || finalPrice,
           description: `Pagamento Antecipado (PIX): ${realServiceName} (${session.user?.name || 'Cliente'})`,
           category: 'Venda de Serviço',
-          paymentMethod: 'pix'
+          paymentMethod: 'pix',
+          status: 'approved'
         });
 
         // SENIOR FIX: Notificar administradores usando o novo modelo de Notification
@@ -170,7 +186,7 @@ export async function POST(req: Request) {
           Notification.create({
             userId: admin._id,
             title: 'Novo Pagamento PIX! 📱',
-            message: `O cliente ${session.user?.name || 'Cliente'} realizou um pagamento de R$ ${(totalAmount || realPrice).toFixed(2)} via PIX para o agendamento de ${realServiceName}.`,
+            message: `O cliente ${session.user?.name || 'Cliente'} realizou um pagamento de R$ ${(totalAmount || finalPrice).toFixed(2)} via PIX para o agendamento de ${realServiceName}.`,
             type: 'info'
           })
         );

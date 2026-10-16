@@ -176,8 +176,8 @@ export default function BarberDashboard() {
                       <button onClick={() => setActiveComanda(appt)} className="flex-1 bg-neutral-900 text-white hover:bg-neutral-800 border border-white/10 transition-all font-black uppercase tracking-widest text-[10px] py-3 rounded-xl">
                         📋 Comanda
                       </button>
-                      <button onClick={() => updateStatus(currentId, 'completed')} className="flex-1 bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white border border-green-500/30 transition-all font-black uppercase tracking-widest text-[10px] py-3 rounded-xl">
-                        Finalizar
+                      <button onClick={() => setActiveComanda(appt)} className="flex-1 bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white border border-green-500/30 transition-all font-black uppercase tracking-widest text-[10px] py-3 rounded-xl">
+                        ✅ Finalizar / PDV
                       </button>
                     </>
                   )}

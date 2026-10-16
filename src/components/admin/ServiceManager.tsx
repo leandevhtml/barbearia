@@ -28,7 +28,7 @@ export default function ServiceManager() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch('/api/services');
+      const res = await fetch('/api/services?includeAll=true');
       const data = await res.json();
       if (res.ok) setServices(data);
     } catch (err) {

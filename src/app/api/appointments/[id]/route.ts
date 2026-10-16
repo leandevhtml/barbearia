@@ -13,12 +13,12 @@ import { sanitizeBody, isValidObjectId, getClientIP, auditLog } from '@/lib/secu
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
-    const userRole = session && (session.user as any).role;
-
-    if (!session || (userRole !== 'admin' && userRole !== 'barber')) {
+    if (!session || !session.user) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
     }
-    
+
+    const userRole = (session.user as any).role;
+    const sessionUserId = (session.user as any).id;
     const barbershopId = (session.user as any).barbershopId;
     if (!barbershopId) {
       return NextResponse.json({ message: 'Barbearia não vinculada' }, { status: 400 });
@@ -46,6 +46,24 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ message: 'Agendamento não encontrado' }, { status: 404 });
     }
 
+    // Client role can only cancel their own pending appointment
+    if (userRole !== 'admin' && userRole !== 'barber') {
+      const apptUserId = (currentAppointment.userId?._id || currentAppointment.userId || '').toString();
+      if (apptUserId !== String(sessionUserId) || status !== 'cancelled') {
+        return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
+      }
+      if (currentAppointment.status !== 'pending') {
+        return NextResponse.json({ message: 'Apenas agendamentos pendentes podem ser cancelados.' }, { status: 400 });
+      }
+      const cancelNoticeHours = settings?.cancelNoticeHours ?? 2;
+      const diffHours = (new Date(currentAppointment.date).getTime() - Date.now()) / (1000 * 60 * 60);
+      if (diffHours < cancelNoticeHours) {
+        return NextResponse.json({
+          message: `Cancelamento permitido apenas com no mínimo ${cancelNoticeHours}h de antecedência.`
+        }, { status: 400 });
+      }
+    }
+
     const isFidelityOn = settings?.fidelityEnabled ?? true;
     const wasCompleted = currentAppointment.status === 'completed';
     const isCompleting = status === 'completed' && !wasCompleted;
@@ -53,7 +71,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const updateData: any = {};
     if (status) updateData.status = status;
     if (items) updateData.items = items;
-    if (totalAmount) updateData.totalAmount = totalAmount;
+    if (totalAmount !== undefined) updateData.totalAmount = totalAmount;
 
     // 2. Perform the appointment update ATOMICALLY
     // SENIOR FIX: Evita que cliques duplos processem transações e selos duas vezes
@@ -77,6 +95,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ message: 'Agendamento não encontrado ou já atualizado.' }, { status: 404 });
     }
 
+    // Refund free coupon if a free_reward appointment was cancelled
+    if (status === 'cancelled' && currentAppointment.paymentStatus === 'free_reward') {
+      const clientRef = currentAppointment.userId?._id || currentAppointment.userId;
+      if (clientRef) {
+        await User.findByIdAndUpdate(clientRef, { $set: { freeCouponAvailable: true } });
+      }
+    }
+
       // 3. Side effects of completion (PDV Logic)
       if (isCompleting && updatedAppointment) {
         const clientRef = updatedAppointment.userId;
@@ -86,11 +112,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
         if (user) {
           // B. Notifications & Receipt
-          const itemsDesc = items && Array.isArray(items) 
+          const itemsDesc = items && Array.isArray(items) && items.length > 0
             ? items.map((i: any) => `${i.name} (x${i.quantity})`).join(', ') 
             : '';
           
-          const receiptMsg = `Serviço: ${updatedAppointment.serviceName}${itemsDesc ? ` + Itens: ${itemsDesc}` : ''}. Valor Total: R$ ${(totalAmount || updatedAppointment.price || 0).toFixed(2)}.`;
+          const finalReceiptVal = totalAmount !== undefined ? totalAmount : (updatedAppointment.price || 0);
+          const receiptMsg = `Serviço: ${updatedAppointment.serviceName}${itemsDesc ? ` + Itens: ${itemsDesc}` : ''}. Valor Total: R$ ${Number(finalReceiptVal).toFixed(2)}.`;
 
           // SENIOR FIX: Criar recibo usando o novo modelo de Notification
           await Notification.create({
@@ -105,7 +132,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           };
 
           const setOps: any = {};
-          if (updatedAppointment.price === 0) {
+          if (updatedAppointment.price === 0 || updatedAppointment.paymentStatus === 'free_reward') {
             setOps.freeCouponAvailable = false;
           } else if (isFidelityOn) {
             const currentStamps = typeof user.stamps === 'number' ? user.stamps : 0;
@@ -116,6 +143,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
               setOps.stamps = 0;
               setOps.freeCouponAvailable = true;
               setOps.hasSeenFreeCutModal = false;
+
+              // Notify Client and Admins about the free cut reward
+              await Notification.create({
+                userId: clientObjectId,
+                title: 'Prêmio Desbloqueado! 🎉',
+                message: `Parabéns! Você completou ${targetStamps} selos e ganhou um CORTE GRÁTIS!`,
+                type: 'reward'
+              });
             } else {
               setOps.stamps = nextStamps;
             }
@@ -151,28 +186,33 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
         // D. Create Transaction Record
         const existingTx = await Transaction.findOne({ appointmentId: updatedAppointment._id, barbershopId });
+        const txAmount = totalAmount !== undefined ? Number(totalAmount) : Number(updatedAppointment.price || 0);
         
-        if (!existingTx) {
+        if (!existingTx && txAmount > 0) {
           // No pre-payment: Record the full amount (Service + Items)
           await Transaction.create({
             barbershopId,
+            userId: clientObjectId,
             appointmentId: updatedAppointment._id,
             type: 'service',
-            amount: totalAmount || updatedAppointment.price,
+            amount: txAmount,
             description: `Atendimento: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
             category: 'Venda de Serviço',
-            paymentMethod: paymentMethod || 'pix'
+            paymentMethod: paymentMethod || 'pix',
+            status: 'approved'
           });
-        } else if (totalAmount && totalAmount > 0) {
+        } else if (existingTx && txAmount > 0) {
           // Pre-paid service exists: Record only the additional items/consumption
           await Transaction.create({
             barbershopId,
+            userId: clientObjectId,
             appointmentId: updatedAppointment._id,
             type: 'product',
-            amount: totalAmount,
+            amount: txAmount,
             description: `Consumo Extra: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
             category: 'Venda de Produtos',
-            paymentMethod: paymentMethod || 'pix'
+            paymentMethod: paymentMethod || 'pix',
+            status: 'approved'
           });
         }
       }

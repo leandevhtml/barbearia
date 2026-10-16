@@ -101,7 +101,11 @@ function normalizeForMatch(val: any): any {
     return val.toString();
   }
   if (val instanceof Date) {
-    return val;
+    return val.getTime();
+  }
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(val)) {
+    const parsed = Date.parse(val);
+    if (!Number.isNaN(parsed)) return parsed;
   }
   if (Array.isArray(val)) {
     return val.map(normalizeForMatch);
@@ -126,16 +130,23 @@ function matchesFilter(doc: any, filter: any): boolean {
 
 function applyUpdate(doc: any, update: any) {
   if (!update) return;
+  const now = new Date();
   const hasOperators = Object.keys(update).some((k) => k.startsWith('$'));
   if (!hasOperators) {
     const id = doc._id;
+    const createdAt = doc.createdAt || now;
     for (const k of Object.keys(doc)) {
       if (k !== '_id') delete doc[k];
     }
-    Object.assign(doc, update, { _id: id });
+    Object.assign(doc, update, { _id: id, createdAt, updatedAt: now });
     return;
   }
 
+  if (update.$setOnInsert) {
+    for (const [k, v] of Object.entries(update.$setOnInsert)) {
+      if (doc[k] === undefined) doc[k] = v;
+    }
+  }
   if (update.$set) {
     for (const [k, v] of Object.entries(update.$set)) {
       doc[k] = v;
@@ -157,6 +168,8 @@ function applyUpdate(doc: any, update: any) {
       doc[k].push(v);
     }
   }
+  if (!doc.createdAt) doc.createdAt = now;
+  doc.updatedAt = now;
 }
 
 async function handleCommand(cmd: any): Promise<any> {
@@ -252,9 +265,12 @@ async function handleCommand(cmd: any): Promise<any> {
     const colName = cmd.insert;
     const col = getCol(colName);
     const toInsert = cmd.documents || [];
+    const now = new Date();
     let count = 0;
     for (const doc of toInsert) {
       if (!doc._id) doc._id = new ObjectId();
+      if (!doc.createdAt) doc.createdAt = now;
+      if (!doc.updatedAt) doc.updatedAt = now;
       const idx = col.findIndex((existing) => String(existing._id) === String(doc._id));
       if (idx >= 0) {
         col[idx] = doc;

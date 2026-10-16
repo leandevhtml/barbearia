@@ -26,8 +26,8 @@ export async function POST() {
     // Delete all transactions for this barbershop
     const transactionsRes = await Transaction.deleteMany({ barbershopId });
 
-    // Delete non-admin users for this barbershop
-    const usersRes = await User.deleteMany({ barbershopId, role: { $ne: 'admin' } });
+    // Delete only client users for this barbershop (preserve admin and barbers)
+    const usersRes = await User.deleteMany({ barbershopId, role: 'client' });
 
     return NextResponse.json({
       message: 'Database reset successful',

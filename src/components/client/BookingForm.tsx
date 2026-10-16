@@ -283,6 +283,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
       const data = await res.json();
 
       if (res.ok) {
+        if (pStatus === 'free_reward') setBookingFreeCut(false);
         setDone(true);
         showToast('Agendamento realizado com sucesso!', 'success');
         setTimeout(onBooked, 2200);
@@ -403,7 +404,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
               className={`flex overflow-x-auto gap-4 pb-8 pt-4 px-4 custom-scroll flex-nowrap items-stretch transition-all duration-300 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab snap-x snap-mandatory'}`}
             >
             {activeServices.map(s => {
-              const price = getServicePrice(s.id);
+              const price = getServicePrice(s._id);
               const isFree = isBookingFreeCut && price === 0;
 
               return (
@@ -625,7 +626,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                     <div className="text-center space-y-6 py-4">
                         <div className="w-48 h-48 mx-auto bg-white rounded-2xl p-2 flex items-center justify-center">
                             {pixData?.qr_code_base64 ? (
-                                <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="QR Code PIX Real" className="w-full h-full object-contain" />
+                                <img src={`data:${(pixData as any).qr_code_mime || 'image/png'};base64,${pixData.qr_code_base64}`} alt="QR Code PIX Real" className="w-full h-full object-contain" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-[10px] font-black">CARREGANDO...</div>
                             )}

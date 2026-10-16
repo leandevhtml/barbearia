@@ -26,22 +26,53 @@ const CFG = {
 };
 
 export default function AppointmentStatus() {
-  const { currentUser } = useBarbershopStore();
+  const { currentUser, showToast, syncUser } = useBarbershopStore();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    fetch('/api/appointments')
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const fetchMyAppointments = () => {
+    fetch('/api/appointments', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setAppointments(data);
+        if (Array.isArray(data)) {
+          setAppointments(data.filter((a: any) => !a.isBusySlot));
+        }
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchMyAppointments();
   }, []);
+
+  const handleCancel = async (apptId: string) => {
+    if (!apptId || cancellingId) return;
+    setCancellingId(apptId);
+    try {
+      const res = await fetch(`/api/appointments/${apptId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast('Agendamento cancelado com sucesso.', 'info');
+        fetchMyAppointments();
+        syncUser();
+      } else {
+        showToast(data.message || 'Não foi possível cancelar.', 'error');
+      }
+    } catch {
+      showToast('Erro de conexão ao cancelar.', 'error');
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   if (!currentUser) return null;
 
@@ -66,11 +97,14 @@ export default function AppointmentStatus() {
     <div className="space-y-8 w-full max-w-3xl mx-auto px-2 pb-20">
       {list.map((appt, i) => {
         const cfg = CFG[appt.status as keyof typeof CFG] || CFG.pending;
-        const timeFormatted = format(new Date(appt.date), 'HH:mm');
+        const apptDate = new Date(appt.date);
+        const timeFormatted = format(apptDate, 'HH:mm');
+        const dateFormatted = format(apptDate, 'dd/MM/yyyy');
+        const apptId = appt._id || appt.id;
 
         return (
           <motion.div 
-            key={appt._id}
+            key={apptId}
             className="group relative card-luxury overflow-hidden border-white/10"
             initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1, duration: 0.8 }}
@@ -96,12 +130,26 @@ export default function AppointmentStatus() {
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-0.5 drop-shadow-sm" style={{ color: cfg.color }}>{cfg.label}</p>
-                            <p className="text-3xl md:text-5xl text-bebas font-black text-white italic leading-none drop-shadow-md">{timeFormatted}</p>
+                            <div className="flex items-baseline gap-3">
+                              <p className="text-3xl md:text-5xl text-bebas font-black text-white italic leading-none drop-shadow-md">{timeFormatted}</p>
+                              <span className="text-xs font-black text-orange-500 uppercase tracking-widest">{dateFormatted}</span>
+                            </div>
                         </div>
                     </div>
-                    <div className="text-left sm:text-right">
-                        <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">PROTOCOLO VIP</p>
-                        <p className="text-xl text-bebas font-black text-orange-500 italic tracking-tighter">#{(appt._id || appt.id || '').toString().toUpperCase().slice(0,8)}</p>
+                    <div className="text-left sm:text-right flex sm:flex-col items-center sm:items-end justify-between gap-2">
+                        <div>
+                          <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">PROTOCOLO VIP</p>
+                          <p className="text-xl text-bebas font-black text-orange-500 italic tracking-tighter">#{(apptId || '').toString().toUpperCase().slice(0,8)}</p>
+                        </div>
+                        {appt.status === 'pending' && (
+                          <button
+                            onClick={() => handleCancel(apptId)}
+                            disabled={cancellingId === apptId}
+                            className="px-4 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-[9px] font-black text-red-500 uppercase tracking-widest transition-all"
+                          >
+                            {cancellingId === apptId ? 'Cancelando...' : 'Cancelar Reserva'}
+                          </button>
+                        )}
                     </div>
                 </div>
 
@@ -133,7 +181,7 @@ export default function AppointmentStatus() {
                     <div className="text-left sm:text-right">
                         <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-0.5">Valor</p>
                         <p className="text-3xl text-bebas font-black text-orange-500 italic leading-none drop-shadow-lg">
-                          {appt.price === 0 ? 'GRÁTIS' : `R$ ${appt.price?.toFixed(2)}`}
+                          {appt.price === 0 || appt.paymentStatus === 'free_reward' ? 'GRÁTIS' : `R$ ${(appt.totalAmount || appt.price || 0).toFixed(2)}`}
                         </p>
                     </div>
                 </div>
