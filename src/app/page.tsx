@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBarbershopStore } from '@/store/barbershopStore';
@@ -10,12 +10,11 @@ import BarberDashboard from '@/components/barber/BarberDashboard';
 import AuthView from '@/components/shared/AuthView';
 import StampAnimationOverlay from '@/components/shared/StampAnimationOverlay';
 import FreeCouponModal from '@/components/shared/FreeCouponModal';
-
 import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
-import { useState } from 'react';
 
 export default function HomePage() {
-  const { data: session, status } = useSession();
+  const slug = 'gigantes-do-corte';
+  const { status } = useSession();
   const { currentUser, isAdminMode, setCurrentUser, settings, syncUser } = useBarbershopStore();
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [hasDismissedAnnouncement, setHasDismissedAnnouncement] = useState(false);
@@ -33,7 +32,7 @@ export default function HomePage() {
 
     // 1. Check Global Manual Announcement
     if (settings.announcementEnabled && !hasDismissedAnnouncement) {
-      setAutoAnnouncement(null); // Clear auto if manual is active
+      setAutoAnnouncement(null);
       setShowAnnouncement(true);
       return;
     }
@@ -55,7 +54,7 @@ export default function HomePage() {
         setShowAnnouncement(true);
       }
     }
-  }, [settings, currentUser?.id, hasDismissedAnnouncement]);
+  }, [settings, currentUser, hasDismissedAnnouncement]);
 
   useEffect(() => {
     if (status === 'authenticated' && !currentUser) {
@@ -93,18 +92,14 @@ export default function HomePage() {
     }
   }, [status, currentUser, setCurrentUser]);
 
-  // Combined loading check is now handled by Providers for a smoother transition
-
   return (
     <main className="min-h-dvh relative flex flex-col overflow-x-hidden selection:bg-orange-500/30">
       {/* ── Visual Layers ── */}
       <div className="luxury-bg" />
-      
-      {/* Removed the top glow orb to eliminate the brown tint at the top */}
       <div className="glow-orb bottom-[-300px] right-[-100px] opacity-30" />
 
       {!currentUser ? (
-        <AuthView />
+        <AuthView slug={slug} />
       ) : (
         <>
           {/* ── Main Stage ── */}
@@ -127,10 +122,11 @@ export default function HomePage() {
 
       {!isAdminMode && currentUser?.role !== 'barber' && (
         <>
-            <StampAnimationOverlay />
-            <FreeCouponModal />
+          <StampAnimationOverlay />
+          <FreeCouponModal />
         </>
       )}
+
       {/* ── Global Announcement Popup ── */}
       <AnimatePresence>
         {showAnnouncement && (settings?.announcementEnabled || autoAnnouncement) && !hasDismissedAnnouncement && (
@@ -144,7 +140,6 @@ export default function HomePage() {
           />
         )}
       </AnimatePresence>
-
     </main>
   );
 }

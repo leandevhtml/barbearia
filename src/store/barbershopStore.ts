@@ -128,41 +128,17 @@ interface BarbershopState {
   setGlobalLoading: (val: boolean, message?: string) => void;
 }
 
-const initialServices: Service[] = [
-  { id: 's1', name: 'Corte Social', price: 45, duration: 30, active: true, icon: '✂️' },
-  { id: 's2', name: 'Barba Terapia', price: 60, duration: 45, active: true, icon: '🪒' },
-  { id: 's3', name: 'Combo Gigante', price: 90, duration: 75, active: true, icon: '🔥' },
-  { id: 's4', name: 'Degradê Navalhado', price: 55, duration: 40, active: true, icon: '💈' },
-  { id: 's5', name: 'Pigmentação', price: 35, duration: 25, active: true, icon: '🎨' },
-  { id: 's6', name: 'Sobrancelha', price: 20, duration: 15, active: true, icon: '✨' },
-];
-
-const initialBarbers: Barber[] = [
-  { id: 'b1', name: 'Mestre Onofre', avatar: 'MO', specialty: 'Degradês e Clássicos', available: true },
-  { id: 'b2', name: 'Junior Gigante', avatar: 'JG', specialty: 'Barbas e Visagismo', available: true },
-  { id: 'b3', name: 'Thiago Navalha', avatar: 'TN', specialty: 'Cortes Artísticos', available: true },
-];
-
-const initialClients: Client[] = [
-  { id: 'c1', name: 'Leandro Souza', email: 'leandro@test.com', phone: '(11) 98888-0001', password: '123', stamps: 9, totalCuts: 19, freeCouponAvailable: false, hasSeenFreeCutModal: false, appointments: ['a1'] },
-  { id: 'c2', name: 'Admin', email: 'admin@gigantes.com', phone: '(11) 99999-9999', password: 'admin', stamps: 0, totalCuts: 0, freeCouponAvailable: false, hasSeenFreeCutModal: false, appointments: [] },
-];
-
 const today = format(new Date(), 'yyyy-MM-dd');
-
-const initialAppointments: Appointment[] = [
-  { id: 'a1', clientName: 'Leandro Souza', clientId: 'c1', barberId: 'b1', serviceId: 's3', date: today, time: '10:00', status: 'completed', completedAt: '11:15' },
-];
 
 function generateId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
 export const useBarbershopStore = create<BarbershopState>((set, get) => ({
-  services: initialServices,
-  barbers: initialBarbers,
-  appointments: initialAppointments,
-  clients: initialClients,
+  services: [],
+  barbers: [],
+  appointments: [],
+  clients: [],
   transactions: [],
   
   currentUser: null,
@@ -194,32 +170,38 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
   
   syncUser: async () => {
     try {
-      // Sync user and global settings in parallel
-      const [userRes, settingsRes] = await Promise.all([
+      // Sync user, global settings and notifications in parallel
+      const [userRes, settingsRes, notificationsRes] = await Promise.all([
         fetch('/api/users/me', { cache: 'no-store' }),
-        fetch('/api/admin/settings', { cache: 'no-store' })
+        fetch('/api/admin/settings', { cache: 'no-store' }),
+        fetch('/api/users/notifications', { cache: 'no-store' })
       ]);
 
       if (userRes.ok) {
         const user = await userRes.json();
-        
-        // Map DB notifications to store notifications
-        const dbNotifs = (user.notifications || [])
-          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .map((n: any) => ({
-            id: n.id,
-            type: n.type || 'info',
-            title: n.title,
-            message: n.message,
-            timestamp: format(new Date(n.date), 'HH:mm'),
-            read: n.read,
-            userId: user._id || user.id
-          }));
+        const mappedUser = {
+          ...user,
+          id: user._id || user.id,
+        };
+        set((state) => ({
+          currentUser: mappedUser,
+          isAdminMode: state.currentUser ? state.isAdminMode : mappedUser.role === 'admin',
+        }));
+      }
 
-        set({ 
-          currentUser: user,
-          notifications: dbNotifs // Update global notifications with user-specific ones
-        });
+      if (notificationsRes.ok) {
+        const dbNotifs = await notificationsRes.json();
+        const mappedNotifs = dbNotifs.map((n: any) => ({
+          id: n._id || n.id,
+          type: n.type || 'info',
+          title: n.title,
+          message: n.message,
+          timestamp: format(new Date(n.date || n.createdAt), 'HH:mm'),
+          read: n.read,
+          userId: n.userId
+        }));
+
+        set({ notifications: mappedNotifs });
       }
 
       if (settingsRes.ok) {

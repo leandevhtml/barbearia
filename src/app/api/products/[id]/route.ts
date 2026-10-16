@@ -15,7 +15,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     await connectToDatabase();
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: id, barbershopId: (session.user as any).barbershopId },
+      body, 
+      { new: true }
+    );
     
     if (!updatedProduct) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
@@ -37,7 +41,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { id } = await params;
     await connectToDatabase();
 
-    const deletedProduct = await Product.findByIdAndDelete(id);
+    const deletedProduct = await Product.findOneAndDelete({ 
+      _id: id, 
+      barbershopId: (session.user as any).barbershopId 
+    });
     
     if (!deletedProduct) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });

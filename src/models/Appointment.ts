@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAppointment extends Document {
+  barbershopId: mongoose.Types.ObjectId; // tenant isolamento
   userId: mongoose.Types.ObjectId;
   barberId?: mongoose.Types.ObjectId;
-  serviceId: string; // Will link to a service model later or just be string for now
+  serviceId: string;
   serviceName: string;
   price: number;
   date: Date;
@@ -17,6 +18,7 @@ export interface IAppointment extends Document {
 
 const AppointmentSchema: Schema = new Schema(
   {
+    barbershopId: { type: Schema.Types.ObjectId, ref: 'Barbershop', required: true, index: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     barberId: { type: Schema.Types.ObjectId, ref: 'User' },
     serviceId: { type: String, required: true },
@@ -37,5 +39,11 @@ const AppointmentSchema: Schema = new Schema(
   },
   { timestamps: true }
 );
+
+// SENIOR PERFORMANCE: Índices para buscas rápidas
+AppointmentSchema.index({ barbershopId: 1, date: -1 });
+AppointmentSchema.index({ barbershopId: 1, barberId: 1, date: 1 });
+AppointmentSchema.index({ barbershopId: 1, userId: 1, date: -1 });
+AppointmentSchema.index({ barbershopId: 1, status: 1 });
 
 export default mongoose.models.Appointment || mongoose.model<IAppointment>('Appointment', AppointmentSchema);

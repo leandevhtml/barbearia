@@ -371,10 +371,10 @@ export default function ProductManager() {
               <motion.div 
                 key={p._id} 
                 layout
-                className="luxury-card grid grid-cols-1 sm:grid-cols-[180px_1fr] border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden min-h-[320px] sm:min-h-0"
+                className="luxury-card grid grid-cols-1 sm:grid-cols-[140px_1fr] border-white/5 relative group hover:border-orange-500/30 transition-all overflow-hidden"
               >
                 {/* Image Section */}
-                <div className="relative bg-neutral-900/80 border-b sm:border-b-0 sm:border-r border-white/5 h-48 sm:h-auto flex items-center justify-center overflow-hidden">
+                <div className="relative bg-neutral-900/80 border-b sm:border-b-0 sm:border-r border-white/5 h-40 sm:h-auto flex items-center justify-center overflow-hidden">
                   {p.image ? (
                     <img src={p.image} className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500" />
                   ) : (
@@ -408,28 +408,28 @@ export default function ProductManager() {
                 </div>
 
                 {/* Content Body */}
-                <div className="p-6 flex flex-col justify-between gap-6">
+                <div className="p-4 flex flex-col justify-between gap-4">
                   <div className="text-center sm:text-left">
-                    <h4 className="font-black text-lg sm:text-xl text-white leading-tight break-words uppercase tracking-tighter">
+                    <h4 className="font-black text-base sm:text-lg text-white leading-tight break-words uppercase tracking-tighter">
                       {p.name}
                     </h4>
                   </div>
                   
-                  <div className="flex flex-col xl:flex-row items-center justify-between gap-6 w-full mt-auto">
-                    <div className="text-center sm:text-left flex flex-col gap-1">
-                      <span className="text-[10px] text-neutral-500 uppercase font-black tracking-widest leading-none">Preço Sugerido</span>
-                      <div className="flex items-baseline gap-1.5 mt-1 justify-center sm:justify-start">
+                  <div className="flex flex-wrap items-end justify-between gap-3 w-full mt-auto">
+                    <div className="text-left flex flex-col gap-0.5">
+                      <span className="text-[9px] text-neutral-500 uppercase font-black tracking-widest leading-none">Preço Sugerido</span>
+                      <div className="flex items-baseline gap-1 mt-0.5 justify-start">
                         <span className="text-xs font-black text-orange-500 italic">R$</span>
-                        <span className="text-3xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
+                        <span className="text-2xl font-black text-white tracking-tighter leading-none">{p.price.toFixed(2)}</span>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 bg-neutral-950/50 px-4 py-2 rounded-2xl border border-white/5 shadow-inner xl:ml-auto">
-                      <div className="flex flex-col items-center sm:items-end">
-                        <span className={`text-lg font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
-                        <span className="text-[7px] font-black text-neutral-600 uppercase mt-0.5 tracking-widest">Estoque</span>
+                    <div className="flex items-center gap-2 bg-neutral-950/50 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
+                      <div className="flex flex-col items-end">
+                        <span className={`text-base font-black leading-none ${p.stock < 10 ? 'text-red-500' : 'text-green-500'}`}>{p.stock}</span>
+                        <span className="text-[6px] font-black text-neutral-600 uppercase mt-0.5 tracking-widest">Estoque</span>
                       </div>
-                      <Package size={14} className="text-neutral-700" />
+                      <Package size={12} className="text-neutral-700" />
                     </div>
                   </div>
                 </div>

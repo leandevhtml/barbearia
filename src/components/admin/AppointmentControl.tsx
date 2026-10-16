@@ -61,12 +61,14 @@ export default function AppointmentControl() {
     return true;
   });
 
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const updateStatus = async (apptId: string, status: string, items?: any[], totalAmount?: number, paymentMethod?: string) => {
-    if (!apptId || apptId === 'undefined') {
-      showToast('Erro: ID do agendamento inválido.', 'error');
+    if (!apptId || apptId === 'undefined' || isUpdating) {
       return;
     }
 
+    setIsUpdating(true);
     console.log('Tentando atualizar:', apptId, status);
     
     try {
@@ -84,7 +86,7 @@ export default function AppointmentControl() {
       }
       
       if (res.ok) {
-        fetchAppointments();
+        await fetchAppointments();
         if (status === 'completed') {
           showToast('Atendimento finalizado com sucesso!', 'success');
         } else if (status === 'in-progress') {
@@ -99,6 +101,8 @@ export default function AppointmentControl() {
     } catch (err: any) {
       console.error('Erro de conexão:', err);
       showToast('Erro de conexão ao tentar atualizar o agendamento.', 'error');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -288,15 +292,17 @@ export default function AppointmentControl() {
                   {appt.status === 'pending' && (
                     <>
                       <motion.button id={`btn-start-${currentId}`}
+                        disabled={isUpdating}
                         onClick={() => updateStatus(currentId, 'in-progress')}
-                        className="px-8 py-3 rounded-2xl text-xs font-black tracking-widest btn-primary"
-                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        className={`px-8 py-3 rounded-2xl text-xs font-black tracking-widest btn-primary ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        whileHover={!isUpdating ? { scale: 1.05 } : {}} whileTap={!isUpdating ? { scale: 0.95 } : {}}>
                         ▶ INICIAR
                       </motion.button>
                       <motion.button id={`btn-cancel-${currentId}`}
+                        disabled={isUpdating}
                         onClick={() => updateStatus(currentId, 'cancelled')}
-                        className="px-8 py-3 rounded-2xl text-xs font-black tracking-widest btn-ghost text-red-500 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40"
-                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        className={`px-8 py-3 rounded-2xl text-xs font-black tracking-widest btn-ghost text-red-500 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40 ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        whileHover={!isUpdating ? { scale: 1.05 } : {}} whileTap={!isUpdating ? { scale: 0.95 } : {}}>
                         ✕ CANCELAR
                       </motion.button>
                     </>
@@ -304,9 +310,10 @@ export default function AppointmentControl() {
 
                   {appt.status === 'in-progress' && (
                     <motion.button id={`btn-complete-${currentId}`}
+                      disabled={isUpdating}
                       onClick={() => { setCheckoutAppt(appt); }}
-                      className="px-10 py-4 rounded-2xl text-xs font-black tracking-widest bg-green-500/10 border border-green-500/30 text-green-500 hover:bg-green-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all"
-                      whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      className={`px-10 py-4 rounded-2xl text-xs font-black tracking-widest bg-green-500/10 border border-green-500/30 text-green-500 hover:bg-green-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      whileHover={!isUpdating ? { scale: 1.05 } : {}} whileTap={!isUpdating ? { scale: 0.95 } : {}}>
                       ✅ FECHAR CONTA / PDV
                     </motion.button>
                   )}

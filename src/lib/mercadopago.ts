@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { MercadoPagoConfig } from 'mercadopago';
 import connectToDatabase from './mongodb';
 import GlobalSetting from '@/models/Settings';
 

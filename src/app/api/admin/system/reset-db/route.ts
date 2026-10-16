@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectToDatabase from '@/lib/mongodb';
-import mongoose from 'mongoose';
+import Appointment from '@/models/Appointment';
+import Transaction from '@/models/Transaction';
+import User from '@/models/User';
 
 export async function POST() {
   try {
@@ -11,26 +13,31 @@ export async function POST() {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    await connectToDatabase();
-    
-    const collections = mongoose.connection.collections;
-    const results: any = {};
-
-    for (const key in collections) {
-      if (key === 'users') {
-        // Clear non-admins
-        const res = await collections[key].deleteMany({ role: { $ne: 'admin' } });
-        results[key] = res.deletedCount;
-      } else if (key === 'settings') {
-        // Keep settings
-        results[key] = 'preserved';
-      } else {
-        const res = await collections[key].deleteMany({});
-        results[key] = res.deletedCount;
-      }
+    const barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      return NextResponse.json({ message: 'Missing barbershopId' }, { status: 400 });
     }
 
-    return NextResponse.json({ message: 'Database reset successful', details: results });
+    await connectToDatabase();
+
+    // Delete all appointments for this barbershop
+    const appointmentsRes = await Appointment.deleteMany({ barbershopId });
+
+    // Delete all transactions for this barbershop
+    const transactionsRes = await Transaction.deleteMany({ barbershopId });
+
+    // Delete non-admin users for this barbershop
+    const usersRes = await User.deleteMany({ barbershopId, role: { $ne: 'admin' } });
+
+    return NextResponse.json({
+      message: 'Database reset successful',
+      details: {
+        appointments: appointmentsRes.deletedCount,
+        transactions: transactionsRes.deletedCount,
+        users: usersRes.deletedCount,
+        settings: 'preserved',
+      }
+    });
   } catch (error: any) {
     console.error('Reset DB error:', error);
     return NextResponse.json({ message: error.message }, { status: 500 });

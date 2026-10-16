@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface IProduct extends Document {
+  barbershopId: Types.ObjectId; // tenant
   name: string;
   price: number;
   stock: number;
@@ -13,6 +14,7 @@ export interface IProduct extends Document {
 
 const ProductSchema: Schema = new Schema(
   {
+    barbershopId: { type: Schema.Types.ObjectId, ref: 'Barbershop', required: true, index: true },
     name: { type: String, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },

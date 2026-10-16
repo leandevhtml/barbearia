@@ -20,6 +20,7 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'app' | 'counter'>('counter');
   const [pixStep, setPixStep] = useState(false);
+  const [pixData, setPixData] = useState<{ qr_code: string, qr_code_base64: string } | null>(null);
   const svcRef = useRef<HTMLDivElement>(null);
   const brbRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
@@ -213,7 +214,33 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
 
   async function handleBookClick() {
     if (getServicePrice(svc) > 0 && paymentMethod === 'app' && !pixStep) {
-      setPixStep(true);
+      // Gerar PIX Real no Mercado Pago
+      setLoading(true);
+      setGlobalLoading(true, 'GERANDO COBRANÇA PIX...');
+      try {
+        const s = dbServices.find(x => x._id === svc);
+        const res = await fetch('/api/payments/mercadopago/pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: getServicePrice(svc),
+            description: `Reserva: ${s?.name || 'Serviço'}`,
+            email: user?.email
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setPixData(data);
+          setPixStep(true);
+        } else {
+          showToast(data.message || 'Erro ao gerar pagamento.', 'error');
+        }
+      } catch (err) {
+          showToast('Erro de conexão ao gerar PIX.', 'error');
+      } finally {
+          setLoading(false);
+          setGlobalLoading(false);
+      }
       return;
     }
     
@@ -253,12 +280,14 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
         })
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setDone(true);
         showToast('Agendamento realizado com sucesso!', 'success');
         setTimeout(onBooked, 2200);
       } else {
-        showToast('Erro ao agendar. Tente outro horário.', 'error');
+        showToast(data.message || 'Erro ao agendar. Tente outro horário.', 'error');
       }
     } catch (err) {
       console.error(err);
@@ -595,26 +624,47 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
                   ) : (
                     <div className="text-center space-y-6 py-4">
                         <div className="w-48 h-48 mx-auto bg-white rounded-2xl p-2 flex items-center justify-center">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266554400005204000053039865802BR5913GIGANTES CORTE6009SAO PAULO62070503***63041234" alt="QR Code PIX" className="w-full h-full object-contain" />
+                            {pixData?.qr_code_base64 ? (
+                                <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="QR Code PIX Real" className="w-full h-full object-contain" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-[10px] font-black">CARREGANDO...</div>
+                            )}
                         </div>
                         <div>
                             <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">Pagamento via PIX</p>
                             <p className="text-3xl text-bebas font-black text-orange-500 italic">R$ {getServicePrice(svc).toFixed(2)}</p>
                         </div>
-                        <p className="text-xs text-neutral-400 font-bold leading-relaxed px-4">
-                            Abra o app do seu banco, escolha "PIX Copia e Cola" ou escaneie o QR Code acima.
-                        </p>
+                        <div className="space-y-3">
+                            <p className="text-[10px] text-neutral-400 font-bold leading-relaxed px-4">
+                                Escaneie o QR Code ou use o botão abaixo para copiar o código de pagamento.
+                            </p>
+                            <button 
+                                onClick={() => {
+                                    if (pixData?.qr_code) {
+                                        navigator.clipboard.writeText(pixData.qr_code);
+                                        showToast('Código PIX copiado!', 'success');
+                                    }
+                                }}
+                                className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-white hover:bg-white/10 transition-all uppercase tracking-widest"
+                            >
+                                📋 Copiar Código PIX
+                            </button>
+                        </div>
                     </div>
                   )}
                 </div>
-                <button onClick={handleBookClick} className={`btn-prime w-full py-6 text-lg tracking-[0.2em] ${pixStep ? 'bg-[#25D366] hover:bg-[#1EBE5D] text-white border-[#25D366] shadow-[0_0_20px_rgba(37,211,102,0.4)]' : ''}`}>
-                    {pixStep ? 'SIMULAR PAGAMENTO APROVADO' : (paymentMethod === 'app' && getServicePrice(svc) > 0 ? 'PAGAR COM PIX' : 'AGENDAR AGORA')}
+                <button 
+                  onClick={handleBookClick} 
+                  disabled={loading}
+                  className={`btn-prime w-full py-6 text-lg tracking-[0.2em] transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    {pixStep ? 'CONFIRMAR AGENDAMENTO' : (paymentMethod === 'app' && getServicePrice(svc) > 0 ? 'GERAR PIX' : 'AGENDAR AGORA')}
                 </button>
               </motion.div>
             )}
             <button 
                onClick={() => {
-                 if (pixStep) { setPixStep(false); return; }
+                 if (pixStep) { setPixStep(false); setPixData(null); return; }
                  setStep(3);
                }} 
                className="text-[11px] font-black text-neutral-500 uppercase tracking-[0.3em] hover:text-orange-500 transition-all flex items-center gap-3 border-b border-white/5 pb-2"

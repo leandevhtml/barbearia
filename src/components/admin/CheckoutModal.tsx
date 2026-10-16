@@ -21,6 +21,7 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'cash'>('pix');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isServicePaid, setIsServicePaid] = useState(
     appointment.paymentStatus === 'paid_app' || appointment.paymentStatus === 'free_reward'
   );
@@ -34,8 +35,18 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
       });
   }, []);
 
+  const { showToast } = useBarbershopStore();
+
   const addItem = (product: Product) => {
     const existing = selectedItems.find(i => i.productId === product._id);
+    const currentQty = existing ? existing.quantity : 0;
+    
+    // SENIOR FIX: Verificar estoque antes de adicionar
+    if (currentQty >= product.stock) {
+      showToast(`Estoque esgotado para "${product.name}".`, 'error');
+      return;
+    }
+    
     if (existing) {
       setSelectedItems(selectedItems.map(i => 
         i.productId === product._id ? { ...i, quantity: i.quantity + 1 } : i
@@ -91,16 +102,25 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {products.map(p => (
-                  <button 
-                    key={p._id}
-                    onClick={() => addItem(p)}
-                    className="p-4 rounded-2xl bg-neutral-900 border border-white/5 text-left hover:border-orange-500/30 transition-all group"
-                  >
-                    <p className="text-sm font-bold text-white group-hover:text-orange-500">{p.name}</p>
-                    <p className="text-xs font-black text-orange-500 mt-1">R$ {p.price.toFixed(2)}</p>
-                  </button>
-                ))}
+                {products.map(p => {
+                  const inCart = selectedItems.find(i => i.productId === p._id)?.quantity || 0;
+                  const outOfStock = p.stock <= 0;
+                  const cartFull = inCart >= p.stock;
+                  return (
+                    <button 
+                      key={p._id}
+                      onClick={() => addItem(p)}
+                      disabled={outOfStock || cartFull}
+                      className={`p-4 rounded-2xl bg-neutral-900 border border-white/5 text-left transition-all group ${outOfStock || cartFull ? 'opacity-40 cursor-not-allowed' : 'hover:border-orange-500/30'}`}
+                    >
+                      <p className="text-sm font-bold text-white group-hover:text-orange-500">{p.name}</p>
+                      <p className="text-xs font-black text-orange-500 mt-1">R$ {p.price.toFixed(2)}</p>
+                      <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${outOfStock ? 'text-red-500' : 'text-neutral-600'}`}>
+                        {outOfStock ? 'SEM ESTOQUE' : `${p.stock - inCart} disponíveis`}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -176,10 +196,18 @@ export default function CheckoutModal({ appointment, onClose, onConfirm }: Check
                 </span>
               </div>
               <button 
-                onClick={() => onConfirm(selectedItems, totalToPay, paymentMethod)}
-                className="btn-prime w-full py-4 text-xs font-black tracking-widest"
+                disabled={isSubmitting}
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  try {
+                    await onConfirm(selectedItems, totalToPay, paymentMethod);
+                  } catch (e) {
+                    setIsSubmitting(false);
+                  }
+                }}
+                className={`btn-prime w-full py-4 text-xs font-black tracking-widest transition-all ${isSubmitting ? 'opacity-50 cursor-not-allowed scale-95' : ''}`}
               >
-                FINALIZAR E PAGAR
+                {isSubmitting ? 'PROCESSANDO...' : 'FINALIZAR E PAGAR'}
               </button>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectToDatabase from '@/lib/mongodb';
-import User from '@/models/User';
+import Notification from '@/models/Notification';
 
 export async function POST() {
   try {
@@ -10,13 +10,14 @@ export async function POST() {
     if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
 
     await connectToDatabase();
-    await User.updateOne(
-      { email: session.user?.email },
-      { $set: { "notifications.$[].read": true } }
+    await Notification.updateMany(
+      { userId: (session.user as any).id, read: false },
+      { $set: { read: true } }
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Error marking notifications as read:', error);
     return NextResponse.json({ message: 'Erro no servidor' }, { status: 500 });
   }
 }

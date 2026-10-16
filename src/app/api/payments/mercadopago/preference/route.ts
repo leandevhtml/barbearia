@@ -42,11 +42,13 @@ export async function POST(req: Request) {
     // Create a pending transaction in our DB
     await connectToDatabase();
     await Transaction.create({
+      barbershopId: (session.user as any).barbershopId,
       userId: (session.user as any).id,
       appointmentId: appointmentId || null,
       type: 'service',
       amount: Number(amount),
       description: description || 'Pagamento App',
+      category: 'Serviços',
       paymentMethod: 'mercadopago',
       status: 'pending',
       providerId: result.id

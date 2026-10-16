@@ -6,6 +6,9 @@ import connectToDatabase from '@/lib/mongodb';
 import Appointment from '@/models/Appointment';
 import User from '@/models/User';
 import Transaction from '@/models/Transaction';
+import Notification from '@/models/Notification';
+import Service from '@/models/Service';
+import { sanitizeBody, isValidObjectId, getClientIP, auditLog } from '@/lib/security';
 
 export async function GET(req: Request) {
   try {
@@ -19,16 +22,22 @@ export async function GET(req: Request) {
     // Admin can see all, client can only see their own
     const userRole = (session.user as any).role;
     const userId = (session.user as any).id;
+    const barbershopId = (session.user as any).barbershopId;
+
+    if (!barbershopId) {
+      return NextResponse.json({ message: 'Barbearia não vinculada' }, { status: 400 });
+    }
     
     let appointments;
     if (userRole === 'admin') {
-      appointments = await Appointment.find().populate('userId', 'name phone').populate('barberId', 'name avatar').sort({ date: 1 });
+      appointments = await Appointment.find({ barbershopId }).populate('userId', 'name phone').populate('barberId', 'name avatar').sort({ date: 1 });
     } else if (userRole === 'barber') {
-      appointments = await Appointment.find({ barberId: userId }).populate('userId', 'name phone').sort({ date: 1 });
+      appointments = await Appointment.find({ barbershopId, barberId: userId }).populate('userId', 'name phone').sort({ date: 1 });
     } else {
       // Client view: See own appointments normally, and others' as anonymized busy slots
-      const own = await Appointment.find({ userId }).populate('barberId', 'name avatar').sort({ date: 1 });
+      const own = await Appointment.find({ barbershopId, userId }).populate('barberId', 'name avatar').sort({ date: 1 });
       const others = await Appointment.find({ 
+        barbershopId,
         userId: { $ne: userId }, 
         status: { $ne: 'cancelled' },
         date: { $gte: subDays(new Date(), 1) } // Only recent/future appointments
@@ -60,56 +69,112 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { serviceId, serviceName, price, date, barberId, paymentStatus, totalAmount } = await req.json();
+    // 🛡️ SECURITY: Sanitizar inputs contra NoSQL Injection
+    const rawBody = await req.json();
+    const body = sanitizeBody(rawBody);
+    const { serviceId, date, barberId, paymentStatus, totalAmount } = body;
 
-    if (!serviceId || !serviceName || !price || !date) {
+    if (!serviceId || !date) {
       return NextResponse.json({ message: 'Campos obrigatórios faltando' }, { status: 400 });
+    }
+
+    // 🛡️ SECURITY: Validar formato dos IDs
+    if (!isValidObjectId(serviceId)) {
+      return NextResponse.json({ message: 'ID de serviço inválido.' }, { status: 400 });
+    }
+    if (barberId && !isValidObjectId(barberId)) {
+      return NextResponse.json({ message: 'ID de barbeiro inválido.' }, { status: 400 });
+    }
+
+    const barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      return NextResponse.json({ message: 'Barbearia não vinculada' }, { status: 400 });
     }
 
     await connectToDatabase();
 
+    // SENIOR SECURITY: Buscar o serviço no banco para garantir o preço real
+    // Nunca confie no preço enviado pelo frontend!
+    const dbService = await Service.findById(serviceId);
+    if (!dbService) {
+      return NextResponse.json({ message: 'Serviço não encontrado ou inativo.' }, { status: 404 });
+    }
+
+    const realPrice = dbService.price;
+    const realServiceName = dbService.name;
+
+    // SENIOR FIX: Evitar Race Condition (Reserva Dupla)
+    const appointmentDate = new Date(date);
+    const existingAppointment = await Appointment.findOne({
+      barbershopId,
+      barberId: barberId || null,
+      date: appointmentDate,
+      status: { $ne: 'cancelled' }
+    });
+
+    if (existingAppointment) {
+      return NextResponse.json(
+        { message: 'Este horário acabou de ser ocupado. Por favor, escolha outro momento.' }, 
+        { status: 409 }
+      );
+    }
+
     const newAppointment = new Appointment({
+      barbershopId,
       userId: (session.user as any).id,
       barberId: barberId || null,
       serviceId,
-      serviceName,
-      price,
-      date: new Date(date),
+      serviceName: realServiceName,
+      price: realPrice,
+      date: appointmentDate,
       status: 'pending',
       paymentStatus: paymentStatus || 'pending',
-      totalAmount: totalAmount || price
+      totalAmount: totalAmount || realPrice
     });
 
     await newAppointment.save();
+
+    // 🛡️ AUDIT: Registrar a criação do agendamento
+    auditLog({
+      action: 'APPOINTMENT_CREATED',
+      userId: (session.user as any).id,
+      userRole: (session.user as any).role,
+      ip: getClientIP(req),
+      details: {
+        appointmentId: newAppointment._id,
+        serviceId,
+        serviceName: realServiceName,
+        price: realPrice,
+        barberId,
+        paymentStatus: paymentStatus || 'pending',
+      },
+      timestamp: new Date(),
+    });
 
     // Side effect: If paid via App (PIX), create transaction record and notify admin immediately
     if (paymentStatus === 'paid_app') {
       try {
         await Transaction.create({
+          barbershopId,
           appointmentId: newAppointment._id,
           type: 'service',
-          amount: totalAmount || price,
-          description: `Pagamento Antecipado (PIX): ${serviceName} (${session.user?.name || 'Cliente'})`,
+          amount: totalAmount || realPrice,
+          description: `Pagamento Antecipado (PIX): ${realServiceName} (${session.user?.name || 'Cliente'})`,
           category: 'Venda de Serviço',
           paymentMethod: 'pix'
         });
 
-        // Notify all admins about the new pre-paid booking
-        await User.updateMany(
-          { role: 'admin' },
-          {
-            $push: {
-              notifications: {
-                id: Math.random().toString(36).substring(7),
-                title: 'Novo Pagamento PIX! 📱',
-                message: `O cliente ${session.user?.name || 'Cliente'} realizou um pagamento de R$ ${(totalAmount || price).toFixed(2)} via PIX para o agendamento de ${serviceName}.`,
-                date: new Date(),
-                read: false,
-                type: 'info'
-              }
-            }
-          }
+        // SENIOR FIX: Notificar administradores usando o novo modelo de Notification
+        const admins = await User.find({ barbershopId, role: 'admin' });
+        const notificationPromises = admins.map(admin => 
+          Notification.create({
+            userId: admin._id,
+            title: 'Novo Pagamento PIX! 📱',
+            message: `O cliente ${session.user?.name || 'Cliente'} realizou um pagamento de R$ ${(totalAmount || realPrice).toFixed(2)} via PIX para o agendamento de ${realServiceName}.`,
+            type: 'info'
+          })
         );
+        await Promise.all(notificationPromises);
       } catch (error) {
         console.error('Error creating pre-paid transaction/notification:', error);
         // We don't fail the request if notification fails

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import BarberLoading from '@/components/shared/BarberLoading';
 import { motion, AnimatePresence } from 'framer-motion';

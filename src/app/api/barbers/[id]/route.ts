@@ -24,8 +24,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       }
     }
 
-    const updatedBarber = await User.findByIdAndUpdate(
-      id,
+    const updatedBarber = await User.findOneAndUpdate(
+      { _id: id, barbershopId: (session.user as any).barbershopId },
       { 
         name, 
         email, 
@@ -60,13 +60,18 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     await connectToDatabase();
     
-    const deletedBarber = await User.findByIdAndDelete(id);
+    // SENIOR FIX: Soft Delete
+    // Em vez de apagar, marcamos como inativo para não quebrar o histórico de agendamentos
+    const deletedBarber = await User.findOneAndUpdate(
+      { _id: id, barbershopId: (session.user as any).barbershopId }, 
+      { active: false, available: false }
+    );
 
     if (!deletedBarber) {
       return NextResponse.json({ message: 'Barbeiro não encontrado' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Barbeiro excluído com sucesso' });
+    return NextResponse.json({ message: 'Barbeiro desativado com sucesso' });
   } catch (error) {
     console.error('Error deleting barber:', error);
     return NextResponse.json({ message: 'Erro ao excluir barbeiro' }, { status: 500 });

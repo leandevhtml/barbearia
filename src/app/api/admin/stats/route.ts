@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import connectToDatabase from '@/lib/mongodb';
 import Appointment from '@/models/Appointment';
 import Transaction from '@/models/Transaction';
-import { startOfDay, endOfDay, subDays, subMonths, startOfMonth, endOfMonth, startOfHour, addHours } from 'date-fns';
+import { startOfDay, endOfDay, subDays, subMonths, startOfMonth, endOfMonth, addHours } from 'date-fns';
 
 export async function GET(request: Request) {
   try {
@@ -18,6 +18,8 @@ export async function GET(request: Request) {
 
     await connectToDatabase();
 
+    const barbershopId = (session.user as any).barbershopId;
+
     const now = new Date();
     
     let startDate = startOfDay(subDays(now, 6)); // default 7d
@@ -29,11 +31,13 @@ export async function GET(request: Request) {
 
     // 1. Get all transactions in range for revenue
     const rangeTransactions = await Transaction.find({
+      barbershopId,
       createdAt: { $gte: startDate, $lte: endDate }
     });
 
     // 2. Get all completed appointments in range for cuts count and service mix
     const rangeAppointments = await Appointment.find({
+      barbershopId,
       status: 'completed',
       updatedAt: { $gte: startDate, $lte: endDate }
     });
@@ -43,13 +47,13 @@ export async function GET(request: Request) {
 
     // Advanced Revenue Split based on Transactions
     const appRevenue = rangeTransactions
-      .filter(t => t.paymentMethod === 'pix' && (t.description.includes('Antecipado') || t.description.includes('PIX')))
+      .filter(t => t.paymentMethod === 'pix' && (t.description?.includes('Antecipado') || t.description?.includes('PIX')))
       .reduce((acc, t) => acc + t.amount, 0);
     
     const counterRevenue = totalRev - appRevenue;
 
     const consumptionRevenue = rangeTransactions
-      .filter(t => t.type === 'product' || t.category.includes('Produtos'))
+      .filter(t => t.type === 'product' || t.category?.includes('Produtos'))
       .reduce((acc, t) => acc + t.amount, 0);
 
     const serviceRevenue = totalRev - consumptionRevenue;

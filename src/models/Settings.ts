@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface ISettings extends Document {
+  barbershopId: Types.ObjectId; // tenant
   fidelityEnabled: boolean;
   stampsPerReward: number;
   rewardServiceName: string; // Service that can be free
@@ -28,6 +29,7 @@ export interface ISettings extends Document {
 
 const SettingsSchema: Schema = new Schema(
   {
+    barbershopId: { type: Schema.Types.ObjectId, ref: 'Barbershop', required: true, unique: true, index: true },
     fidelityEnabled: { type: Boolean, default: true },
     stampsPerReward: { type: Number, default: 10 },
     rewardServiceName: { type: String, default: 'Corte Social' },
@@ -61,5 +63,5 @@ const SettingsSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-delete mongoose.models.GlobalSetting;
-export default mongoose.model<ISettings>('GlobalSetting', SettingsSchema);
+delete mongoose.models.Settings;
+export default mongoose.model<ISettings>('Settings', SettingsSchema);

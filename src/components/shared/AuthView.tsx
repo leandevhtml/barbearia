@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import BarberLoading from './BarberLoading';
 
-export default function AuthView() {
+export default function AuthView({ slug }: { slug?: string }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,19 @@ export default function AuthView() {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [barbershopInfo, setBarbershopInfo] = useState<{name: string, logoUrl?: string} | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (slug) {
+      fetch(`/api/barbershops/public?slug=${slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) setBarbershopInfo(data);
+        })
+        .catch(console.error);
+    }
+  }, [slug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +60,7 @@ export default function AuthView() {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, password }),
+          body: JSON.stringify({ name, email, phone, password, slug }),
         });
         
         const data = await res.json();
@@ -88,14 +100,13 @@ export default function AuthView() {
         
         <div className="text-center mb-8 md:mb-10">
           <div className="flex justify-center mb-6">
-              <div className="relative w-40 h-28">
+              <div className="relative w-40 h-28 flex items-center justify-center">
                 <Image 
-                    src="/logo.png" 
-                    alt="Gigantes do Corte" 
-                    width={160}
-                    height={112}
+                    src={barbershopInfo?.logoUrl || '/logo.png'} 
+                    alt={barbershopInfo?.name || 'Gigantes do Corte'} 
+                    fill
                     priority
-                    className="w-full h-full object-contain brightness-110 drop-shadow-[0_0_20px_rgba(234,88,12,0.4)]"
+                    className="object-contain brightness-110 drop-shadow-[0_0_20px_rgba(234,88,12,0.4)]"
                 />
               </div>
           </div>
