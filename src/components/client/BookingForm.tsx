@@ -365,23 +365,25 @@ export default function BookingForm({ onBooked }: { onBooked: () => void }) {
           )}
         </div>
 
-        {/* Botão de Enviar Confirmação no WhatsApp */}
-        <div className="space-y-3">
-          <a
-            href={clientWaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-4 rounded-xl bg-green-500 hover:bg-green-600 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_0_25px_rgba(34,197,94,0.3)] hover:scale-[1.02]"
-          >
-            <span className="text-lg">💬</span>
-            <span>Receber Confirmação no WhatsApp</span>
-          </a>
+        {/* Status de Envio Automático do WhatsApp */}
+        <div className="space-y-4">
+          <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/25 flex items-center justify-center gap-3">
+            <span className="text-xl">✅</span>
+            <div className="text-left">
+              <p className="text-xs font-black uppercase text-green-400 tracking-wider">
+                Confirmação enviada no seu WhatsApp!
+              </p>
+              <p className="text-[10px] text-neutral-400 font-medium">
+                Os dados completos do seu horário já chegaram no seu celular.
+              </p>
+            </div>
+          </div>
 
           <button
             onClick={onBooked}
-            className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all border border-white/5"
+            className="btn-prime w-full py-4 text-xs tracking-[0.2em] uppercase font-black"
           >
-            Acompanhar Meus Agendamentos →
+            ACOMPANHAR MEUS AGENDAMENTOS →
           </button>
         </div>
       </motion.div>
