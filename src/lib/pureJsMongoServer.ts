@@ -245,10 +245,14 @@ async function handleCommand(cmd: any): Promise<any> {
     for (const stage of pipeline) {
       if (stage.$match) {
         current = current.filter((d) => matchesFilter(d, stage.$match));
+      } else if (stage.$skip) {
+        current = current.slice(Number(stage.$skip));
+      } else if (stage.$limit) {
+        current = current.slice(0, Number(stage.$limit));
       } else if (stage.$count) {
         current = [{ [stage.$count]: current.length }];
-      } else if (stage.$group && stage.$group._id === null && stage.$group.n) {
-        current = [{ _id: null, n: current.length }];
+      } else if (stage.$group) {
+        current = [{ _id: null, n: current.length, count: current.length }];
       }
     }
     return {
