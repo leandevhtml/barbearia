@@ -17,6 +17,7 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "mercadopago": "^2.12.0",
+    "mingo": "^7.2.5",
     "mongodb-memory-server": "^11.3.0",
     "mongoose": "^9.5.0",
     "next": "16.2.4",
