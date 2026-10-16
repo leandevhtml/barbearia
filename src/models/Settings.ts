@@ -24,6 +24,10 @@ export interface ISettings extends Document {
   specialDays: Array<{ date: string; openHour?: string; closeHour?: string; isClosed: boolean }>;
   mpAccessToken?: string;
   mpPublicKey?: string;
+  whatsappAutoSendEnabled?: boolean;
+  evolutionApiUrl?: string;
+  evolutionApiKey?: string;
+  evolutionInstanceName?: string;
   updatedAt: Date;
 }
 
@@ -59,6 +63,10 @@ const SettingsSchema: Schema = new Schema(
     ],
     mpAccessToken: { type: String, default: '' },
     mpPublicKey: { type: String, default: '' },
+    whatsappAutoSendEnabled: { type: Boolean, default: false },
+    evolutionApiUrl: { type: String, default: '' },
+    evolutionApiKey: { type: String, default: '' },
+    evolutionInstanceName: { type: String, default: 'gigantes-do-corte' },
   },
   { timestamps: true }
 );

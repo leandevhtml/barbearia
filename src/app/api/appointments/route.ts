@@ -8,6 +8,9 @@ import User from '@/models/User';
 import Transaction from '@/models/Transaction';
 import Notification from '@/models/Notification';
 import Service from '@/models/Service';
+import { sendWhatsAppMessage } from '@/lib/whatsapp';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { sanitizeBody, isValidObjectId, getClientIP, auditLog } from '@/lib/security';
 
 export async function GET(req: Request) {
@@ -197,6 +200,38 @@ export async function POST(req: Request) {
         console.error('Error creating pre-paid transaction/notification:', error);
         // We don't fail the request if notification fails
       }
+    }
+
+    // 📲 WHATSAPP AUTOMATION: Disparo autônomo e gratuito para o WhatsApp do cliente
+    try {
+      const [clientUser, barberUser] = await Promise.all([
+        User.findById(clientUserId).select('name phone'),
+        barberId ? User.findById(barberId).select('name') : null
+      ]);
+
+      if (clientUser && clientUser.phone) {
+        const appointmentDateFormatted = format(appointmentDate, "dd/MM/yyyy 'às' HH:mm'h'", { locale: ptBR });
+        const barberName = barberUser?.name || 'Profissional da Casa';
+
+        const whatsappText = `✂️ *AGENDAMENTO CONFIRMADO - BARBEARIA GIGANTES DO CORTE* ✂️\n\n` +
+          `Olá, *${clientUser.name}*!\n` +
+          `Seu agendamento foi confirmado com sucesso no sistema:\n\n` +
+          `💈 *Serviço:* ${realServiceName}\n` +
+          `✂️ *Barbeiro:* ${barberName}\n` +
+          `📅 *Data e Horário:* ${appointmentDateFormatted}\n` +
+          `💰 *Valor:* R$ ${finalPrice.toFixed(2)}\n` +
+          (clientNotes ? `📝 *Sua observação:* ${clientNotes}\n` : '') +
+          `\nTe aguardamos na barbearia! Por favor, chegue com 5 a 10 minutos de antecedência. Caso precise reagendar, entre em contato com a gente.`;
+
+        // Executa o envio sem travar a resposta HTTP
+        sendWhatsAppMessage({
+          barbershopId,
+          phone: clientUser.phone,
+          message: whatsappText
+        }).catch(err => console.error('[WhatsApp Hook Error]:', err));
+      }
+    } catch (waError) {
+      console.error('[WhatsApp Hook Trigger Error]:', waError);
     }
 
     return NextResponse.json(newAppointment, { status: 201 });

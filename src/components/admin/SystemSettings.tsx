@@ -7,7 +7,7 @@ import { useBarbershopStore } from '@/store/barbershopStore';
 import ServiceManager from './ServiceManager';
 
 export default function SystemSettings() {
-  const [activeSubTab, setActiveSubTab] = useState<'geral' | 'regras' | 'servicos' | 'recados' | 'estabelecimento' | 'pagamentos'>('geral');
+  const [activeSubTab, setActiveSubTab] = useState<'geral' | 'regras' | 'servicos' | 'recados' | 'estabelecimento' | 'pagamentos' | 'whatsapp'>('geral');
   const [fidelityEnabled, setFidelityEnabled] = useState(true);
   const [stampsPerReward, setStampsPerReward] = useState(10);
   const [announcementEnabled, setAnnouncementEnabled] = useState(false);
@@ -33,6 +33,12 @@ export default function SystemSettings() {
   const [newSpecialClosed, setNewSpecialClosed] = useState(true);
   const [mpAccessToken, setMpAccessToken] = useState('');
   const [mpPublicKey, setMpPublicKey] = useState('');
+
+  // WhatsApp Evolution API settings
+  const [whatsappAutoSendEnabled, setWhatsappAutoSendEnabled] = useState(false);
+  const [evolutionApiUrl, setEvolutionApiUrl] = useState('');
+  const [evolutionApiKey, setEvolutionApiKey] = useState('');
+  const [evolutionInstanceName, setEvolutionInstanceName] = useState('gigantes-do-corte');
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,6 +68,10 @@ export default function SystemSettings() {
         setSpecialDays(data.specialDays || []);
         setMpAccessToken(data.mpAccessToken || '');
         setMpPublicKey(data.mpPublicKey || '');
+        setWhatsappAutoSendEnabled(data.whatsappAutoSendEnabled || false);
+        setEvolutionApiUrl(data.evolutionApiUrl || '');
+        setEvolutionApiKey(data.evolutionApiKey || '');
+        setEvolutionInstanceName(data.evolutionInstanceName || 'gigantes-do-corte');
         setLoading(false);
       });
   }, []);
@@ -95,7 +105,11 @@ export default function SystemSettings() {
           bookingNoticeHours,
           specialDays,
           mpAccessToken,
-          mpPublicKey
+          mpPublicKey,
+          whatsappAutoSendEnabled,
+          evolutionApiUrl,
+          evolutionApiKey,
+          evolutionInstanceName
         })
       });
       await syncUser();
@@ -151,6 +165,12 @@ export default function SystemSettings() {
                 className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'pagamentos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Pagamentos
+            </button>
+            <button 
+                onClick={() => setActiveSubTab('whatsapp')}
+                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'whatsapp' ? 'bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'text-neutral-500 hover:text-white'}`}
+            >
+                💬 WhatsApp Robô
             </button>
         </div>
       </div>
@@ -680,6 +700,107 @@ export default function SystemSettings() {
                 <p className="text-xs text-neutral-500 leading-relaxed">
                     Seus tokens são armazenados de forma segura e utilizados apenas para processar os pagamentos dos seus clientes. Nunca compartilhe seu Access Token com ninguém.
                 </p>
+            </div>
+          </motion.div>
+        )}
+
+        {activeSubTab === 'whatsapp' && (
+          <motion.div 
+            key="whatsapp"
+            initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
+            className="space-y-8"
+          >
+            <motion.div className="luxury-card p-10 border border-green-500/20 space-y-8 max-w-2xl shadow-[0_0_50px_rgba(34,197,94,0.08)]">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-3xl shadow-inner">
+                    💬
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bebas text-white italic tracking-tight">Robô de WhatsApp (100% Automático & Gratuito)</h3>
+                    <p className="text-[10px] text-green-400 font-bold uppercase tracking-widest">
+                      Disparo autônomo de confirmação para o WhatsApp do cliente
+                    </p>
+                  </div>
+                </div>
+
+                {/* Switch Ativar/Desativar */}
+                <div className="flex items-center justify-between p-6 rounded-2xl bg-neutral-900 border border-white/5">
+                  <div>
+                    <p className="text-sm font-bold text-white">Disparo Automático ao Agendar</p>
+                    <p className="text-[10px] text-neutral-500 font-medium mt-1">
+                      Envia mensagem instantânea com serviço, barbeiro, data e hora para o celular do cliente.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setWhatsappAutoSendEnabled(!whatsappAutoSendEnabled)}
+                    className={`w-14 h-8 rounded-full transition-colors relative p-1 ${whatsappAutoSendEnabled ? 'bg-green-600' : 'bg-neutral-800'}`}
+                  >
+                    <div className={`w-6 h-6 rounded-full bg-white transition-transform ${whatsappAutoSendEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+
+                {/* Evolution API Connection Credentials */}
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+                      URL da Evolution API (Servidor ou Local)
+                    </label>
+                    <input 
+                      type="text" 
+                      value={evolutionApiUrl}
+                      onChange={(e) => setEvolutionApiUrl(e.target.value)}
+                      className="w-full bg-neutral-950 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-green-500 transition-colors text-xs font-mono"
+                      placeholder="https://sua-evolution-api.up.railway.app ou http://localhost:8080"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+                      Chave de Autenticação (API Key / Token)
+                    </label>
+                    <input 
+                      type="password" 
+                      value={evolutionApiKey}
+                      onChange={(e) => setEvolutionApiKey(e.target.value)}
+                      className="w-full bg-neutral-950 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-green-500 transition-colors text-xs font-mono"
+                      placeholder="Sua chave secreta da API"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+                      Nome da Instância Conectada
+                    </label>
+                    <input 
+                      type="text" 
+                      value={evolutionInstanceName}
+                      onChange={(e) => setEvolutionInstanceName(e.target.value)}
+                      className="w-full bg-neutral-950 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-green-500 transition-colors text-xs font-mono"
+                      placeholder="gigantes-do-corte"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full py-5 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-black text-xs uppercase tracking-[0.3em] disabled:opacity-50 transition-all shadow-[0_0_30px_rgba(34,197,94,0.3)]"
+                >
+                  {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÃO DO WHATSAPP'}
+                </button>
+            </motion.div>
+
+            {/* Como funciona / Guia rápido gratuito */}
+            <div className="glass p-6 rounded-2xl border border-green-500/20 max-w-2xl space-y-3">
+              <p className="text-[10px] font-black text-green-400 uppercase tracking-widest">
+                💡 Como funciona 100% Grátis:
+              </p>
+              <ul className="text-xs text-neutral-400 space-y-2 leading-relaxed">
+                <li>• A <strong>Evolution API</strong> é um serviço gratuito de código aberto que emula uma sessão de WhatsApp Web segura no servidor.</li>
+                <li>• Você pode rodá-la no computador da própria barbearia (na mesma máquina do servidor 24h) ou em hospedagens com plano gratuito como Railway.</li>
+                <li>• Uma vez configurado, o sistema não depende de ninguém: o cliente confirma o agendamento e o robô dispara na mesma hora para o WhatsApp dele!</li>
+              </ul>
             </div>
           </motion.div>
         )}
