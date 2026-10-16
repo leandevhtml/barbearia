@@ -83,7 +83,6 @@ async function ensureDefaultData() {
         { barbershopId: defaultShop._id, name: 'Sobrancelha', price: 20, duration: 15, icon: '✨', active: true },
       ]);
     } else if (allServices.length > 6) {
-      // Remove duplicate services created by earlier cold starts
       const seenNames = new Set<string>();
       for (const svc of allServices) {
         const key = (svc.name || '').trim().toLowerCase();
@@ -95,18 +94,28 @@ async function ensureDefaultData() {
       }
     }
 
-    const productCount = await Product.countDocuments({ barbershopId: defaultShop._id });
-    if (productCount === 0) {
+    const allProducts = await Product.find({ barbershopId: defaultShop._id });
+    if (allProducts.length === 0) {
       await Product.insertMany([
         { barbershopId: defaultShop._id, name: 'Pomada Efeito Matte', price: 35, stock: 25, category: 'Cosméticos', active: true },
         { barbershopId: defaultShop._id, name: 'Óleo para Barba Premium', price: 40, stock: 20, category: 'Cosméticos', active: true },
         { barbershopId: defaultShop._id, name: 'Cerveja Artesanal Gelada', price: 15, stock: 48, category: 'Bebidas', active: true },
         { barbershopId: defaultShop._id, name: 'Refrigerante Lata', price: 8, stock: 36, category: 'Bebidas', active: true },
       ]);
+    } else if (allProducts.length > 4) {
+      const seenProducts = new Set<string>();
+      for (const prod of allProducts) {
+        const key = (prod.name || '').trim().toLowerCase();
+        if (seenProducts.has(key)) {
+          await Product.deleteOne({ _id: prod._id });
+        } else {
+          seenProducts.add(key);
+        }
+      }
     }
 
-    const barberCount = await User.countDocuments({ barbershopId: defaultShop._id, role: 'barber' });
-    if (barberCount === 0) {
+    const allBarbers = await User.find({ barbershopId: defaultShop._id, role: 'barber' });
+    if (allBarbers.length === 0) {
       const barberPassword = await bcrypt.hash('barber123', 10);
       await User.create({
         name: 'Mestre Navalha',
@@ -120,6 +129,16 @@ async function ensureDefaultData() {
         available: true,
         active: true,
       });
+    } else if (allBarbers.length > 1) {
+      const seenEmails = new Set<string>();
+      for (const brb of allBarbers) {
+        const key = (brb.email || brb.name || '').trim().toLowerCase();
+        if (seenEmails.has(key)) {
+          await User.deleteOne({ _id: brb._id });
+        } else {
+          seenEmails.add(key);
+        }
+      }
     }
   } catch (seedErr) {
     console.warn('[MongoDB] Seed warning:', seedErr);
