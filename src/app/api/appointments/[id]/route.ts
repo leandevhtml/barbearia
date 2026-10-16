@@ -73,27 +73,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (items) updateData.items = items;
     if (totalAmount !== undefined) updateData.totalAmount = totalAmount;
 
-    // 2. Perform the appointment update ATOMICALLY
-    // SENIOR FIX: Evita que cliques duplos processem transações e selos duas vezes
-    const query: any = { _id: id, barbershopId };
-    if (status === 'completed') {
-      query.status = { $ne: 'completed' };
+    // 2. Perform the appointment update
+    if (status === 'completed' && currentAppointment.status === 'completed') {
+      return NextResponse.json({ message: 'Este atendimento já foi finalizado.' }, { status: 409 });
     }
 
-    const updatedAppointment = await Appointment.findOneAndUpdate(
-      query,
-      { $set: updateData },
-      { new: true }
-    );
-
-    if (!updatedAppointment) {
-      // Se não encontrou, provavelmente já foi finalizado por outro processo/clique
-      const checkCurrent = await Appointment.findById(id);
-      if (checkCurrent?.status === 'completed' && status === 'completed') {
-        return NextResponse.json({ message: 'Este atendimento já foi finalizado.' }, { status: 409 });
-      }
-      return NextResponse.json({ message: 'Agendamento não encontrado ou já atualizado.' }, { status: 404 });
-    }
+    currentAppointment.set(updateData);
+    const updatedAppointment = await currentAppointment.save();
 
     // Refund free coupon if a free_reward appointment was cancelled
     if (status === 'cancelled' && currentAppointment.paymentStatus === 'free_reward') {
