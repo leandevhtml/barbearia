@@ -25,7 +25,19 @@ const ADMIN_TABS = [
 type AdminTab = typeof ADMIN_TABS[number]['id'];
 
 export default function AdminView() {
-  const [tab, setTab] = useState<AdminTab>('appointments');
+  const [tab, setTab] = useState<AdminTab>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gdc_admin_tab') as AdminTab;
+      if (saved && ADMIN_TABS.some(t => t.id === saved)) return saved;
+    }
+    return 'appointments';
+  });
+
+  const handleSelectTab = (newTab: AdminTab) => {
+    setTab(newTab);
+    if (typeof window !== 'undefined') localStorage.setItem('gdc_admin_tab', newTab);
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const { toggleAdminMode, notifications, markNotificationsRead, logout, currentUser, syncUser } = useBarbershopStore();
   const [showNotifs, setShowNotifs] = useState(false);
@@ -63,7 +75,7 @@ export default function AdminView() {
                 {ADMIN_TABS.map(t => (
                     <button
                         key={t.id}
-                        onClick={() => { setTab(t.id); setIsOpen(false); }}
+                        onClick={() => { handleSelectTab(t.id); setIsOpen(false); }}
                         className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
                             tab === t.id ? 'bg-orange-600 text-white shadow-lg' : 'text-neutral-500 hover:bg-white/5 hover:text-white'
                         }`}

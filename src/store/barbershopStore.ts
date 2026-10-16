@@ -146,7 +146,7 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
   
   notifications: [],
   isBookingFreeCut: false,
-  activeTab: 'book',
+  activeTab: (typeof window !== 'undefined' && (localStorage.getItem('gdc_active_tab') as any)) || 'book',
   currentClientId: null,
   
   showStampAnimation: false,
@@ -251,7 +251,10 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
   
   setCurrentClient: (clientId) => set({ currentClientId: clientId }),
 
-  logout: () => set({ currentUser: null, isAdminMode: false, isBookingFreeCut: false, activeTab: 'book' }),
+  logout: () => {
+    if (typeof window !== 'undefined') localStorage.removeItem('gdc_active_tab');
+    set({ currentUser: null, isAdminMode: false, isBookingFreeCut: false, activeTab: 'book' });
+  },
   
   toggleAdminMode: () => {
     const { currentUser } = get();
@@ -284,7 +287,10 @@ export const useBarbershopStore = create<BarbershopState>((set, get) => ({
   },
 
   setBookingFreeCut: (val) => set({ isBookingFreeCut: val }),
-  setActiveTab: (tab) => set({ activeTab: tab }),
+  setActiveTab: (tab) => {
+    if (typeof window !== 'undefined') localStorage.setItem('gdc_active_tab', tab);
+    set({ activeTab: tab });
+  },
 
   toggleService: (serviceId) => {
     set((state) => ({

@@ -106,10 +106,10 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    // 🛡️ Token expira em 24 horas (o usuário terá que logar novamente)
-    maxAge: 24 * 60 * 60, // 24 horas
-    // Renovar o token a cada 1 hora
-    updateAge: 60 * 60, // 1 hora
+    // 🛡️ Manter o usuário logado por 30 dias (não desloga ao fechar navegador ou recarregar)
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
+    // Renovar o token a cada 24 horas de uso contínuo
+    updateAge: 24 * 60 * 60, // 24 horas
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

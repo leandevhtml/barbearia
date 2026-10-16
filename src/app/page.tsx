@@ -8,6 +8,7 @@ import ClientView from '@/components/client/ClientView';
 import AdminView from '@/components/admin/AdminView';
 import BarberDashboard from '@/components/barber/BarberDashboard';
 import AuthView from '@/components/shared/AuthView';
+import BarberLoading from '@/components/shared/BarberLoading';
 import StampAnimationOverlay from '@/components/shared/StampAnimationOverlay';
 import FreeCouponModal from '@/components/shared/FreeCouponModal';
 import AnnouncementPopup from '@/components/shared/AnnouncementPopup';
@@ -98,7 +99,11 @@ export default function HomePage() {
       <div className="luxury-bg" />
       <div className="glow-orb bottom-[-300px] right-[-100px] opacity-30" />
 
-      {!currentUser ? (
+      {status === 'loading' || (status === 'authenticated' && !currentUser) ? (
+        <div className="flex-1 flex items-center justify-center min-h-[80dvh]">
+          <BarberLoading message="RESTAURANDO SUA SESSÃO..." />
+        </div>
+      ) : !currentUser ? (
         <AuthView slug={slug} />
       ) : (
         <>
