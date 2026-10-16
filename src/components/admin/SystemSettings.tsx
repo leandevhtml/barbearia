@@ -814,17 +814,39 @@ export default function SystemSettings() {
                       </button>
                     </div>
                   ) : botQr ? (
-                    <div className="flex flex-col items-center p-6 bg-white rounded-2xl space-y-3">
-                      <img src={botQr} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
-                      <p className="text-black font-black text-xs uppercase tracking-tight text-center">
-                        Abra o WhatsApp no celular {'>'} Aparelhos conectados {'>'} Conectar um aparelho
-                      </p>
+                    <div className="flex flex-col items-center p-6 bg-white rounded-2xl space-y-4">
+                      <img src={botQr} alt="QR Code WhatsApp" className="w-64 h-64 object-contain shadow-md" />
+                      <div className="text-center space-y-1">
+                        <p className="text-black font-black text-xs uppercase tracking-tight">
+                          Abra o WhatsApp {'>'} Aparelhos conectados {'>'} Conectar um aparelho
+                        </p>
+                        <p className="text-neutral-500 text-[10px] font-medium">
+                          O QR Code atualiza sozinho. Aponte a câmera para parear.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={fetchBotStatus}
+                        className="px-4 py-2 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 text-[10px] font-bold uppercase tracking-wider transition-all"
+                      >
+                        🔄 Atualizar QR Code
+                      </button>
                     </div>
                   ) : (
-                    <div className="p-6 rounded-xl bg-neutral-950 border border-white/5 text-center">
-                      <p className="text-xs text-neutral-400 font-medium">
-                        Gerando novo QR Code de conexão... Por favor aguarde alguns segundos.
+                    <div className="p-8 rounded-xl bg-neutral-950 border border-white/5 text-center space-y-3">
+                      <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                      <p className="text-xs text-neutral-300 font-bold">
+                        {botStatus === 'offline' 
+                          ? 'Iniciando o gateway do WhatsApp no servidor local...' 
+                          : 'Gerando novo QR Code de conexão...'}
                       </p>
+                      <button
+                        type="button"
+                        onClick={fetchBotStatus}
+                        className="px-4 py-2 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 text-[9px] font-black uppercase tracking-widest transition-all"
+                      >
+                        🔄 Verificar Conexão
+                      </button>
                     </div>
                   )}
                 </div>
