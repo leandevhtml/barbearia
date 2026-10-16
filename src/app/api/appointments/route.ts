@@ -223,14 +223,19 @@ export async function POST(req: Request) {
           (clientNotes ? `📝 *Sua observação:* ${clientNotes}\n` : '') +
           `\nTe aguardamos na barbearia! Por favor, chegue com 5 a 10 minutos de antecedência. Caso precise reagendar, entre em contato com a gente.`;
 
-        // Executa o envio sem travar a resposta HTTP
-        sendWhatsAppMessage({
-          barbershopId,
-          phone: clientUser.phone,
-          message: whatsappText
-        }).then(result => {
-          console.log('[WhatsApp Hook Result]:', result);
-        }).catch(err => console.error('[WhatsApp Hook Error]:', err));
+        // Executa o envio garantindo que lambdas da nuvem/Vercel esperem a finalização
+        try {
+          const waResult = await sendWhatsAppMessage({
+            barbershopId,
+            phone: clientUser.phone,
+            message: whatsappText
+          });
+          console.log('[WhatsApp Hook Result]:', waResult);
+        } catch (waSendErr) {
+          console.error('[WhatsApp Hook Send Error]:', waSendErr);
+        }
+      } else {
+        console.warn('[WhatsApp Hook] Usuário sem telefone cadastrado:', clientUser);
       }
     } catch (waError) {
       console.error('[WhatsApp Hook Trigger Error]:', waError);

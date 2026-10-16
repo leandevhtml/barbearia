@@ -10,12 +10,14 @@ import LoyaltyCard from './LoyaltyCard';
 import AppointmentStatus from './AppointmentStatus';
 import QuickInfo from './QuickInfo';
 import PaymentsView from './PaymentsView';
+import ProfileView from './ProfileView';
 
 const TABS = [
-  { id: 'book',   icon: '📅', label: 'Agendar' },
-  { id: 'status', icon: '⚡', label: 'Status' },
-  { id: 'loyalty',icon: '💎', label: 'Fidelidade' },
+  { id: 'book',     icon: '📅', label: 'Agendar' },
+  { id: 'status',   icon: '⚡', label: 'Status' },
+  { id: 'loyalty',  icon: '💎', label: 'Fidelidade' },
   { id: 'payments', icon: '💳', label: 'Carteira' },
+  { id: 'profile',  icon: '👤', label: 'Minha Conta' },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
@@ -192,15 +194,16 @@ export default function ClientView() {
                             {TABS.find(t => t.id === activeTab)?.label}
                         </h2>
                     </div>
-                    {activeTab === 'book'    && (
+                    {activeTab === 'book'     && (
                         <div className="space-y-12">
                             <BookingForm onBooked={() => setActiveTab('status')} />
                             <QuickInfo />
                         </div>
                     )}
-                    {activeTab === 'loyalty' && <LoyaltyCard />}
-                    {activeTab === 'status'  && <AppointmentStatus />}
+                    {activeTab === 'loyalty'  && <LoyaltyCard />}
+                    {activeTab === 'status'   && <AppointmentStatus />}
                     {activeTab === 'payments' && <PaymentsView />}
+                    {activeTab === 'profile'  && <ProfileView />}
                 </motion.div>
             </AnimatePresence>
         </div>

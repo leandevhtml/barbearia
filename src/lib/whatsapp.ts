@@ -13,8 +13,8 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
     }
 
     let settings = await Settings.findOne({ barbershopId });
-    if (!settings) {
-      settings = await Settings.findOne();
+    if (!settings || !settings.whatsappTunnelUrl) {
+      settings = await Settings.findOne({ whatsappTunnelUrl: { $exists: true, $ne: '' } }) || await Settings.findOne();
     }
     if (settings && settings.whatsappAutoSendEnabled === false) {
       return { success: false, reason: 'Disparo automático de WhatsApp desativado nas configurações' };
@@ -22,11 +22,15 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
 
     // 1. Tentar primeiro o robô embutido local na porta 3001 (100% gratuito e direto)
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
       const localRes = await fetch('http://127.0.0.1:3001/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, message })
+        body: JSON.stringify({ phone, message }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (localRes.ok) {
         const localData = await localRes.json();
         if (localData.success) {
@@ -39,17 +43,21 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
     }
 
     // 2. Tentar via Túnel Seguro do Robô (para quando o cliente agenda pelo site na Vercel)
-    if (settings.whatsappTunnelUrl) {
+    if (settings?.whatsappTunnelUrl) {
       try {
         const tunnelUrl = settings.whatsappTunnelUrl.replace(/\/+$/, '');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         const tunnelRes = await fetch(`${tunnelUrl}/send`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Bypass-Tunnel-Reminder': 'true'
           },
-          body: JSON.stringify({ phone, message })
+          body: JSON.stringify({ phone, message }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (tunnelRes.ok) {
           const tunnelData = await tunnelRes.json();
           if (tunnelData.success) {

@@ -87,7 +87,7 @@ interface BarbershopState {
   
   notifications: Notification[];
   isBookingFreeCut: boolean;
-  activeTab: 'book' | 'status' | 'loyalty';
+  activeTab: 'book' | 'status' | 'loyalty' | 'payments' | 'profile';
   currentClientId: string | null;
   
   // UI state
@@ -115,7 +115,7 @@ interface BarbershopState {
   addNotification: (type: Notification['type'], message: string, userId?: string) => void;
   markNotificationsRead: () => Promise<void>;
   setBookingFreeCut: (val: boolean) => void;
-  setActiveTab: (tab: 'book' | 'status' | 'loyalty') => void;
+  setActiveTab: (tab: 'book' | 'status' | 'loyalty' | 'payments' | 'profile') => void;
 
   toggleService: (serviceId: string) => void;
   addAppointment: (appointment: Omit<Appointment, 'id'>) => void;
