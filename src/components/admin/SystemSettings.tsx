@@ -165,46 +165,47 @@ export default function SystemSettings() {
       <div className="flex flex-col gap-4 mb-4">
         <h2 className="text-white font-bold text-xl tracking-tight">Painel de Configurações</h2>
         
-        <div className="flex flex-wrap items-center bg-neutral-900/80 p-2 rounded-2xl border border-white/5 shadow-inner gap-2 w-full">
+        {/* Subtabs com scroll horizontal suave no celular para nunca quebrar ou estourar a tela */}
+        <div className="flex items-center bg-neutral-900/80 p-1.5 sm:p-2 rounded-2xl border border-white/5 shadow-inner gap-2 w-full overflow-x-auto no-scrollbar">
             <button 
                 onClick={() => setActiveSubTab('geral')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'geral' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'geral' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Fidelidade
             </button>
             <button 
                 onClick={() => setActiveSubTab('regras')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'regras' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'regras' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Regras
             </button>
             <button 
                 onClick={() => setActiveSubTab('recados')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'recados' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'recados' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Recados
             </button>
             <button 
                 onClick={() => setActiveSubTab('estabelecimento')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'estabelecimento' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'estabelecimento' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Estabelecimento
             </button>
             <button 
                 onClick={() => setActiveSubTab('servicos')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'servicos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'servicos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Serviços
             </button>
             <button 
                 onClick={() => setActiveSubTab('pagamentos')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'pagamentos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'pagamentos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 Pagamentos
             </button>
             <button 
                 onClick={() => setActiveSubTab('whatsapp')}
-                className={`shrink-0 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeSubTab === 'whatsapp' ? 'bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'whatsapp' ? 'bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'text-neutral-500 hover:text-white'}`}
             >
                 💬 WhatsApp Robô
             </button>
@@ -216,52 +217,69 @@ export default function SystemSettings() {
           <motion.div 
             key="geral"
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-10 border border-white/5 space-y-10 max-w-2xl"
+                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
             >
                 {/* Fidelity Toggle */}
-                <div className="flex items-center justify-between gap-12">
-                <div className="flex-1">
-                    <h4 className="text-xl font-bold text-white tracking-tight">Sistema de Fidelidade</h4>
-                    <p className="text-xs text-neutral-500 mt-2 leading-relaxed">Habilite ou desabilite o acúmulo de selos e prêmios para os clientes em tempo real.</p>
-                </div>
-                <button
-                    onClick={() => setFidelityEnabled(!fidelityEnabled)}
-                    className={`relative w-14 h-8 rounded-full transition-all duration-700 flex items-center px-1 border ${
-                        fidelityEnabled ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_25px_rgba(255,110,0,0.3)]' : 'bg-white/5 border-white/10'
-                    }`}
-                >
-                    <motion.div
-                        className="w-6 h-6 rounded-full bg-white shadow-2xl"
-                        animate={{ x: fidelityEnabled ? 24 : 0 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                </button>
+                <div className="flex items-center justify-between gap-4 sm:gap-8">
+                  <div className="flex-1 pr-2">
+                      <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight">Sistema de Fidelidade</h4>
+                      <p className="text-xs text-neutral-500 mt-1 sm:mt-2 leading-relaxed">Habilite ou desabilite o acúmulo de selos e prêmios para os clientes em tempo real.</p>
+                  </div>
+                  <button
+                      type="button"
+                      onClick={() => setFidelityEnabled(!fidelityEnabled)}
+                      className={`shrink-0 relative w-14 h-8 rounded-full transition-all duration-500 flex items-center px-1 border ${
+                          fidelityEnabled ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_25px_rgba(255,110,0,0.3)]' : 'bg-white/5 border-white/10'
+                      }`}
+                  >
+                      <motion.div
+                          className="w-6 h-6 rounded-full bg-white shadow-2xl"
+                          animate={{ x: fidelityEnabled ? 24 : 0 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
+                  </button>
                 </div>
 
-                {/* Stamps Amount */}
-                <div className={`transition-all duration-700 ${fidelityEnabled ? 'opacity-100 scale-100' : 'opacity-20 scale-[0.98] pointer-events-none'}`}>
-                <div className="flex items-center justify-between gap-12">
-                    <div className="flex-1">
-                        <h4 className="text-xl font-bold text-white tracking-tight">Selos para Recompensa</h4>
-                        <p className="text-xs text-neutral-500 mt-2 leading-relaxed">Defina quantos cortes o cliente deve realizar para desbloquear o prêmio grátis.</p>
-                    </div>
-                    <div className="flex items-center gap-3 bg-neutral-950 p-2 rounded-2xl border border-white/5 shadow-inner">
-                        <button onClick={() => setStampsPerReward(Math.max(1, stampsPerReward - 1))} className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">-</button>
-                        <span className="text-3xl font-bebas text-orange-500 w-14 text-center tracking-tighter">{stampsPerReward}</span>
-                        <button onClick={() => setStampsPerReward(stampsPerReward + 1)} className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">+</button>
-                    </div>
-                </div>
+                {/* Stamps Amount - Adaptável para qualquer celular */}
+                <div className={`transition-all duration-500 ${fidelityEnabled ? 'opacity-100 scale-100' : 'opacity-20 scale-[0.98] pointer-events-none'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8 bg-neutral-900/40 p-4 sm:p-5 rounded-2xl border border-white/5">
+                      <div className="flex-1">
+                          <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight">Selos para Recompensa</h4>
+                          <p className="text-xs text-neutral-500 mt-1 leading-relaxed">Defina quantos cortes o cliente deve realizar para desbloquear o prêmio grátis.</p>
+                      </div>
+                      <div className="flex items-center justify-center gap-3 bg-neutral-950 p-2 rounded-2xl border border-white/10 shadow-inner self-start sm:self-auto w-full sm:w-auto">
+                          <button 
+                            type="button"
+                            onClick={() => setStampsPerReward(Math.max(1, stampsPerReward - 1))} 
+                            className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl font-bold hover:bg-white/10 active:scale-95 transition-all"
+                            aria-label="Diminuir selos"
+                          >
+                            -
+                          </button>
+                          <span className="text-3xl font-bebas text-orange-500 w-16 text-center tracking-tighter select-none font-bold">
+                            {stampsPerReward}
+                          </span>
+                          <button 
+                            type="button"
+                            onClick={() => setStampsPerReward(stampsPerReward + 1)} 
+                            className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl font-bold hover:bg-white/10 active:scale-95 transition-all"
+                            aria-label="Aumentar selos"
+                          >
+                            +
+                          </button>
+                      </div>
+                  </div>
                 </div>
 
                 <button 
-                onClick={handleSave}
-                disabled={saving}
-                className="btn-prime w-full py-5 text-xs font-black uppercase tracking-[0.3em] disabled:opacity-50 mt-4"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="btn-prime w-full py-4 sm:py-5 text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] disabled:opacity-50 mt-4"
                 >
-                {saving ? 'PROCESSANDO...' : 'SALVAR CONFIGURAÇÕES'}
+                  {saving ? 'PROCESSANDO...' : 'SALVAR CONFIGURAÇÕES'}
                 </button>
             </motion.div>
 
@@ -309,49 +327,49 @@ export default function SystemSettings() {
           <motion.div 
             key="regras"
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-10 border border-white/5 space-y-10 max-w-2xl"
+                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
             >
                 <div>
-                    <h4 className="text-xl font-bold text-white tracking-tight mb-2">Regras de Agendamento</h4>
-                    <p className="text-xs text-neutral-500 leading-relaxed mb-8">Defina as políticas de marcação e cancelamento para manter a agenda organizada.</p>
+                    <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-2">Regras de Agendamento</h4>
+                    <p className="text-xs text-neutral-500 leading-relaxed mb-6 sm:mb-8">Defina as políticas de marcação e cancelamento para manter a agenda organizada.</p>
                     
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between gap-8 bg-neutral-900/50 p-5 rounded-2xl border border-white/5">
+                    <div className="space-y-4 sm:space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Tolerância de Atraso (minutos)</p>
                                 <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Tempo de espera pelo cliente</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5">
-                                <button onClick={() => setDelayTolerance(Math.max(0, delayTolerance - 5))} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">-</button>
-                                <span className="w-10 text-center font-bebas text-xl text-orange-500">{delayTolerance}</span>
-                                <button onClick={() => setDelayTolerance(delayTolerance + 5)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">+</button>
+                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
+                                <button type="button" onClick={() => setDelayTolerance(Math.max(0, delayTolerance - 5))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
+                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{delayTolerance}</span>
+                                <button type="button" onClick={() => setDelayTolerance(delayTolerance + 5)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-8 bg-neutral-900/50 p-5 rounded-2xl border border-white/5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Antecedência p/ Agendar (horas)</p>
                                 <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Tempo mínimo de reserva</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5">
-                                <button onClick={() => setBookingNoticeHours(Math.max(0, bookingNoticeHours - 1))} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">-</button>
-                                <span className="w-10 text-center font-bebas text-xl text-orange-500">{bookingNoticeHours}</span>
-                                <button onClick={() => setBookingNoticeHours(bookingNoticeHours + 1)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">+</button>
+                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
+                                <button type="button" onClick={() => setBookingNoticeHours(Math.max(0, bookingNoticeHours - 1))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
+                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{bookingNoticeHours}</span>
+                                <button type="button" onClick={() => setBookingNoticeHours(bookingNoticeHours + 1)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-8 bg-neutral-900/50 p-5 rounded-2xl border border-white/5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Antecedência p/ Cancelar (horas)</p>
                                 <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Bloqueio no app do cliente</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5">
-                                <button onClick={() => setCancelNoticeHours(Math.max(0, cancelNoticeHours - 1))} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">-</button>
-                                <span className="w-10 text-center font-bebas text-xl text-orange-500">{cancelNoticeHours}</span>
-                                <button onClick={() => setCancelNoticeHours(cancelNoticeHours + 1)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white">+</button>
+                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
+                                <button type="button" onClick={() => setCancelNoticeHours(Math.max(0, cancelNoticeHours - 1))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
+                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{cancelNoticeHours}</span>
+                                <button type="button" onClick={() => setCancelNoticeHours(cancelNoticeHours + 1)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
                             </div>
                         </div>
                     </div>
@@ -360,7 +378,7 @@ export default function SystemSettings() {
                 <button 
                     onClick={handleSave}
                     disabled={saving}
-                    className="btn-prime w-full py-5 text-xs font-black uppercase tracking-[0.3em] disabled:opacity-50 mt-4"
+                    className="btn-prime w-full py-4 sm:py-5 text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] disabled:opacity-50 mt-4"
                 >
                     {saving ? 'PROCESSANDO...' : 'SALVAR REGRAS'}
                 </button>
@@ -372,20 +390,21 @@ export default function SystemSettings() {
           <motion.div 
             key="recados"
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-10 border border-white/5 space-y-10 max-w-2xl"
+                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
             >
                 {/* Announcement Toggle */}
-                <div className="flex items-center justify-between gap-12">
-                    <div className="flex-1">
-                        <h4 className="text-xl font-bold text-white tracking-tight">Pop-up de Recado</h4>
-                        <p className="text-xs text-neutral-500 mt-2 leading-relaxed">Ative um aviso global que aparecerá para todos os clientes ao abrirem o aplicativo.</p>
+                <div className="flex items-center justify-between gap-4 sm:gap-8">
+                    <div className="flex-1 pr-2">
+                        <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight">Pop-up de Recado</h4>
+                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">Ative um aviso global que aparecerá para todos os clientes ao abrirem o aplicativo.</p>
                     </div>
                     <button
+                        type="button"
                         onClick={() => setAnnouncementEnabled(!announcementEnabled)}
-                        className={`relative w-14 h-8 rounded-full transition-all duration-700 flex items-center px-1 border ${
+                        className={`shrink-0 relative w-14 h-8 rounded-full transition-all duration-500 flex items-center px-1 border ${
                             announcementEnabled ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_25px_rgba(255,110,0,0.3)]' : 'bg-white/5 border-white/10'
                         }`}
                     >
@@ -398,14 +417,14 @@ export default function SystemSettings() {
                 </div>
 
                 {/* Announcement Content */}
-                <div className={`space-y-6 transition-all duration-700 ${announcementEnabled ? 'opacity-100 scale-100' : 'opacity-20 scale-[0.98] pointer-events-none'}`}>
+                <div className={`space-y-4 sm:space-y-6 transition-all duration-500 ${announcementEnabled ? 'opacity-100 scale-100' : 'opacity-20 scale-[0.98] pointer-events-none'}`}>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest ml-1">Texto do Recado</label>
                         <textarea 
                             value={announcementText}
                             onChange={(e) => setAnnouncementText(e.target.value)}
                             rows={3}
-                            className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm leading-relaxed"
+                            className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-4 sm:p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm leading-relaxed"
                             placeholder="Ex: Estamos com uma promoção especial de Páscoa!"
                         />
                     </div>
@@ -416,7 +435,7 @@ export default function SystemSettings() {
                             type="text" 
                             value={announcementImage}
                             onChange={(e) => setAnnouncementImage(e.target.value)}
-                            className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
+                            className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-4 sm:p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
                             placeholder="https://exemplo.com/imagem.jpg"
                         />
                     </div>
@@ -425,14 +444,14 @@ export default function SystemSettings() {
                 <button 
                 onClick={handleSave}
                 disabled={saving}
-                className="btn-prime w-full py-5 text-xs font-black uppercase tracking-[0.3em] disabled:opacity-50 mt-4"
+                className="btn-prime w-full py-4 sm:py-5 text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] disabled:opacity-50 mt-4"
                 >
                 {saving ? 'PROCESSANDO...' : 'SALVAR RECADOS'}
                 </button>
             </motion.div>
 
             {announcementEnabled && (
-                <div className="glass p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
+                <div className="glass p-5 sm:p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
                     <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Visualização</p>
                     <div className="bg-[#050505] p-4 rounded-xl border border-white/5 flex items-center gap-4">
                         {announcementImage && <img src={announcementImage} className="w-12 h-12 rounded-lg object-cover" alt="Preview" />}
@@ -441,7 +460,7 @@ export default function SystemSettings() {
                 </div>
             )}
 
-            <div className="glass p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
+            <div className="glass p-5 sm:p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
                 <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Informação Importante</p>
                 <p className="text-xs text-neutral-500 leading-relaxed">
                     Ao ativar o Pop-up de Recado, essa mensagem saltará na tela de todos os clientes assim que eles abrirem o aplicativo. É uma ferramenta perfeita para avisar sobre horários de fim de ano, informar promoções relâmpago ou dar boas-vindas!
@@ -454,10 +473,10 @@ export default function SystemSettings() {
           <motion.div 
             key="estabelecimento"
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-10 border border-white/5 space-y-10 max-w-2xl"
+                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
             >
                 <div className="space-y-2">
                     <h4 className="text-xl font-bold text-white tracking-tight mb-6">Endereço e Horários</h4>
@@ -691,7 +710,7 @@ export default function SystemSettings() {
             className="space-y-8"
           >
             <motion.div 
-                className="luxury-card p-10 border border-white/5 space-y-10 max-w-2xl"
+                className="luxury-card p-4 sm:p-8 md:p-10 border border-white/5 space-y-8 sm:space-y-10 max-w-2xl"
             >
                 <div>
                     <h4 className="text-xl font-bold text-white tracking-tight mb-2">Mercado Pago</h4>
@@ -704,7 +723,7 @@ export default function SystemSettings() {
                                 type="text" 
                                 value={mpPublicKey}
                                 onChange={(e) => setMpPublicKey(e.target.value)}
-                                className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
+                                className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-4 sm:p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
                                 placeholder="APP_USR-..."
                             />
                         </div>
@@ -715,7 +734,7 @@ export default function SystemSettings() {
                                 type="password" 
                                 value={mpAccessToken}
                                 onChange={(e) => setMpAccessToken(e.target.value)}
-                                className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
+                                className="w-full bg-neutral-950 border border-white/5 rounded-2xl p-4 sm:p-5 text-white focus:outline-none focus:border-orange-500 transition-colors text-sm"
                                 placeholder="APP_USR-..."
                             />
                         </div>
@@ -725,13 +744,13 @@ export default function SystemSettings() {
                 <button 
                     onClick={handleSave}
                     disabled={saving}
-                    className="btn-prime w-full py-5 text-xs font-black uppercase tracking-[0.3em] disabled:opacity-50 mt-4"
+                    className="btn-prime w-full py-4 sm:py-5 text-xs font-black uppercase tracking-[0.3em] disabled:opacity-50 mt-4"
                 >
                     {saving ? 'PROCESSANDO...' : 'SALVAR CHAVES'}
                 </button>
             </motion.div>
 
-            <div className="glass p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
+            <div className="glass p-5 sm:p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
                 <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Segurança</p>
                 <p className="text-xs text-neutral-500 leading-relaxed">
                     Seus tokens são armazenados de forma segura e utilizados apenas para processar os pagamentos dos seus clientes. Nunca compartilhe seu Access Token com ninguém.
@@ -746,13 +765,13 @@ export default function SystemSettings() {
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
             className="space-y-8"
           >
-            <motion.div className="luxury-card p-10 border border-green-500/20 space-y-8 max-w-2xl shadow-[0_0_50px_rgba(34,197,94,0.08)]">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-3xl shadow-inner">
+            <motion.div className="luxury-card p-4 sm:p-8 md:p-10 border border-green-500/20 space-y-6 sm:space-y-8 max-w-2xl shadow-[0_0_50px_rgba(34,197,94,0.08)]">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-2xl sm:text-3xl shadow-inner">
                     💬
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bebas text-white italic tracking-tight">Robô de WhatsApp (100% Automático & Gratuito)</h3>
+                    <h3 className="text-xl sm:text-2xl font-bebas text-white italic tracking-tight">Robô de WhatsApp (100% Automático & Gratuito)</h3>
                     <p className="text-[10px] text-green-400 font-bold uppercase tracking-widest">
                       Disparo autônomo de confirmação para o WhatsApp do cliente
                     </p>
