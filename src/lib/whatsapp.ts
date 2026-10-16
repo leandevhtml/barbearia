@@ -32,52 +32,76 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
         }
       }
     } catch (localErr) {
-      // Se o bot local não responder, continua para o fallback
+      // Se o bot local não responder diretamente (ex: rodando na Vercel), continua
     }
 
+    // 2. Tentar via Túnel Seguro do Robô (para quando o cliente agenda pelo site na Vercel)
+    if (settings.whatsappTunnelUrl) {
+      try {
+        const tunnelUrl = settings.whatsappTunnelUrl.replace(/\/+$/, '');
+        const tunnelRes = await fetch(`${tunnelUrl}/send`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': 'true'
+          },
+          body: JSON.stringify({ phone, message })
+        });
+        if (tunnelRes.ok) {
+          const tunnelData = await tunnelRes.json();
+          if (tunnelData.success) {
+            console.log(`[WhatsApp Tunnel Bot] Mensagem enviada via túnel para ${phone}`);
+            return { success: true };
+          }
+        }
+      } catch (tunnelErr) {
+        console.warn('[WhatsApp Tunnel Bot] Erro ao enviar via túnel:', tunnelErr);
+      }
+    }
+
+    // 3. Fallback: Evolution API se configurada
     const { evolutionApiUrl, evolutionApiKey, evolutionInstanceName } = settings;
-    if (!evolutionApiUrl || !evolutionApiKey || !evolutionInstanceName) {
-      return { success: false, reason: 'Nenhum robô de WhatsApp ativo no momento' };
-    }
+    if (evolutionApiUrl && evolutionApiKey && evolutionInstanceName) {
+      // Limpar telefone deixando apenas dígitos e prefixo internacional
+      let cleanPhone = phone.replace(/\D/g, '');
+      if (!cleanPhone.startsWith('55') && cleanPhone.length >= 10) {
+        cleanPhone = `55${cleanPhone}`;
+      }
 
-    // Limpar telefone deixando apenas dígitos e prefixo internacional
-    let cleanPhone = phone.replace(/\D/g, '');
-    if (!cleanPhone.startsWith('55') && cleanPhone.length >= 10) {
-      cleanPhone = `55${cleanPhone}`;
-    }
+      const baseUrl = evolutionApiUrl.replace(/\/+$/, '');
+      const endpoint = `${baseUrl}/message/sendText/${evolutionInstanceName}`;
 
-    const baseUrl = evolutionApiUrl.replace(/\/+$/, '');
-    const endpoint = `${baseUrl}/message/sendText/${evolutionInstanceName}`;
-
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': evolutionApiKey,
-      },
-      body: JSON.stringify({
-        number: cleanPhone,
-        options: {
-          delay: 1200,
-          presence: 'composing',
-          linkPreview: false,
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': evolutionApiKey,
         },
-        textMessage: {
-          text: message,
-        },
-      }),
-    });
+        body: JSON.stringify({
+          number: cleanPhone,
+          options: {
+            delay: 1200,
+            presence: 'composing',
+            linkPreview: false,
+          },
+          textMessage: {
+            text: message,
+          },
+        }),
+      });
 
-    if (res.ok) {
-      console.log(`[WhatsApp Evolution] Mensagem enviada com sucesso para ${cleanPhone}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('[Evolution API Error]:', errorText);
+        return { success: false, reason: errorText };
+      }
+
       return { success: true };
-    } else {
-      const errText = await res.text();
-      console.error(`[WhatsApp Evolution] Erro ao enviar mensagem (${res.status}):`, errText);
-      return { success: false, reason: `Status ${res.status}: ${errText}` };
     }
+
+    return { success: false, reason: 'Nenhum robô de WhatsApp ativo ou online no momento' };
   } catch (error: any) {
-    console.error('[WhatsApp Evolution] Falha na requisição:', error);
+    console.error('[WhatsApp Service Error]:', error);
     return { success: false, reason: error.message };
   }
 }

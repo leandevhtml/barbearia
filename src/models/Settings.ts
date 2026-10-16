@@ -28,6 +28,7 @@ export interface ISettings extends Document {
   evolutionApiUrl?: string;
   evolutionApiKey?: string;
   evolutionInstanceName?: string;
+  whatsappTunnelUrl?: string;
   updatedAt: Date;
 }
 
@@ -67,6 +68,7 @@ const SettingsSchema: Schema = new Schema(
     evolutionApiUrl: { type: String, default: '' },
     evolutionApiKey: { type: String, default: '' },
     evolutionInstanceName: { type: String, default: 'gigantes-do-corte' },
+    whatsappTunnelUrl: { type: String, default: '' },
   },
   { timestamps: true }
 );
