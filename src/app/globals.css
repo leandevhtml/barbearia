@@ -44,10 +44,12 @@ body {
   min-height: 100dvh;
 }
 
-/* Minimum touch target size (WCAG 2.5.5) */
-button, a, [role="button"] {
-  min-height: 44px;
-  min-width: 44px;
+/* Minimum touch target size for standard interactive elements (WCAG 2.5.5) */
+button:not([role="switch"]):not(.stepper-btn):not(.switch-btn), 
+a, 
+[role="button"] {
+  min-height: 38px;
+  min-width: 38px;
   cursor: pointer;
 }
 

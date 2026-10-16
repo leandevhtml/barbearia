@@ -121,7 +121,7 @@ export default function ServiceManager() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Create Form */}
         <motion.div 
-            className="luxury-card p-6 border border-orange-500/20 sticky top-24 self-start"
+            className="luxury-card p-4 sm:p-6 border border-orange-500/20 lg:sticky lg:top-24 self-start"
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
         >
             <div className="flex justify-between items-center mb-6">
@@ -174,7 +174,7 @@ export default function ServiceManager() {
         {services.map((service, index) => (
           <motion.div
             key={service._id}
-            className="glass rounded-2xl border p-4 card-hover relative overflow-hidden"
+            className="glass rounded-2xl border p-3.5 sm:p-4 card-hover relative overflow-hidden"
             style={{ 
                 borderColor: service.active ? 'var(--border)' : 'rgba(255,255,255,0.05)',
                 background: service.active ? 'rgba(20,20,20,0.75)' : 'rgba(10,10,10,0.4)'
@@ -188,9 +188,9 @@ export default function ServiceManager() {
               <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.03] blur-3xl pointer-events-none bg-orange-500" />
             )}
 
-            <div className="flex items-center gap-4 relative z-10">
+            <div className="flex items-center gap-3 sm:gap-4 relative z-10">
               <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 transition-all duration-500 ${
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shrink-0 transition-all duration-500 ${
                   service.active
                     ? 'border border-orange-500 shadow-[0_0_15px_rgba(255,110,0,0.2)] bg-orange-600/10'
                     : 'bg-white/5 border border-white/5 grayscale opacity-30'
@@ -199,20 +199,20 @@ export default function ServiceManager() {
                 {service.icon}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className={`text-lg font-black tracking-tight transition-colors ${service.active ? 'text-white' : 'text-white/20'}`}>
+              <div className="flex-1 min-w-0 pr-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className={`text-base sm:text-lg font-black tracking-tight truncate transition-colors ${service.active ? 'text-white' : 'text-white/20'}`}>
                     {service.name}
                   </p>
                   <span
-                    className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
+                    className={`text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
                       service.active ? 'status-completed' : 'status-cancelled'
                     }`}
                   >
                     {service.active ? 'Ativo' : 'Offline'}
                   </span>
                 </div>
-                <div className="flex gap-4 mt-1 text-xs font-medium text-neutral-500">
+                <div className="flex gap-3 sm:gap-4 mt-1 text-[11px] sm:text-xs font-medium text-neutral-400">
                   <span className="flex items-center gap-1">
                     <span className="opacity-50">⏱</span> {service.duration} min
                   </span>
@@ -222,26 +222,29 @@ export default function ServiceManager() {
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <button
                   onClick={() => handleEdit(service)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-orange-500 hover:border-orange-500/30 transition-all text-sm"
+                  className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-orange-500 hover:border-orange-500/30 transition-all text-xs sm:text-sm"
                   title="Editar Serviço"
                 >
                   ✏️
                 </button>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={service.active}
                   onClick={() => toggleService(service)}
-                  className={`relative w-14 h-7 rounded-full transition-all duration-500 flex-shrink-0 flex items-center px-1 ${
+                  className={`switch-btn relative w-12 sm:w-14 h-7 min-w-[48px] sm:min-w-[56px] min-h-[28px] max-w-[56px] max-h-[28px] rounded-full transition-all duration-300 shrink-0 flex items-center px-1 ${
                     service.active
                       ? 'bg-orange-600 shadow-[0_0_15px_rgba(255,110,0,0.4)]'
-                      : 'bg-white/5 border border-white/10'
+                      : 'bg-neutral-800 border border-white/10'
                   }`}
                   title={service.active ? 'Desativar Serviço' : 'Ativar Serviço'}
                 >
                   <motion.div
-                    className="w-5 h-5 rounded-full bg-white shadow-xl"
-                    animate={{ x: service.active ? 24 : 0 }}
+                    className="w-5 h-5 rounded-full bg-white shadow-xl pointer-events-none"
+                    animate={{ x: service.active ? 20 : 0 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                   />
                 </button>

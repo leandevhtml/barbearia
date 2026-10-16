@@ -220,41 +220,43 @@ export default function SystemSettings() {
             className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
+                className="luxury-card p-4 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-full sm:max-w-2xl"
             >
                 {/* Fidelity Toggle */}
-                <div className="flex items-center justify-between gap-4 sm:gap-8">
-                  <div className="flex-1 pr-2">
-                      <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight">Sistema de Fidelidade</h4>
-                      <p className="text-xs text-neutral-500 mt-1 sm:mt-2 leading-relaxed">Habilite ou desabilite o acúmulo de selos e prêmios para os clientes em tempo real.</p>
+                <div className="flex items-center justify-between gap-3 sm:gap-8 bg-neutral-900/30 p-3.5 sm:p-5 rounded-2xl border border-white/5">
+                  <div className="flex-1 pr-1 sm:pr-2">
+                      <h4 className="text-base sm:text-xl font-bold text-white tracking-tight">Sistema de Fidelidade</h4>
+                      <p className="text-[11px] sm:text-xs text-neutral-400 mt-1 leading-relaxed">Habilite ou desabilite o acúmulo de selos e prêmios para os clientes em tempo real.</p>
                   </div>
                   <button
                       type="button"
+                      role="switch"
+                      aria-checked={fidelityEnabled}
                       onClick={() => setFidelityEnabled(!fidelityEnabled)}
-                      className={`shrink-0 relative w-14 h-8 rounded-full transition-all duration-500 flex items-center px-1 border ${
-                          fidelityEnabled ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_25px_rgba(255,110,0,0.3)]' : 'bg-white/5 border-white/10'
+                      className={`switch-btn shrink-0 relative w-14 h-8 min-w-[56px] min-h-[32px] max-w-[56px] max-h-[32px] rounded-full transition-all duration-300 flex items-center px-1 border ${
+                          fidelityEnabled ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_20px_rgba(255,110,0,0.4)]' : 'bg-neutral-800 border-white/10'
                       }`}
                   >
                       <motion.div
-                          className="w-6 h-6 rounded-full bg-white shadow-2xl"
-                          animate={{ x: fidelityEnabled ? 24 : 0 }}
+                          className="w-6 h-6 rounded-full bg-white shadow-md pointer-events-none"
+                          animate={{ x: fidelityEnabled ? 22 : 0 }}
                           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                   </button>
                 </div>
 
                 {/* Stamps Amount - Adaptável para qualquer celular */}
-                <div className={`transition-all duration-500 ${fidelityEnabled ? 'opacity-100 scale-100' : 'opacity-20 scale-[0.98] pointer-events-none'}`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8 bg-neutral-900/40 p-4 sm:p-5 rounded-2xl border border-white/5">
+                <div className={`transition-all duration-300 ${fidelityEnabled ? 'opacity-100 scale-100' : 'opacity-30 scale-[0.99] pointer-events-none'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                       <div className="flex-1">
-                          <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight">Selos para Recompensa</h4>
-                          <p className="text-xs text-neutral-500 mt-1 leading-relaxed">Defina quantos cortes o cliente deve realizar para desbloquear o prêmio grátis.</p>
+                          <h4 className="text-base sm:text-xl font-bold text-white tracking-tight">Selos para Recompensa</h4>
+                          <p className="text-[11px] sm:text-xs text-neutral-400 mt-1 leading-relaxed">Defina quantos cortes o cliente deve realizar para desbloquear o prêmio grátis.</p>
                       </div>
-                      <div className="flex items-center justify-center gap-3 bg-neutral-950 p-2 rounded-2xl border border-white/10 shadow-inner self-start sm:self-auto w-full sm:w-auto">
+                      <div className="flex items-center justify-center gap-3 bg-neutral-950 p-2 rounded-2xl border border-white/10 shadow-inner w-full sm:w-auto shrink-0">
                           <button 
                             type="button"
                             onClick={() => setStampsPerReward(Math.max(1, stampsPerReward - 1))} 
-                            className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl font-bold hover:bg-white/10 active:scale-95 transition-all"
+                            className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl bg-white/5 flex items-center justify-center text-white text-2xl font-bold hover:bg-white/10 active:scale-95 transition-all border border-white/5"
                             aria-label="Diminuir selos"
                           >
                             -
@@ -265,7 +267,7 @@ export default function SystemSettings() {
                           <button 
                             type="button"
                             onClick={() => setStampsPerReward(stampsPerReward + 1)} 
-                            className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white text-xl font-bold hover:bg-white/10 active:scale-95 transition-all"
+                            className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl bg-white/5 flex items-center justify-center text-white text-2xl font-bold hover:bg-white/10 active:scale-95 transition-all border border-white/5"
                             aria-label="Aumentar selos"
                           >
                             +
@@ -283,20 +285,20 @@ export default function SystemSettings() {
                 </button>
             </motion.div>
 
-            <div className="glass p-6 rounded-2xl border border-orange-500/10 max-w-2xl">
+            <div className="glass p-5 sm:p-6 rounded-2xl border border-orange-500/10 max-w-full sm:max-w-2xl">
                 <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Informação Importante</p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-400 leading-relaxed">
                     Ao desativar a fidelidade, os clientes atuais manterão seus selos, mas não acumularão novos selos ao finalizar cortes até que a opção seja reativada.
                 </p>
             </div>
 
             {/* Danger Zone */}
-            <div className="mt-20 pt-10 border-t border-red-500/10 max-w-2xl">
-                <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-6">Zona de Perigo</h4>
-                <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="mt-14 sm:mt-20 pt-8 sm:pt-10 border-t border-red-500/10 max-w-full sm:max-w-2xl">
+                <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-4 sm:mb-6">Zona de Perigo</h4>
+                <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-5 sm:p-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6">
                     <div className="flex-1">
                         <p className="text-white font-bold text-sm mb-1">Resetar Banco de Dados</p>
-                        <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Isso apagará agendamentos, clientes e transações de teste.</p>
+                        <p className="text-[10px] text-neutral-400 uppercase tracking-widest leading-relaxed">Isso apagará agendamentos, clientes e transações de teste.</p>
                     </div>
                     <button 
                         onClick={async () => {
@@ -314,7 +316,7 @@ export default function SystemSettings() {
                                 }
                             }
                         }}
-                        className="px-8 py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap"
+                        className="w-full md:w-auto px-6 py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all text-center"
                     >
                         Resetar Agora
                     </button>
@@ -330,46 +332,46 @@ export default function SystemSettings() {
             className="space-y-6 sm:space-y-8"
           >
             <motion.div 
-                className="luxury-card p-5 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-2xl"
+                className="luxury-card p-4 sm:p-8 md:p-10 border border-white/5 space-y-6 sm:space-y-8 max-w-full sm:max-w-2xl"
             >
                 <div>
                     <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-2">Regras de Agendamento</h4>
-                    <p className="text-xs text-neutral-500 leading-relaxed mb-6 sm:mb-8">Defina as políticas de marcação e cancelamento para manter a agenda organizada.</p>
+                    <p className="text-xs text-neutral-400 leading-relaxed mb-6 sm:mb-8">Defina as políticas de marcação e cancelamento para manter a agenda organizada.</p>
                     
                     <div className="space-y-4 sm:space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Tolerância de Atraso (minutos)</p>
-                                <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Tempo de espera pelo cliente</p>
+                                <p className="text-[10px] text-neutral-400 uppercase tracking-widest">Tempo de espera pelo cliente</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
-                                <button type="button" onClick={() => setDelayTolerance(Math.max(0, delayTolerance - 5))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
-                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{delayTolerance}</span>
-                                <button type="button" onClick={() => setDelayTolerance(delayTolerance + 5)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
+                            <div className="flex items-center justify-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 w-full sm:w-auto shrink-0">
+                                <button type="button" onClick={() => setDelayTolerance(Math.max(0, delayTolerance - 5))} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">-</button>
+                                <span className="w-16 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{delayTolerance}</span>
+                                <button type="button" onClick={() => setDelayTolerance(delayTolerance + 5)} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">+</button>
                             </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Antecedência p/ Agendar (horas)</p>
-                                <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Tempo mínimo de reserva</p>
+                                <p className="text-[10px] text-neutral-400 uppercase tracking-widest">Tempo mínimo de reserva</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
-                                <button type="button" onClick={() => setBookingNoticeHours(Math.max(0, bookingNoticeHours - 1))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
-                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{bookingNoticeHours}</span>
-                                <button type="button" onClick={() => setBookingNoticeHours(bookingNoticeHours + 1)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
+                            <div className="flex items-center justify-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 w-full sm:w-auto shrink-0">
+                                <button type="button" onClick={() => setBookingNoticeHours(Math.max(0, bookingNoticeHours - 1))} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">-</button>
+                                <span className="w-16 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{bookingNoticeHours}</span>
+                                <button type="button" onClick={() => setBookingNoticeHours(bookingNoticeHours + 1)} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">+</button>
                             </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neutral-900/50 p-4 sm:p-5 rounded-2xl border border-white/5">
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Antecedência p/ Cancelar (horas)</p>
-                                <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Bloqueio no app do cliente</p>
+                                <p className="text-[10px] text-neutral-400 uppercase tracking-widest">Bloqueio no app do cliente</p>
                             </div>
-                            <div className="flex items-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 self-start sm:self-auto">
-                                <button type="button" onClick={() => setCancelNoticeHours(Math.max(0, cancelNoticeHours - 1))} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">-</button>
-                                <span className="w-12 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{cancelNoticeHours}</span>
-                                <button type="button" onClick={() => setCancelNoticeHours(cancelNoticeHours + 1)} className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-lg transition-all">+</button>
+                            <div className="flex items-center justify-center gap-2 bg-neutral-950 p-1.5 rounded-xl border border-white/5 w-full sm:w-auto shrink-0">
+                                <button type="button" onClick={() => setCancelNoticeHours(Math.max(0, cancelNoticeHours - 1))} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">-</button>
+                                <span className="w-16 text-center font-bebas text-2xl text-orange-500 select-none font-bold">{cancelNoticeHours}</span>
+                                <button type="button" onClick={() => setCancelNoticeHours(cancelNoticeHours + 1)} className="stepper-btn w-12 h-12 min-w-[48px] min-h-[48px] rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-white font-bold text-xl transition-all border border-white/5">+</button>
                             </div>
                         </div>
                     </div>
@@ -580,40 +582,40 @@ export default function SystemSettings() {
                                 <h5 className="text-sm font-bold text-white mb-4">Exceções (Folgas e Feriados)</h5>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {specialDays.map((sd: any, i: number) => (
-                                        <div key={i} className="flex flex-col gap-3 bg-neutral-900 border border-white/10 p-5 rounded-2xl w-full">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-orange-600/10 flex items-center justify-center text-orange-500 text-xl">
+                                        <div key={i} className="flex flex-col gap-3 bg-neutral-900 border border-white/10 p-4 sm:p-5 rounded-2xl w-full">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                                <div className="flex items-center gap-3 sm:gap-4">
+                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-600/10 flex items-center justify-center text-orange-500 text-lg sm:text-xl shrink-0">
                                                         🗓️
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-white text-lg">{new Date(sd.date + 'T12:00:00Z').toLocaleDateString('pt-BR')}</p>
+                                                        <p className="font-black text-white text-base sm:text-lg">{new Date(sd.date + 'T12:00:00Z').toLocaleDateString('pt-BR')}</p>
                                                         <div className="flex items-center gap-2">
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${sd.isClosed ? 'bg-red-500' : 'bg-green-500'}`} />
+                                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${sd.isClosed ? 'bg-red-500' : 'bg-green-500'}`} />
                                                             <p className={`text-[10px] uppercase font-bold tracking-widest ${sd.isClosed ? 'text-red-500' : 'text-green-500'}`}>
                                                                 {sd.isClosed ? 'Loja Fechada' : 'Loja Aberta'}
                                                             </p>
-                                                            {!sd.isClosed && <span className="text-[9px] text-neutral-500 ml-1">({sd.openHour} - {sd.closeHour})</span>}
+                                                            {!sd.isClosed && <span className="text-[9px] text-neutral-400 ml-1">({sd.openHour} - {sd.closeHour})</span>}
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 self-end sm:self-auto">
                                                     <button 
                                                         onClick={() => {
                                                             const updated = [...specialDays];
                                                             updated[i].isClosed = !updated[i].isClosed;
                                                             setSpecialDays(updated);
                                                         }}
-                                                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[9px] font-black text-neutral-400 uppercase tracking-widest transition-all"
+                                                        className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[9px] font-black text-neutral-300 uppercase tracking-widest transition-all"
                                                     >
                                                         Alterar Status
                                                     </button>
-                                                    <button onClick={() => setSpecialDays(specialDays.filter((_: any, idx: number) => idx !== i))} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-neutral-500 hover:text-red-500 transition-colors">✕</button>
+                                                    <button onClick={() => setSpecialDays(specialDays.filter((_: any, idx: number) => idx !== i))} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-neutral-400 hover:text-red-500 transition-colors">✕</button>
                                                 </div>
                                             </div>
 
                                             {sd.isClosed && (
-                                                <div className="flex gap-2 mt-2">
+                                                <div className="flex flex-col sm:flex-row gap-2 mt-2">
                                                     <button 
                                                         onClick={() => {
                                                             const dateFmt = new Date(sd.date + 'T12:00:00Z').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
@@ -623,7 +625,7 @@ export default function SystemSettings() {
                                                             showToast('Flyer de feriado gerado e aplicado!', 'success');
                                                             setActiveSubTab('recados');
                                                         }}
-                                                        className="flex-1 py-3 px-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-[9px] font-black text-orange-500 uppercase tracking-widest hover:bg-orange-500/20 transition-all"
+                                                        className="w-full sm:flex-1 py-2.5 sm:py-3 px-3 bg-orange-500/10 border border-orange-500/20 rounded-xl text-[9px] font-black text-orange-500 uppercase tracking-widest hover:bg-orange-500/20 transition-all text-center"
                                                     >
                                                         📢 Publicar Recado (Flyer 1)
                                                     </button>
@@ -636,7 +638,7 @@ export default function SystemSettings() {
                                                             showToast('Flyer de fechamento gerado e aplicado!', 'success');
                                                             setActiveSubTab('recados');
                                                         }}
-                                                        className="flex-1 py-3 px-4 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all"
+                                                        className="w-full sm:flex-1 py-2.5 sm:py-3 px-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all text-center"
                                                     >
                                                         📢 Publicar Recado (Flyer 2)
                                                     </button>
@@ -779,25 +781,27 @@ export default function SystemSettings() {
                 </div>
 
                 {/* Switch Ativar/Desativar */}
-                <div className="flex items-center justify-between p-6 rounded-2xl bg-neutral-900 border border-white/5">
-                  <div>
+                <div className="flex items-center justify-between gap-3 p-4 sm:p-6 rounded-2xl bg-neutral-900 border border-white/5">
+                  <div className="flex-1 pr-2">
                     <p className="text-sm font-bold text-white">Disparo Automático ao Agendar</p>
-                    <p className="text-[10px] text-neutral-500 font-medium mt-1">
+                    <p className="text-[10px] text-neutral-400 font-medium mt-1 leading-relaxed">
                       Envia mensagem instantânea com serviço, barbeiro, data e hora para o celular do cliente.
                     </p>
                   </div>
                   <button
                     type="button"
+                    role="switch"
+                    aria-checked={whatsappAutoSendEnabled}
                     onClick={() => setWhatsappAutoSendEnabled(!whatsappAutoSendEnabled)}
-                    className={`w-14 h-8 rounded-full transition-colors relative p-1 ${whatsappAutoSendEnabled ? 'bg-green-600' : 'bg-neutral-800'}`}
+                    className={`switch-btn shrink-0 relative w-14 h-8 min-w-[56px] min-h-[32px] max-w-[56px] max-h-[32px] rounded-full transition-colors p-1 border border-white/10 ${whatsappAutoSendEnabled ? 'bg-green-600 border-green-400/50' : 'bg-neutral-800'}`}
                   >
                     <div className={`w-6 h-6 rounded-full bg-white transition-transform ${whatsappAutoSendEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                   </button>
                 </div>
 
                 {/* Bloco 1: Conexão Direta via QR Code (Robô Embutido Grátis) */}
-                <div className="p-6 rounded-2xl bg-neutral-900 border border-green-500/30 space-y-4">
-                  <div className="flex items-center justify-between">
+                <div className="p-4 sm:p-6 rounded-2xl bg-neutral-900 border border-green-500/30 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <p className="text-xs font-black uppercase text-green-400 tracking-wider">
                         Conexão do WhatsApp da Barbearia
@@ -806,7 +810,7 @@ export default function SystemSettings() {
                         Escaneie o QR Code uma única vez com o WhatsApp da sua barbearia.
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
                       botStatus === 'open' 
                         ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                         : botStatus === 'connecting'
@@ -818,7 +822,7 @@ export default function SystemSettings() {
                   </div>
 
                   {botStatus === 'open' ? (
-                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-between">
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <p className="text-xs font-bold text-white">WhatsApp Pronto para Envios!</p>
                         <p className="text-[10px] text-neutral-400">Número conectado: {botPhone || 'Ativo'}</p>
@@ -827,14 +831,14 @@ export default function SystemSettings() {
                         type="button"
                         onClick={handleDisconnectBot}
                         disabled={botLoading}
-                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[9px] font-black uppercase tracking-widest transition-all"
+                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[9px] font-black uppercase tracking-widest transition-all self-start sm:self-auto"
                       >
                         {botLoading ? 'Desconectando...' : 'Desconectar'}
                       </button>
                     </div>
                   ) : botQr ? (
-                    <div className="flex flex-col items-center p-6 bg-white rounded-2xl space-y-4">
-                      <img src={botQr} alt="QR Code WhatsApp" className="w-64 h-64 object-contain shadow-md" />
+                    <div className="flex flex-col items-center p-4 sm:p-6 bg-white rounded-2xl space-y-4 max-w-full overflow-hidden">
+                      <img src={botQr} alt="QR Code WhatsApp" className="w-56 h-56 sm:w-64 sm:h-64 object-contain shadow-md" />
                       <div className="text-center space-y-1">
                         <p className="text-black font-black text-xs uppercase tracking-tight">
                           Abra o WhatsApp {'>'} Aparelhos conectados {'>'} Conectar um aparelho
