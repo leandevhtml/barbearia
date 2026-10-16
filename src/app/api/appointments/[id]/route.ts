@@ -170,31 +170,51 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           }
         }
 
-        // D. Create Transaction Record
+        // D. Create Transaction Records (Splitting Service & Consumption Products)
         const existingTx = await Transaction.findOne({ appointmentId: updatedAppointment._id, barbershopId });
-        const txAmount = totalAmount !== undefined ? Number(totalAmount) : Number(updatedAppointment.price || 0);
-        
-        if (!existingTx && txAmount > 0) {
-          // No pre-payment: Record the full amount (Service + Items)
-          await Transaction.create({
-            barbershopId,
-            userId: clientObjectId,
-            appointmentId: updatedAppointment._id,
-            type: 'service',
-            amount: txAmount,
-            description: `Atendimento: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
-            category: 'Venda de Serviço',
-            paymentMethod: paymentMethod || 'pix',
-            status: 'approved'
-          });
-        } else if (existingTx && txAmount > 0) {
-          // Pre-paid service exists: Record only the additional items/consumption
+        const servicePrice = Number(updatedAppointment.price || 0);
+        const itemsConsumption = items && Array.isArray(items)
+          ? items.reduce((acc: number, item: any) => acc + (Number(item.price || 0) * Number(item.quantity || 1)), 0)
+          : 0;
+
+        if (!existingTx) {
+          // If service was not pre-paid on the app, register the service transaction
+          if (servicePrice > 0 && updatedAppointment.paymentStatus !== 'free_reward') {
+            await Transaction.create({
+              barbershopId,
+              userId: clientObjectId,
+              appointmentId: updatedAppointment._id,
+              type: 'service',
+              amount: servicePrice,
+              description: `Atendimento: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
+              category: 'Venda de Serviço',
+              paymentMethod: paymentMethod || 'pix',
+              status: 'approved'
+            });
+          }
+
+          // If products were added to comanda, register a separate product consumption transaction
+          if (itemsConsumption > 0) {
+            await Transaction.create({
+              barbershopId,
+              userId: clientObjectId,
+              appointmentId: updatedAppointment._id,
+              type: 'product',
+              amount: itemsConsumption,
+              description: `Consumo no Balcão: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
+              category: 'Venda de Produtos',
+              paymentMethod: paymentMethod || 'pix',
+              status: 'approved'
+            });
+          }
+        } else if (itemsConsumption > 0) {
+          // Pre-paid service already has its transaction. Record the consumption products:
           await Transaction.create({
             barbershopId,
             userId: clientObjectId,
             appointmentId: updatedAppointment._id,
             type: 'product',
-            amount: txAmount,
+            amount: itemsConsumption,
             description: `Consumo Extra: ${updatedAppointment.serviceName} (${user?.name || 'Cliente'})`,
             category: 'Venda de Produtos',
             paymentMethod: paymentMethod || 'pix',

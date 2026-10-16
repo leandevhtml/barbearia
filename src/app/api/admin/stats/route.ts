@@ -53,10 +53,10 @@ export async function GET(request: Request) {
     const counterRevenue = totalRev - appRevenue;
 
     const consumptionRevenue = rangeTransactions
-      .filter(t => t.type === 'product' || t.category?.includes('Produtos'))
+      .filter(t => t.type === 'product' || t.category?.toLowerCase().includes('produto') || t.description?.toLowerCase().includes('consumo'))
       .reduce((acc, t) => acc + t.amount, 0);
 
-    const serviceRevenue = totalRev - consumptionRevenue;
+    const serviceRevenue = Math.max(0, totalRev - consumptionRevenue);
 
     // Generate chart data based on range
     let chartData: any[] = [];
