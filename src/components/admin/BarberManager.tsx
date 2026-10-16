@@ -205,32 +205,48 @@ export default function BarberManager() {
               </div>
 
               <div className="space-y-4">
-                <input 
-                  type="text" placeholder="Nome Completo" required
-                  value={name} onChange={e => setName(e.target.value)}
-                  className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-4 text-sm text-white focus:border-orange-500 transition-colors outline-none"
-                />
-                <input 
-                  type="email" placeholder="E-mail de Login" required
-                  value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-4 text-sm text-white focus:border-orange-500 transition-colors outline-none"
-                />
-                <input 
-                  type="tel" placeholder="WhatsApp / Telefone" required
-                  value={phone} onChange={e => setPhone(e.target.value)}
-                  className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-4 text-sm text-white focus:border-orange-500 transition-colors outline-none"
-                />
-                <input 
-                  type="password" placeholder={editingId ? "Senha (deixe em branco para manter)" : "Senha de Acesso"}
-                  required={!editingId}
-                  value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-4 text-sm text-white focus:border-orange-500 transition-colors outline-none"
-                />
-                <input 
-                  type="text" placeholder="Especialidade (ex: Barboterapia)" 
-                  value={specialty} onChange={e => setSpecialty(e.target.value)}
-                  className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-4 text-sm text-white focus:border-orange-500 transition-colors outline-none"
-                />
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 mb-1 block">Nome do Barbeiro</label>
+                  <input 
+                    type="text" placeholder="Nome Completo" required
+                    value={name} onChange={e => setName(e.target.value)}
+                    className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-orange-500 transition-colors outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 mb-1 block">E-mail</label>
+                  <input 
+                    type="email" placeholder="E-mail profissional" required
+                    value={email} onChange={e => setEmail(e.target.value)}
+                    className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-orange-500 transition-colors outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 mb-1 block">WhatsApp / Celular</label>
+                  <input 
+                    type="tel" placeholder="(11) 99999-9999" required
+                    value={phone} onChange={e => setPhone(e.target.value)}
+                    className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-orange-500 transition-colors outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 mb-1 block">Especialidade (Opcional)</label>
+                  <input 
+                    type="text" placeholder="Ex: Degradê, Barba Terapia, Pigmentação" 
+                    value={specialty} onChange={e => setSpecialty(e.target.value)}
+                    className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-orange-500 transition-colors outline-none"
+                  />
+                </div>
+                {editingId && (
+                  <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 mb-1 block">Nova Senha (Opcional - deixe vazio para manter)</label>
+                    <input 
+                      type="password" placeholder="Deixe em branco para não alterar"
+                      value={password} onChange={e => setPassword(e.target.value)}
+                      className="w-full bg-neutral-950 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-orange-500 transition-colors outline-none"
+                    />
+                  </div>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">

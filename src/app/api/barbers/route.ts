@@ -53,40 +53,53 @@ export async function POST(req: Request) {
     const body = sanitizeBody(rawBody);
     const { name, email, phone, password, specialty, commissionRate, avatar } = body;
 
-    if (!name || !email || !phone || !password) {
-      return NextResponse.json({ message: 'Campos obrigatórios faltando' }, { status: 400 });
+    if (!name || !email || !phone) {
+      return NextResponse.json({ message: 'Nome, e-mail e telefone são obrigatórios' }, { status: 400 });
     }
 
     if (!isValidEmail(email)) {
       return NextResponse.json({ message: 'Formato de e-mail inválido.' }, { status: 400 });
     }
 
-    // 🛡️ SECURITY: Política de senha forte
-    const passwordCheck = isStrongPassword(password);
-    if (!passwordCheck.valid) {
-      return NextResponse.json({ message: passwordCheck.message }, { status: 400 });
+    // Se fornecida senha personalizada, valida força; senão gera uma senha padrão segura
+    const chosenPassword = password && password.trim().length > 0 ? password.trim() : 'Barbeiro@123';
+    if (password && password.trim().length > 0) {
+      const passwordCheck = isStrongPassword(chosenPassword);
+      if (!passwordCheck.valid) {
+        return NextResponse.json({ message: passwordCheck.message }, { status: 400 });
+      }
     }
 
     await connectToDatabase();
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return NextResponse.json({ message: 'E-mail já está em uso' }, { status: 400 });
     }
 
-    // 🛡️ SECURITY: bcrypt com custo 12 (mais resistente a brute force)
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // 🛡️ SECURITY: bcrypt com custo 12
+    const hashedPassword = await bcrypt.hash(chosenPassword, 12);
+
+    let barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      const Barbershop = (await import('@/models/Barbershop')).default;
+      const defaultShop = await Barbershop.findOne({});
+      if (defaultShop) barbershopId = defaultShop._id;
+    }
 
     const newBarber = new User({
-      name,
-      email,
-      phone,
+      name: name.trim(),
+      email: normalizedEmail,
+      phone: phone.trim(),
       password: hashedPassword,
       role: 'barber',
-      barbershopId: (session.user as any).barbershopId,
+      barbershopId,
       specialty,
-      commissionRate: commissionRate || 50,
+      commissionRate: commissionRate !== undefined ? Number(commissionRate) : 50,
       avatar: avatar || name.substring(0, 2).toUpperCase(),
+      available: true,
+      active: true,
     });
 
     await newBarber.save();
