@@ -26,7 +26,7 @@ const CFG = {
 };
 
 export default function AppointmentStatus() {
-  const { currentUser, showToast, syncUser } = useBarbershopStore();
+  const { currentUser, showToast, syncUser, settings } = useBarbershopStore();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -141,15 +141,27 @@ export default function AppointmentStatus() {
                           <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">PROTOCOLO VIP</p>
                           <p className="text-xl text-bebas font-black text-orange-500 italic tracking-tighter">#{(apptId || '').toString().toUpperCase().slice(0,8)}</p>
                         </div>
-                        {appt.status === 'pending' && (
-                          <button
-                            onClick={() => handleCancel(apptId)}
-                            disabled={cancellingId === apptId}
-                            className="px-4 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-[9px] font-black text-red-500 uppercase tracking-widest transition-all"
-                          >
-                            {cancellingId === apptId ? 'Cancelando...' : 'Cancelar Reserva'}
-                          </button>
-                        )}
+                        <div className="flex gap-2">
+                          {appt.status === 'pending' && (
+                            <a
+                              href={`https://wa.me/${(settings?.supportPhone || '5511999999999').replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, gostaria de confirmar detalhes sobre meu agendamento (#${(apptId || '').slice(0, 8)}) de ${appt.serviceName} para o dia ${dateFormatted} às ${timeFormatted}.`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-xl bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-[9px] font-black text-green-500 uppercase tracking-widest flex items-center gap-1 transition-all"
+                            >
+                              💬 Contato
+                            </a>
+                          )}
+                          {appt.status === 'pending' && (
+                            <button
+                              onClick={() => handleCancel(apptId)}
+                              disabled={cancellingId === apptId}
+                              className="px-4 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-[9px] font-black text-red-500 uppercase tracking-widest transition-all"
+                            >
+                              {cancellingId === apptId ? 'Cancelando...' : 'Cancelar'}
+                            </button>
+                          )}
+                        </div>
                     </div>
                 </div>
 

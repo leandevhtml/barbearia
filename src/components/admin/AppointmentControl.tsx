@@ -17,7 +17,8 @@ export default function AppointmentControl() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkoutAppt, setCheckoutAppt] = useState<any>(null);
-  const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | 'future'>('1d'); // 1d, 7d, 30d, future
+  const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | 'future' | 'all'>('1d');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed' | 'cancelled'>('all');
 
   useEffect(() => {
     fetchAppointments();
@@ -40,9 +41,11 @@ export default function AppointmentControl() {
   const { settings, showToast } = useBarbershopStore();
 
   const filtered = appointments.filter(appt => {
+    if (statusFilter !== 'all' && appt.status !== statusFilter) return false;
+    if (timeRange === 'all') return true;
+
     const d = new Date(appt.date);
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
     if (timeRange === '1d') {
       return d.toDateString() === now.toDateString();
@@ -171,17 +174,18 @@ export default function AppointmentControl() {
             </div>
 
             {/* History Filters */}
-            <div className="flex flex-col gap-2 min-w-[180px]">
+            <div className="flex flex-col gap-2 min-w-[240px]">
                 <p className="text-[9px] font-black text-neutral-600 uppercase tracking-widest ml-1">Relatórios</p>
                 <div className="flex p-1 bg-neutral-950 border border-white/5 rounded-2xl shadow-inner">
                 {[
                     { id: '7d', label: '7 Dias' },
-                    { id: '30d', label: '30 Dias' }
+                    { id: '30d', label: '30 Dias' },
+                    { id: 'all', label: 'Todos' }
                 ].map(r => (
                     <button
                     key={r.id}
                     onClick={() => setTimeRange(r.id as any)}
-                    className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all flex-1 ${
+                    className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all flex-1 ${
                         timeRange === r.id 
                         ? 'bg-orange-600 text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]' 
                         : 'text-neutral-500 hover:text-white'
@@ -193,6 +197,29 @@ export default function AppointmentControl() {
                 </div>
             </div>
         </div>
+      </div>
+
+      {/* ── Status Filter Pills ── */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {[
+          { id: 'all', label: 'Todos os Status' },
+          { id: 'pending', label: 'Aguardando' },
+          { id: 'in-progress', label: 'Em Atendimento' },
+          { id: 'completed', label: 'Concluídos' },
+          { id: 'cancelled', label: 'Cancelados' },
+        ].map(st => (
+          <button
+            key={st.id}
+            onClick={() => setStatusFilter(st.id as any)}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border shrink-0 ${
+              statusFilter === st.id
+                ? 'bg-white/10 text-orange-500 border-orange-500/40 shadow-sm'
+                : 'bg-black/30 text-neutral-500 border-white/5 hover:text-white'
+            }`}
+          >
+            {st.label}
+          </button>
+        ))}
       </div>
 
       {/* ── Quick Stats Grid ── */}
@@ -251,6 +278,17 @@ export default function AppointmentControl() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <p className="text-2xl font-black text-white truncate tracking-tight">{appt.userId?.name || 'Cliente'}</p>
+                      {appt.userId?.phone && (
+                        <a
+                          href={`https://wa.me/55${appt.userId.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${appt.userId.name || ''}, confirmamos seu agendamento de ${appt.serviceName} na Barbearia Gigantes do Corte!`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-[9px] font-black text-green-500 uppercase tracking-widest flex items-center gap-1 transition-all"
+                          title="Enviar WhatsApp ao Cliente"
+                        >
+                          <span>💬</span> WhatsApp
+                        </a>
+                      )}
                       <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest ${meta.cls}`}>
                         {meta.label}
                       </span>

@@ -81,25 +81,58 @@ export default function FinancialDashboard() {
           <p className="text-sm font-bold text-neutral-400 uppercase">Acompanhe seus resultados e faturamento</p>
         </div>
         
-        <div className="flex p-1 bg-neutral-900 border border-white/5 rounded-xl">
-          {[
-            { id: '1d', label: '1 Dia' },
-            { id: '7d', label: '1 Semana' },
-            { id: '30d', label: '1 Mês' },
-            { id: '1y', label: '1 Ano' }
-          ].map(r => (
-            <button
-              key={r.id}
-              onClick={() => setTimeRange(r.id)}
-              className={`px-4 py-2 rounded-lg text-xs font-black uppercase transition-all ${
-                timeRange === r.id 
-                  ? 'bg-orange-600 text-white shadow-lg' 
-                  : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => {
+              if (!data) return;
+              const csvContent = [
+                ['Período', getRangeText()],
+                ['Receita Total (R$)', totalRev.toFixed(2)],
+                ['Atendimentos', totalCuts],
+                ['Mão de Obra (R$)', (data?.splits?.serviceRevenue || 0).toFixed(2)],
+                ['Produtos Consumo (R$)', (data?.splits?.consumptionRevenue || 0).toFixed(2)],
+                ['Pré-pago App (R$)', (data?.splits?.appRevenue || 0).toFixed(2)],
+                ['Balcão (R$)', (data?.splits?.counterRevenue || 0).toFixed(2)],
+                [],
+                ['Dia/Hora', 'Receita (R$)', 'Cortes'],
+                ...chartData.map((c: any) => [c.day, c.revenue.toFixed(2), c.cuts])
+              ].map(row => row.join(';')).join('\n');
+
+              const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.setAttribute('href', url);
+              link.setAttribute('download', `relatorio-financeiro-${timeRange}-${new Date().toISOString().slice(0, 10)}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            className="px-4 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-white/5 border border-white/10 text-white hover:bg-white/10 flex items-center gap-2"
+            title="Exportar CSV"
+          >
+            <span>📥</span> Exportar
+          </button>
+
+          <div className="flex p-1 bg-neutral-900 border border-white/5 rounded-xl">
+            {[
+              { id: '1d', label: '1 Dia' },
+              { id: '7d', label: '1 Semana' },
+              { id: '30d', label: '1 Mês' },
+              { id: '1y', label: '1 Ano' }
+            ].map(r => (
+              <button
+                key={r.id}
+                onClick={() => setTimeRange(r.id)}
+                className={`px-4 py-2 rounded-lg text-xs font-black uppercase transition-all ${
+                  timeRange === r.id 
+                    ? 'bg-orange-600 text-white shadow-lg' 
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

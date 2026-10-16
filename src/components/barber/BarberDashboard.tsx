@@ -148,7 +148,19 @@ export default function BarberDashboard() {
                     <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${meta.cls} mb-2 inline-block`}>
                       {meta.label}
                     </span>
-                    <h3 className="text-2xl text-bebas font-black text-white italic tracking-tight">{appt.userId?.name || 'Cliente'}</h3>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-2xl text-bebas font-black text-white italic tracking-tight">{appt.userId?.name || 'Cliente'}</h3>
+                      {appt.userId?.phone && (
+                        <a
+                          href={`https://wa.me/55${appt.userId.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${appt.userId.name || ''}, estou pronto para te atender na Barbearia Gigantes do Corte!`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 py-0.5 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-[8px] font-black text-green-500 uppercase tracking-widest transition-all"
+                        >
+                          💬 WhatsApp
+                        </a>
+                      )}
+                    </div>
                     <p className="text-[11px] font-bold text-neutral-400 mt-1">
                       {appt.serviceName} 
                       {appt.items && appt.items.length > 0 ? (
