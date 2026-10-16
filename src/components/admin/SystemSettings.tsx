@@ -34,12 +34,48 @@ export default function SystemSettings() {
   const [mpAccessToken, setMpAccessToken] = useState('');
   const [mpPublicKey, setMpPublicKey] = useState('');
 
-  // WhatsApp Evolution API settings
-  const [whatsappAutoSendEnabled, setWhatsappAutoSendEnabled] = useState(false);
+  // WhatsApp Evolution API & Local Bot settings
+  const [whatsappAutoSendEnabled, setWhatsappAutoSendEnabled] = useState(true);
   const [evolutionApiUrl, setEvolutionApiUrl] = useState('');
   const [evolutionApiKey, setEvolutionApiKey] = useState('');
   const [evolutionInstanceName, setEvolutionInstanceName] = useState('gigantes-do-corte');
   
+  // Real-time Bot Connection State
+  const [botStatus, setBotStatus] = useState<'disconnected' | 'connecting' | 'open' | 'offline'>('disconnected');
+  const [botQr, setBotQr] = useState<string | null>(null);
+  const [botPhone, setBotPhone] = useState<string | null>(null);
+  const [botLoading, setBotLoading] = useState(false);
+
+  const fetchBotStatus = async () => {
+    try {
+      const res = await fetch('/api/admin/whatsapp');
+      if (res.ok) {
+        const data = await res.json();
+        setBotStatus(data.status || 'disconnected');
+        setBotQr(data.qr || null);
+        setBotPhone(data.phone || null);
+      }
+    } catch (e) {
+      // offline
+    }
+  };
+
+  useEffect(() => {
+    fetchBotStatus();
+    const interval = setInterval(fetchBotStatus, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDisconnectBot = async () => {
+    setBotLoading(true);
+    try {
+      await fetch('/api/admin/whatsapp', { method: 'POST' });
+      await fetchBotStatus();
+    } finally {
+      setBotLoading(false);
+    }
+  };
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -738,6 +774,65 @@ export default function SystemSettings() {
                   >
                     <div className={`w-6 h-6 rounded-full bg-white transition-transform ${whatsappAutoSendEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                   </button>
+                </div>
+
+                {/* Bloco 1: Conexão Direta via QR Code (Robô Embutido Grátis) */}
+                <div className="p-6 rounded-2xl bg-neutral-900 border border-green-500/30 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black uppercase text-green-400 tracking-wider">
+                        Conexão do WhatsApp da Barbearia
+                      </p>
+                      <p className="text-[10px] text-neutral-400 font-medium mt-0.5">
+                        Escaneie o QR Code uma única vez com o WhatsApp da sua barbearia.
+                      </p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                      botStatus === 'open' 
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        : botStatus === 'connecting'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    }`}>
+                      {botStatus === 'open' ? '🟢 Conectado' : botStatus === 'connecting' ? '🟡 Aguardando Leitura' : '🔴 Desconectado'}
+                    </span>
+                  </div>
+
+                  {botStatus === 'open' ? (
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-white">WhatsApp Pronto para Envios!</p>
+                        <p className="text-[10px] text-neutral-400">Número conectado: {botPhone || 'Ativo'}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDisconnectBot}
+                        disabled={botLoading}
+                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[9px] font-black uppercase tracking-widest transition-all"
+                      >
+                        {botLoading ? 'Desconectando...' : 'Desconectar'}
+                      </button>
+                    </div>
+                  ) : botQr ? (
+                    <div className="flex flex-col items-center p-6 bg-white rounded-2xl space-y-3">
+                      <img src={botQr} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
+                      <p className="text-black font-black text-xs uppercase tracking-tight text-center">
+                        Abra o WhatsApp no celular {'>'} Aparelhos conectados {'>'} Conectar um aparelho
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-6 rounded-xl bg-neutral-950 border border-white/5 text-center">
+                      <p className="text-xs text-neutral-400 font-medium">
+                        Gerando novo QR Code de conexão... Por favor aguarde alguns segundos.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-white/5">
+                  <p className="text-[10px] font-black uppercase text-neutral-500 tracking-widest mb-4">
+                    Ou use um Servidor Remoto (Evolution API / Cloud)
+                  </p>
                 </div>
 
                 {/* Evolution API Connection Credentials */}

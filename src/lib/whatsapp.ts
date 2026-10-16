@@ -17,9 +17,27 @@ export async function sendWhatsAppMessage({ barbershopId, phone, message }: Send
       return { success: false, reason: 'Disparo automático de WhatsApp desativado nas configurações' };
     }
 
+    // 1. Tentar primeiro o robô embutido local na porta 3001 (100% gratuito e direto)
+    try {
+      const localRes = await fetch('http://127.0.0.1:3001/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, message })
+      });
+      if (localRes.ok) {
+        const localData = await localRes.json();
+        if (localData.success) {
+          console.log(`[WhatsApp Local Bot] Mensagem enviada com sucesso para ${phone}`);
+          return { success: true };
+        }
+      }
+    } catch (localErr) {
+      // Se o bot local não responder, continua para o fallback
+    }
+
     const { evolutionApiUrl, evolutionApiKey, evolutionInstanceName } = settings;
     if (!evolutionApiUrl || !evolutionApiKey || !evolutionInstanceName) {
-      return { success: false, reason: 'Configurações da Evolution API incompletas' };
+      return { success: false, reason: 'Nenhum robô de WhatsApp ativo no momento' };
     }
 
     // Limpar telefone deixando apenas dígitos e prefixo internacional

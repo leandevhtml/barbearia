@@ -44,7 +44,23 @@ function startNextServer() {
   });
 }
 
+function startWhatsAppDaemon() {
+  console.log('[24/7 Watchdog] Starting WhatsApp Bot Gateway on port 3001...');
+  const botScript = path.join(__dirname, 'whatsapp-bot.js');
+  const botChild = spawn(process.execPath, [botScript], {
+    cwd: path.join(__dirname, '..'),
+    stdio: 'inherit',
+    env: process.env,
+  });
+
+  botChild.on('exit', (code) => {
+    console.warn(`[24/7 Watchdog] WhatsApp Bot exited with code ${code}. Restarting in 5 seconds...`);
+    setTimeout(startWhatsAppDaemon, 5000);
+  });
+}
+
 (async () => {
   await startMongo();
+  startWhatsAppDaemon();
   startNextServer();
 })();
