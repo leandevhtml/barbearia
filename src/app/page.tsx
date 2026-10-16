@@ -101,7 +101,7 @@ export default function HomePage() {
 
       {status === 'loading' || (status === 'authenticated' && !currentUser) ? (
         <div className="flex-1 flex items-center justify-center min-h-[80dvh]">
-          <BarberLoading message="RESTAURANDO SUA SESSÃO..." />
+          <BarberLoading inline={true} message="RESTAURANDO SUA SESSÃO..." />
         </div>
       ) : !currentUser ? (
         <AuthView slug={slug} />

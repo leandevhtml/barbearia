@@ -5,10 +5,7 @@ import Image from 'next/image';
 
 /**
  * BarberLoading - High Performance Loading Screen
- * 
- * Uses GPU-accelerated CSS animations defined in globals.css.
- * Optimized for mobile to prevent 'freezing' and main-thread blocking.
- * Integrated with Framer Motion for smooth exit transitions.
+ * Fixed overlay always centered on screen to avoid layout shift jumps.
  */
 export default function BarberLoading({ 
   message = 'PREPARANDO SUA CADEIRA...',
@@ -19,15 +16,15 @@ export default function BarberLoading({
 }) {
   return (
     <motion.div 
-      className={inline ? "flex flex-col items-center justify-center py-20 w-full h-full min-h-[400px]" : "barber-loading-overlay"}
+      className={inline ? "flex flex-col items-center justify-center py-20 w-full min-h-[400px]" : "barber-loading-overlay"}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.25 }}
     >
       <div className="barber-loading-inner">
         {/* SVG Premium Spinner - Branded with Logo */}
-        <div className="relative w-28 h-28 flex items-center justify-center">
+        <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
           <motion.svg 
             className="w-full h-full" 
             viewBox="0 0 100 100"
@@ -43,7 +40,7 @@ export default function BarberLoading({
             {/* Background static ring */}
             <circle 
               cx="50" cy="50" r="46" 
-              stroke="rgba(255,110,0,0.05)" 
+              stroke="rgba(255,110,0,0.08)" 
               strokeWidth="2" 
               fill="none" 
             />
@@ -59,12 +56,12 @@ export default function BarberLoading({
           </motion.svg>
           
           {/* Logo in the center with breathing effect */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <motion.div 
               className="relative w-16 h-16 flex items-center justify-center"
               animate={{ 
                 scale: [1, 1.05, 1],
-                filter: ['brightness(1)', 'brightness(1.2)', 'brightness(1)']
+                filter: ['brightness(1)', 'brightness(1.15)', 'brightness(1)']
               }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -73,6 +70,7 @@ export default function BarberLoading({
                 alt="Logo" 
                 width={64} 
                 height={64} 
+                priority
                 className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,110,0,0.3)]"
               />
             </motion.div>
