@@ -351,21 +351,22 @@ export default function ProductManager() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <h3 className="text-2xl font-bebas italic tracking-widest text-white shrink-0">
               Prateleira Digital <span className="text-orange-500 ml-2">({filteredProducts.length})</span>
             </h3>
-            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-thin scrollbar-thumb-white/10 w-full sm:w-auto flex-wrap">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 max-w-full">
               {['Tudo', 'Estoque Baixo', 'Bebidas', 'Cosméticos', 'Acessórios'].map(cat => (
                 <button 
                   key={cat} 
+                  type="button"
                   onClick={() => setActiveFilter(cat)}
-                  className={`shrink-0 px-3.5 py-2 rounded-xl border text-[9px] font-black uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`shrink-0 px-4 py-2.5 rounded-xl border text-[10px] font-black uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     activeFilter === cat 
                       ? cat === 'Estoque Baixo' 
                         ? 'bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                         : 'bg-orange-600 text-white border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)]' 
-                      : 'bg-neutral-900/80 text-neutral-400 border-white/5 hover:text-white hover:border-white/15'
+                      : 'bg-neutral-900/80 text-neutral-400 border-white/5 hover:text-white hover:border-white/20'
                   }`}
                 >
                   {cat === 'Estoque Baixo' && <AlertCircle size={12} className={activeFilter === cat ? 'text-white' : 'text-red-500'} />}
