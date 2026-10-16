@@ -53,10 +53,13 @@ async function syncTunnelToCloud(url) {
   }
 }
 
+let tunnelHealthInterval = null;
+
 async function startTunnel() {
   try {
     if (tunnelInstance) {
       try { tunnelInstance.close(); } catch (_) {}
+      tunnelInstance = null;
     }
     console.log('[WhatsApp Tunnel] Abrindo túnel público seguro para a Vercel...');
     tunnelInstance = await localtunnel({ port: PORT });
@@ -74,6 +77,25 @@ async function startTunnel() {
       console.warn('[WhatsApp Tunnel] Erro no túnel:', err.message);
       setTimeout(startTunnel, 5000);
     });
+
+    // Monitoramento contínuo: testa a cada 30 segundos se o túnel continua respondendo
+    if (tunnelHealthInterval) clearInterval(tunnelHealthInterval);
+    tunnelHealthInterval = setInterval(async () => {
+      if (!tunnelUrl) return;
+      try {
+        const pingRes = await fetch(`${tunnelUrl}/status`, {
+          headers: { 'Bypass-Tunnel-Reminder': 'true' }
+        });
+        if (!pingRes.ok) {
+          console.warn(`[WhatsApp Tunnel] Falha no health check HTTP ${pingRes.status}. Reiniciando túnel...`);
+          startTunnel();
+        }
+      } catch (pingErr) {
+        console.warn('[WhatsApp Tunnel] Timeout no health check. Reiniciando túnel...', pingErr.message);
+        startTunnel();
+      }
+    }, 30000);
+
   } catch (err) {
     console.warn('[WhatsApp Tunnel] Falha ao iniciar túnel:', err.message);
     setTimeout(startTunnel, 10000);
