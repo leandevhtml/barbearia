@@ -4,7 +4,6 @@ const QRCode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-const localtunnel = require('localtunnel');
 const { Pool } = require('pg');
 
 const PORT = 3001;
@@ -22,66 +21,38 @@ let sock = null;
 let currentQrCode = null;
 let connectionStatus = 'disconnected'; // 'connecting', 'open', 'disconnected'
 let connectedPhone = null;
-let tunnelInstance = null;
-let tunnelUrl = null;
 
-// Salva a URL do túnel direto no banco PostgreSQL/Neon para a Vercel sempre saber
-async function syncTunnelToCloud(url) {
+// Sincroniza o status e QR Code diretamente no Neon Postgres
+// Permitindo que a Vercel e o Frontend leiam instantaneamente sem depender de túnel HTTP
+async function syncSessionToCloud(status, qr, phone) {
   try {
     const pool = new Pool({
       connectionString: NEON_DB_URL,
       max: 2,
       connectionTimeoutMillis: 5000,
     });
-    
-    // Atualiza o documento de settings em gdc_mongo_collections
-    const res = await pool.query(`SELECT collection_name, docs_json FROM gdc_mongo_collections WHERE collection_name = 'settings'`);
-    if (res.rows.length > 0) {
-      let docs = JSON.parse(res.rows[0].docs_json);
-      if (Array.isArray(docs) && docs.length > 0) {
-        docs[0].whatsappTunnelUrl = url;
-        await pool.query(
-          `UPDATE gdc_mongo_collections SET docs_json = $1, updated_at = NOW() WHERE collection_name = 'settings'`,
-          [JSON.stringify(docs)]
-        );
-        console.log(`[WhatsApp Tunnel] URL sincronizada na nuvem com sucesso: ${url}`);
-      }
-    }
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS whatsapp_sessions (
+        id TEXT PRIMARY KEY,
+        status TEXT NOT NULL,
+        qr TEXT,
+        phone TEXT,
+        action TEXT DEFAULT 'none',
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    await pool.query(`
+      INSERT INTO whatsapp_sessions (id, status, qr, phone, updated_at)
+      VALUES ('primary', $1, $2, $3, NOW())
+      ON CONFLICT (id) DO UPDATE SET
+        status = EXCLUDED.status,
+        qr = EXCLUDED.qr,
+        phone = EXCLUDED.phone,
+        updated_at = NOW();
+    `, [status, qr, phone]);
     await pool.end();
   } catch (err) {
-    console.warn('[WhatsApp Tunnel] Erro ao sincronizar URL na nuvem:', err.message);
-  }
-}
-
-let tunnelHealthInterval = null;
-
-async function startTunnel() {
-  try {
-    if (tunnelInstance) {
-      try { tunnelInstance.close(); } catch (_) {}
-      tunnelInstance = null;
-    }
-    console.log('[WhatsApp Tunnel] Abrindo túnel público seguro para a Vercel...');
-    tunnelInstance = await localtunnel({ port: PORT });
-    tunnelUrl = tunnelInstance.url;
-    console.log(`[WhatsApp Tunnel] Túnel público ATIVO: ${tunnelUrl}`);
-    
-    await syncTunnelToCloud(tunnelUrl);
-
-    // Eventos do túnel
-    tunnelInstance.on('close', () => {
-      console.warn('[WhatsApp Tunnel] Túnel fechado. Reiniciando em 5 segundos...');
-      setTimeout(startTunnel, 5000);
-    });
-
-    tunnelInstance.on('error', (err) => {
-      console.warn('[WhatsApp Tunnel] Erro no túnel:', err.message);
-      setTimeout(startTunnel, 5000);
-    });
-
-  } catch (err) {
-    console.warn('[WhatsApp Tunnel] Falha ao iniciar túnel:', err.message);
-    setTimeout(startTunnel, 10000);
+    console.warn('[WhatsApp Bot] Erro ao sincronizar sessão na nuvem:', err.message);
   }
 }
 
@@ -109,6 +80,7 @@ async function startWhatsAppBot() {
         currentQrCode = await QRCode.toDataURL(qr);
         connectionStatus = 'connecting';
         console.log('[WhatsApp Bot] Novo QR Code gerado.');
+        await syncSessionToCloud('connecting', currentQrCode, null);
       }
 
       if (connection === 'close') {
@@ -123,18 +95,22 @@ async function startWhatsAppBot() {
           connectionStatus = 'disconnected';
           currentQrCode = null;
           connectedPhone = null;
+          await syncSessionToCloud('disconnected', null, null);
           setTimeout(startWhatsAppBot, 3000);
         } else if (shouldReconnect) {
           connectionStatus = 'connecting';
+          await syncSessionToCloud('connecting', currentQrCode, null);
           setTimeout(startWhatsAppBot, 3000);
         } else {
           connectionStatus = 'disconnected';
+          await syncSessionToCloud('disconnected', null, null);
         }
       } else if (connection === 'open') {
         console.log('[WhatsApp Bot] ✅ Conexão estabelecida com sucesso no WhatsApp!');
         connectionStatus = 'open';
         currentQrCode = null;
         connectedPhone = sock.user?.id ? sock.user.id.split(':')[0] : 'Conectado';
+        await syncSessionToCloud('open', null, connectedPhone);
       }
     });
   } catch (error) {
@@ -143,9 +119,8 @@ async function startWhatsAppBot() {
   }
 }
 
-// Servidor HTTP interno para o Next.js se comunicar com o robô (tanto local quanto pela nuvem via túnel)
+// Servidor HTTP local (para testes locais rápidos)
 const server = http.createServer(async (req, res) => {
-  // CORS & Bypass de proxy do localtunnel
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Bypass-Tunnel-Reminder');
@@ -162,8 +137,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({
       status: connectionStatus,
       qr: currentQrCode,
-      phone: connectedPhone,
-      tunnelUrl: tunnelUrl
+      phone: connectedPhone
     }));
     return;
   }
@@ -178,6 +152,7 @@ const server = http.createServer(async (req, res) => {
       connectionStatus = 'disconnected';
       currentQrCode = null;
       connectedPhone = null;
+      await syncSessionToCloud('disconnected', null, null);
       setTimeout(startWhatsAppBot, 2000);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true }));
@@ -188,7 +163,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Enviar Mensagem Autônoma
+  // 3. Enviar Mensagem Local
   if (req.url === '/send' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -227,7 +202,6 @@ const server = http.createServer(async (req, res) => {
 // Fila de Mensagens Automáticas da Nuvem (Neon DB Poller)
 // Garante que qualquer mensagem disparada pela Vercel seja enviada em tempo real
 async function pollOutboxQueue() {
-  if (!sock || connectionStatus !== 'open') return;
   try {
     const pool = new Pool({
       connectionString: NEON_DB_URL,
@@ -235,7 +209,31 @@ async function pollOutboxQueue() {
       connectionTimeoutMillis: 5000,
     });
 
-    // Cria a tabela se não existir
+    // 1. Verificar se houve solicitação de desconexão pelo Admin na Vercel
+    const sessionRes = await pool.query(`SELECT action FROM whatsapp_sessions WHERE id = 'primary'`);
+    if (sessionRes.rows.length > 0 && sessionRes.rows[0].action === 'disconnect') {
+      console.log('[WhatsApp Bot] Comando de desconexão recebido via Nuvem!');
+      await pool.query(`UPDATE whatsapp_sessions SET action = 'none' WHERE id = 'primary'`);
+      if (sock) {
+        try { await sock.logout(); } catch (_) {}
+      }
+      try { fs.rmSync(AUTH_DIR, { recursive: true, force: true }); } catch (_) {}
+      connectionStatus = 'disconnected';
+      currentQrCode = null;
+      connectedPhone = null;
+      await syncSessionToCloud('disconnected', null, null);
+      setTimeout(startWhatsAppBot, 2000);
+      await pool.end();
+      return;
+    }
+
+    // Se o bot ainda não estiver com conexão aberta, só mantém a sessão atualizada
+    if (!sock || connectionStatus !== 'open') {
+      await pool.end();
+      return;
+    }
+
+    // 2. Processar mensagens pendentes da fila
     await pool.query(`
       CREATE TABLE IF NOT EXISTS whatsapp_outbox (
         id SERIAL PRIMARY KEY,
@@ -282,12 +280,10 @@ async function pollOutboxQueue() {
   }
 }
 
-// Inicia polling a cada 3 segundos
-setInterval(pollOutboxQueue, 3000);
+// Inicia polling a cada 2.5 segundos
+setInterval(pollOutboxQueue, 2500);
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[WhatsApp Bot Gateway] Rodando na porta ${PORT}`);
   startWhatsAppBot();
-  startTunnel();
 });
-
