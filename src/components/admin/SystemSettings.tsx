@@ -162,52 +162,53 @@ export default function SystemSettings() {
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <div className="flex flex-col gap-4 mb-4">
+      <div className="flex flex-col gap-3 mb-6">
         <h2 className="text-white font-bold text-xl tracking-tight">Painel de Configurações</h2>
         
-        {/* Subtabs com scroll horizontal suave no celular para nunca quebrar ou estourar a tela */}
-        <div className="flex items-center bg-neutral-900/80 p-1.5 sm:p-2 rounded-2xl border border-white/5 shadow-inner gap-2 w-full overflow-x-auto no-scrollbar">
+        {/* Subtabs responsivas com rolagem horizontal suave que não quebra em nenhum celular */}
+        <div className="flex items-center bg-neutral-900/90 p-1.5 rounded-2xl border border-white/10 shadow-lg gap-1.5 w-full overflow-x-auto no-scrollbar scroll-smooth">
             <button 
                 onClick={() => setActiveSubTab('geral')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'geral' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'geral' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Fidelidade
             </button>
             <button 
                 onClick={() => setActiveSubTab('regras')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'regras' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'regras' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Regras
             </button>
             <button 
                 onClick={() => setActiveSubTab('recados')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'recados' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'recados' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Recados
             </button>
             <button 
                 onClick={() => setActiveSubTab('estabelecimento')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'estabelecimento' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'estabelecimento' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Estabelecimento
             </button>
             <button 
                 onClick={() => setActiveSubTab('servicos')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'servicos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'servicos' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Serviços
             </button>
             <button 
                 onClick={() => setActiveSubTab('pagamentos')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'pagamentos' ? 'bg-orange-600 text-white shadow-[0_0_20px_var(--orange-glow)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${activeSubTab === 'pagamentos' ? 'bg-orange-600 text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
             >
                 Pagamentos
             </button>
             <button 
                 onClick={() => setActiveSubTab('whatsapp')}
-                className={`shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all duration-300 ${activeSubTab === 'whatsapp' ? 'bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'text-neutral-500 hover:text-white'}`}
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeSubTab === 'whatsapp' ? 'bg-emerald-600 text-white shadow-md' : 'text-emerald-400/80 hover:text-emerald-300 hover:bg-emerald-500/10'}`}
             >
-                💬 WhatsApp Robô
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                WhatsApp Robô
             </button>
         </div>
       </div>
@@ -800,76 +801,113 @@ export default function SystemSettings() {
                 </div>
 
                 {/* Bloco 1: Conexão Direta via QR Code (Robô Embutido Grátis) */}
-                <div className="p-4 sm:p-6 rounded-2xl bg-neutral-900 border border-green-500/30 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="p-4 sm:p-6 rounded-2xl bg-neutral-900/90 border border-emerald-500/30 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <p className="text-xs font-black uppercase text-green-400 tracking-wider">
-                        Conexão do WhatsApp da Barbearia
+                      <p className="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-2">
+                        <span>🤖 Robô WhatsApp da Barbearia</span>
                       </p>
-                      <p className="text-[10px] text-neutral-400 font-medium mt-0.5">
-                        Escaneie o QR Code uma única vez com o WhatsApp da sua barbearia.
+                      <p className="text-[11px] text-neutral-400 font-medium mt-0.5">
+                        Envios automáticos de confirmação de agendamento e lembretes diretamente pelo número da barbearia.
                       </p>
                     </div>
-                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                    <span className={`self-start sm:self-auto px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
                       botStatus === 'open' 
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' 
                         : botStatus === 'connecting'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
-                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 animate-pulse'
+                        : 'bg-neutral-800 text-neutral-400 border border-white/10'
                     }`}>
-                      {botStatus === 'open' ? '🟢 Conectado' : botStatus === 'connecting' ? '🟡 Aguardando Leitura' : '🔴 Desconectado'}
+                      <span className={`w-2 h-2 rounded-full ${botStatus === 'open' ? 'bg-emerald-400' : botStatus === 'connecting' ? 'bg-amber-400' : 'bg-neutral-500'}`} />
+                      {botStatus === 'open' ? 'Conectado' : botStatus === 'connecting' ? 'Aguardando Leitura' : 'Desconectado'}
                     </span>
                   </div>
 
                   {botStatus === 'open' ? (
-                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-bold text-white">WhatsApp Pronto para Envios!</p>
-                        <p className="text-[10px] text-neutral-400">Número conectado: {botPhone || 'Ativo'}</p>
+                    <div className="p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-black text-lg">
+                          ✓
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white flex items-center gap-2">
+                            WhatsApp Conectado e Operacional!
+                          </p>
+                          <p className="text-xs text-neutral-400 mt-0.5">
+                            {botPhone ? `Número ativo: +${botPhone}` : 'Pronto para enviar lembretes e confirmações.'}
+                          </p>
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleDisconnectBot}
-                        disabled={botLoading}
-                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[9px] font-black uppercase tracking-widest transition-all self-start sm:self-auto"
-                      >
-                        {botLoading ? 'Desconectando...' : 'Desconectar'}
-                      </button>
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={fetchBotStatus}
+                          className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-wider transition-all"
+                        >
+                          🔄 Sincronizar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDisconnectBot}
+                          disabled={botLoading}
+                          className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[10px] font-black uppercase tracking-wider transition-all"
+                        >
+                          {botLoading ? 'Desconectando...' : 'Desconectar'}
+                        </button>
+                      </div>
                     </div>
                   ) : botQr ? (
-                    <div className="flex flex-col items-center p-4 sm:p-6 bg-white rounded-2xl space-y-4 max-w-full overflow-hidden">
-                      <img src={botQr} alt="QR Code WhatsApp" className="w-56 h-56 sm:w-64 sm:h-64 object-contain shadow-md" />
-                      <div className="text-center space-y-1">
+                    <div className="flex flex-col items-center p-5 sm:p-6 bg-white rounded-2xl space-y-4 max-w-full overflow-hidden text-center">
+                      <img src={botQr} alt="QR Code WhatsApp" className="w-56 h-56 sm:w-64 sm:h-64 object-contain shadow-md rounded-lg" />
+                      <div className="space-y-1">
                         <p className="text-black font-black text-xs uppercase tracking-tight">
                           Abra o WhatsApp {'>'} Aparelhos conectados {'>'} Conectar um aparelho
                         </p>
                         <p className="text-neutral-500 text-[10px] font-medium">
-                          O QR Code atualiza sozinho. Aponte a câmera para parear.
+                          Aponte a câmera do seu celular para parear a barbearia.
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={fetchBotStatus}
-                        className="px-4 py-2 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 text-[10px] font-bold uppercase tracking-wider transition-all"
+                        className="px-4 py-2 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 text-[10px] font-bold uppercase tracking-wider transition-all shadow"
                       >
                         🔄 Atualizar QR Code
                       </button>
                     </div>
-                  ) : (
-                    <div className="p-8 rounded-xl bg-neutral-950 border border-white/5 text-center space-y-3">
-                      <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                      <p className="text-xs text-neutral-300 font-bold">
-                        {botStatus === 'offline' 
-                          ? 'Iniciando o gateway do WhatsApp no servidor local...' 
-                          : 'Gerando novo QR Code de conexão...'}
+                  ) : botStatus === 'connecting' ? (
+                    <div className="p-8 rounded-2xl bg-neutral-950 border border-amber-500/20 text-center space-y-3">
+                      <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                      <p className="text-xs text-amber-200 font-bold">
+                        Gerando novo QR Code de conexão...
                       </p>
                       <button
                         type="button"
                         onClick={fetchBotStatus}
-                        className="px-4 py-2 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 text-[9px] font-black uppercase tracking-widest transition-all"
+                        className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[10px] font-black uppercase tracking-wider transition-all"
                       >
-                        🔄 Verificar Conexão
+                        🔄 Verificar QR Code
                       </button>
+                    </div>
+                  ) : (
+                    <div className="p-5 sm:p-6 rounded-2xl bg-neutral-950 border border-white/5 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-neutral-300">
+                            Robô Embutido Offline ou Aguardando Inicialização
+                          </p>
+                          <p className="text-[11px] text-neutral-500">
+                            Para conectar via QR Code sem custos de API, certifique-se de que o servidor local esteja rodando (<code className="text-emerald-400 bg-white/5 px-1 py-0.5 rounded text-[10px]">node scripts/server-24h.js</code>).
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={fetchBotStatus}
+                          className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider transition-all self-start sm:self-auto shrink-0"
+                        >
+                          🔄 Verificar Conexão
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

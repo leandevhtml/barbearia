@@ -81,17 +81,24 @@ export default function ServiceManager() {
   };
 
   const toggleService = async (service: Service) => {
+    const nextActive = !service.active;
+    // Atualização otimista imediata na UI
+    setServices(prev => prev.map(s => s._id === service._id ? { ...s, active: nextActive } : s));
+
     try {
       const res = await fetch(`/api/services/${service._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ active: !service.active })
+        body: JSON.stringify({ active: nextActive })
       });
-      if (res.ok) {
-        setServices(services.map(s => s._id === service._id ? { ...s, active: !service.active } : s));
+      if (!res.ok) {
+        // Reverte se falhar
+        setServices(prev => prev.map(s => s._id === service._id ? { ...s, active: service.active } : s));
       }
     } catch (err) {
       console.error(err);
+      // Reverte se falhar
+      setServices(prev => prev.map(s => s._id === service._id ? { ...s, active: service.active } : s));
     }
   };
 
@@ -235,17 +242,17 @@ export default function ServiceManager() {
                   role="switch"
                   aria-checked={service.active}
                   onClick={() => toggleService(service)}
-                  className={`switch-btn relative w-12 sm:w-14 h-7 min-w-[48px] sm:min-w-[56px] min-h-[28px] max-w-[56px] max-h-[28px] rounded-full transition-all duration-300 shrink-0 flex items-center px-1 ${
+                  className={`switch-btn shrink-0 relative w-14 h-8 min-w-[56px] min-h-[32px] max-w-[56px] max-h-[32px] rounded-full transition-all duration-300 flex items-center px-1 border ${
                     service.active
-                      ? 'bg-orange-600 shadow-[0_0_15px_rgba(255,110,0,0.4)]'
-                      : 'bg-neutral-800 border border-white/10'
+                      ? 'bg-orange-600 border-orange-400/50 shadow-[0_0_20px_rgba(255,110,0,0.4)]'
+                      : 'bg-neutral-800 border-white/10'
                   }`}
                   title={service.active ? 'Desativar Serviço' : 'Ativar Serviço'}
                 >
                   <motion.div
-                    className="w-5 h-5 rounded-full bg-white shadow-xl pointer-events-none"
-                    animate={{ x: service.active ? 20 : 0 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="w-6 h-6 rounded-full bg-white shadow-md pointer-events-none"
+                    animate={{ x: service.active ? 22 : 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 </button>
               </div>
